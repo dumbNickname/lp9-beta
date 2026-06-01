@@ -37,17 +37,17 @@ toolchain. No app logic yet.
 
 | #  | Title                                                 | PRD                                            | Status |
 |----|-------------------------------------------------------|------------------------------------------------|--------|
-| 00 | License file (AGPL-3.0)                               | `prds/PRD-00-license.md`                       | todo   |
-| 01 | Trademark notice                                      | `prds/PRD-01-trademark.md`                     | todo   |
-| 02 | README skeleton                                       | `prds/PRD-02-readme.md`                        | todo   |
-| 03 | Progress tracker + `prds/` convention                 | `prds/PRD-03-progress-tracking.md`             | todo   |
-| 04 | Dev subagent definition                               | `prds/PRD-04-dev-subagent.md`                  | todo   |
-| 05 | QA subagent definition                                | `prds/PRD-05-qa-subagent.md`                   | todo   |
-| 06 | `.gitignore` + `.env.example` + gitleaks pre-commit   | `prds/PRD-06-secret-hygiene.md`                | todo   |
-| 07 | Supabase dev/prod projects + first empty migration    | `prds/PRD-07-supabase-bootstrap.md`            | todo   |
-| 08 | SolidStart + Vinxi bootstrap                          | `prds/PRD-08-solidstart-bootstrap.md`          | todo   |
-| 09 | GitHub Actions deploy workflow + 404 fallback         | `prds/PRD-09-deploy-workflow.md`               | todo   |
-| 10 | Theme toggle + CSS custom properties                  | `prds/PRD-10-theme-toggle.md`                  | todo   |
+| 00 | License file (AGPL-3.0)                               | `prds/PRD-00-license.md`                       | qa-done  |
+| 01 | Trademark notice                                      | `prds/PRD-01-trademark.md`                     | qa-done  |
+| 02 | README skeleton                                       | `prds/PRD-02-readme.md`                        | qa-done  |
+| 03 | Progress tracker + `prds/` convention                 | `prds/PRD-03-progress-tracking.md`             | qa-done  |
+| 04 | Dev subagent definition                               | `prds/PRD-04-dev-subagent.md`                  | qa-done  |
+| 05 | QA subagent definition                                | `prds/PRD-05-qa-subagent.md`                   | qa-done  |
+| 06 | `.gitignore` + `.env.example` + gitleaks pre-commit   | `prds/PRD-06-secret-hygiene.md`                | todo     |
+| 07 | Supabase bootstrap (GitHub integration + first migration)  | `prds/PRD-07-supabase-bootstrap.md`            | todo     |
+| 08 | SolidStart + Vinxi bootstrap                          | `prds/PRD-08-solidstart-bootstrap.md`          | todo     |
+| 09 | GitHub Actions deploy workflow + 404 fallback         | `prds/PRD-09-deploy-workflow.md`               | todo     |
+| 10 | Theme toggle + CSS custom properties                  | `prds/PRD-10-theme-toggle.md`                  | todo     |
 
 ### Phase 1 — Supabase + auth foundation
 

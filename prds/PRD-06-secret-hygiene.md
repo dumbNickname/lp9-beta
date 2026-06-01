@@ -12,16 +12,12 @@ as a pre-commit hook that fails the commit on a hit.
 - `.gitignore` covering at least: `node_modules/`, `.output/`, `.vinxi/`,
   `dist/`, `.env`, `.env.local`, `.env.*.local`, IDE dirs (`.vscode/`,
   `.idea/`), OS dirs (`.DS_Store`, `Thumbs.db`), Jupyter
-  `.ipynb_checkpoints/`, `.aider*`. Mirror m-tynki's pattern where it
-  fits.
+  `.ipynb_checkpoints/`, `.aider*`.
 - `.env.example` documenting every variable the project will use,
-  with placeholders. Initial set:
-  - `VITE_SUPABASE_URL=`
-  - `VITE_SUPABASE_ANON_KEY=`
-  - `SUPABASE_PROJECT_REF_DEV=`
-  - `SUPABASE_ACCESS_TOKEN=` (developer's personal access token,
-    never committed)
-  - `SUPABASE_DB_PASSWORD_DEV=`
+  with placeholders. Initial set (see `DESIGN.md` §16e for why no
+  Supabase access token / DB password is needed):
+  - `VITE_SUPABASE_URL=`         (project URL; ships in browser bundle)
+  - `VITE_SUPABASE_ANON_KEY=`    (RLS-protected; ships in browser bundle)
 - `.gitleaks.toml` config tuned for this project:
   - Default ruleset enabled.
   - Allowlist for `LICENSE` (AGPL text contains base64-ish patterns

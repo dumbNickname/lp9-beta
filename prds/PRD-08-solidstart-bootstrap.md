@@ -11,10 +11,11 @@ calls for: `/`, `/privacy`, `/terms`, `/app`.
 **In:**
 - `package.json` with: solid-js, solid-start, vinxi, typescript (strict),
   pnpm as package manager, scripts: `dev`, `build`, `preview`, `lint`,
-  `typecheck`. Mirror m-tynki's `solid-site/package.json` for versions
-  where reasonable.
+  `typecheck`.
 - `app.config.ts` with `preset: "static"` and `BASE_PATH` handling
-  (m-tynki §"Base Path Handling" pattern). `BASE_PATH` reads from env.
+  (env var read at build time; `<base href>` rendered into the HTML
+  shell and prefixed onto built asset URLs). `BASE_PATH` reads from
+  env, defaulting to `/`.
 - `tsconfig.json` strict.
 - `src/entry-server.tsx` with HTML shell + `<base href>` derived from
   `BASE_PATH`. (Theme-init script slot exists but is empty; PRD-10
@@ -39,8 +40,6 @@ calls for: `/`, `/privacy`, `/terms`, `/app`.
 - Theme toggle / CSS custom properties (PRD-10).
 - Any Supabase client wiring (Phase 1).
 - Real CSS / styling beyond what's required to render readable text.
-  We intentionally do NOT copy m-tynki's CSS (`DESIGN.md` "Reference
-  project" note).
 
 ## Touched files / new files
 
@@ -80,8 +79,6 @@ None.
 - Smoke test: each route component renders without throwing.
 
 **QA suite:**
-- Verify NO m-tynki CSS / class names / component code copied
-  verbatim into this repo (grep for telltale m-tynki identifiers).
 - Verify `APP_NAME` change in `src/constants.ts` propagates to all
   four pages on next render.
 - Verify build output is static-only (no server runtime artifacts);
@@ -89,6 +86,7 @@ None.
 
 ## Open questions
 
-- Exact pnpm script names: align with m-tynki for muscle memory.
-- Linter choice: ESLint is the default; if m-tynki uses something
-  else, match it. Decided at execution time.
+- Exact pnpm script names: pick what's idiomatic for SolidStart in
+  the version installed at execution time.
+- Linter choice: ESLint is the default; pick whatever the SolidStart
+  template scaffolds, or add ESLint if it scaffolds nothing.

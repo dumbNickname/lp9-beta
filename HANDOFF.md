@@ -1,5 +1,14 @@
 # Handoff — Couples Gamification App
 
+> **Status as of 2026-06-01:** implementation has started. The Phase 0
+> tasks below have been **decomposed into PRDs under `prds/`** and
+> their canonical status lives in `PROGRESS.md`. The phased structure
+> here remains the strategic roadmap; specific task wording (e.g.
+> "two repos", "two Supabase projects", or any external project
+> references) has been **superseded by `DESIGN.md` §16e and §16f**
+> (single-repo + Supabase branching model). Where this file disagrees
+> with `DESIGN.md` §16, `DESIGN.md` wins.
+
 This document hands off the design phase to the next session. The next
 session's job is **either**:
 
@@ -103,24 +112,22 @@ before moving on. Phases are **not** parallel; complete in order.
 Goal: a deployable empty SolidStart site on GitHub Pages with the right
 toolchain. No app logic yet.
 
-- [ ] **0.1** Initialize SolidStart + Vinxi project at repo root (mirror
-  setup at `~/own/m-tynki/solid-site`, but **do not** copy CSS or
-  components). pnpm, TypeScript strict, `preset: "static"`.
-- [ ] **0.2** Configure `app.config.ts` with `BASE_PATH` handling
-  (m-tynki §"Base Path Handling" pattern) for beta vs. production repo.
+- [ ] **0.1** Initialize SolidStart + Vinxi project at repo root.
+  pnpm, TypeScript strict, `preset: "static"`.
+- [ ] **0.2** Configure `app.config.ts` with `BASE_PATH` env-var
+  handling (build-time prefix for asset URLs).
 - [ ] **0.3** Set up `entry-server.tsx` with HTML shell, theme init
   inline script (light/dark/system, §12f), `<base href>` from
   `BASE_PATH`.
-- [ ] **0.4** Set up `entry-client.tsx` (use SolidStart's default
-  client-side routing — unlike m-tynki we want SPA navigation inside
-  `/app/*`, see §11b).
+- [ ] **0.4** Set up `entry-client.tsx` using SolidStart's default
+  client-side routing (we want SPA navigation inside `/app/*`,
+  see §11b).
 - [ ] **0.5** Hello-world routes: `/`, `/privacy`, `/terms`, `/app`
   (placeholder content).
-- [ ] **0.6** GitHub Actions deploy workflow (port from m-tynki
-  `.github/workflows/deploy.yml`); two remotes (`beta`, `origin`)
-  pattern.
-- [ ] **0.7** Provision two GitHub repos (beta + production); confirm
-  deploy works end-to-end on beta.
+- [ ] **0.6** GitHub Actions deploy workflow (single repo, push to
+  `master` deploys to GH Pages — see §16f for the branching model).
+- [ ] **0.7** Confirm GH Pages deploy works end-to-end on the
+  configured repo.
 - [ ] **0.8** Add `404.html` fallback for `/app/*` deep links on GH
   Pages (§11b).
 - [ ] **0.9** Set up theme toggle component + CSS custom properties for
@@ -348,8 +355,7 @@ Goal: the legal/compliance blockers for public launch are resolved.
 - [ ] **8.4** Data export in settings: JSON download. **Decrypts
   comments client-side** before download so it's actually useful.
 - [ ] **8.5** Cookie/storage banner: honest about IndexedDB +
-  localStorage use; consent persisted in localStorage. Mirror
-  m-tynki's `CookieBanner.tsx` pattern.
+  localStorage use; consent persisted in localStorage.
 - [ ] **8.6** Enable Google OAuth in Supabase; production OAuth client
   registered with privacy+terms URLs. Linking flow in settings (§3,
   §10).
@@ -369,9 +375,10 @@ sign-up.
   honest section about encryption + privacy.
 - [ ] **9.2** Visual design (depends on locked-in name + branding —
   see §14e).
-- [ ] **9.3** SEO meta tags (port `SeoHead.tsx` pattern from m-tynki).
-- [ ] **9.4** Generate `sitemap.xml`, `robots.txt`, `llms.txt` (m-tynki
-  pattern: `scripts/generate-seo.mjs` runs before build).
+- [ ] **9.3** SEO meta tags (per-page `<title>`, `<meta>`,
+  Open Graph) via a reusable head component.
+- [ ] **9.4** Generate `sitemap.xml`, `robots.txt`, `llms.txt`
+  (e.g. via a `scripts/generate-seo.mjs` that runs before build).
 - [ ] **9.5** Open Graph image (depends on branding).
 - [ ] **9.6** Verify Lighthouse perf + accessibility ≥ 90.
 
@@ -391,10 +398,10 @@ sitemap covers all SSG routes.
   least a week. Iterate based on feedback (especially around the
   warning prompts and recovery password flow — those are easy to get
   wrong).
-- [ ] **10.5** Decide on analytics: in keeping with the m-tynki
-  pattern, **no third-party trackers** is recommended. Consider
-  privacy-respecting server-side aggregate (e.g., from Postgres) for
-  growth metrics only.
+- [ ] **10.5** Decide on analytics: **no third-party trackers** is
+  recommended (matches the privacy-first stance of the rest of the
+  product). Consider privacy-respecting server-side aggregate
+  (e.g., from Postgres) for growth metrics only.
 
 ## Open questions for next session
 

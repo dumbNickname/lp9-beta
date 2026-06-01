@@ -11,8 +11,7 @@ CSS custom properties on `:root` and a `[data-theme="dark"]` override.
 **In:**
 - CSS custom properties on `:root` for color tokens (a small token set
   is enough for MVP: bg, fg, muted-bg, muted-fg, border, accent).
-  Mirror m-tynki's pattern for the technique, NOT the values — pick
-  fresh values appropriate for a warm relationship app.
+  Pick fresh values appropriate for a warm relationship app.
 - `[data-theme="dark"]` selector overriding the same tokens with dark
   values.
 - Inline script in `entry-server.tsx`'s HTML head reading

@@ -16,8 +16,9 @@ permission:
     "git add supabase/migrations/*": deny
     "git add scripts/*": deny
     "git add .opencode/*": deny
-    "supabase * --project-ref *prod*": deny
-    "supabase link --project-ref *prod*": deny
+    "supabase db push*": deny
+    "supabase db reset --linked*": deny
+    "supabase link*": ask
   webfetch: ask
   external_directory:
     "*": deny

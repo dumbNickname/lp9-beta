@@ -387,6 +387,9 @@ All non-optional; ship with MVP:
 - **Data export** in settings — JSON download. **Comments decrypted
   client-side** in the export to be useful.
 - **Supabase project in EU region** (Frankfurt or Ireland).
+  - **Confirmed 2026-06-01:** the connected Supabase project is in
+    region **`eu-central-1` (Frankfurt)** ✓ — meets the EU
+    requirement.
 - **Sign Supabase DPA** before going live.
 - **Breach notification process** — 72h to notify users + supervisory
   authority if a breach occurs.
@@ -412,7 +415,7 @@ All non-optional; ship with MVP:
 #### 12f. Dark theme
 - **Decision:** three modes — **light / dark / system**, defaulting to
   **system preference**.
-- **Implementation pattern (copy from m-tynki):**
+- **Implementation pattern:**
   - CSS custom properties on `:root` for color tokens.
   - `[data-theme="dark"]` selector overrides them.
   - Inline script in `entry-server.tsx` reads `localStorage("theme")`
@@ -807,24 +810,16 @@ A scheduled job (Supabase Edge Function or pg_cron) runs daily to:
 
 ## Tech stack (locked in)
 
-- **Framework:** SolidJS + SolidStart + Vinxi (matches reference project at
-  `~/own/m-tynki/solid-site`)
+- **Framework:** SolidJS + SolidStart + Vinxi
 - **Build:** Static site generation where possible (SEO homepage), SPA for
   authenticated app area
 - **Package manager:** pnpm
-- **Hosting:** GitHub Pages (with `BASE_PATH` handling like m-tynki for
-  beta vs. production repos)
+- **Hosting:** GitHub Pages with `BASE_PATH` env-var handling
+  (build-time prefix for asset URLs; needed when GH Pages serves the
+  site from a sub-path like `/lp9-beta/`)
 - **Backend:** Supabase
-- **Styling:** TBD (m-tynki uses CSS Modules + global.css; we will pick
-  fresh, NOT copy m-tynki's CSS)
+- **Styling:** TBD — pick at PRD-10 / PRD-08 execution time
 - **TypeScript:** strict
-
-## Reference project
-
-`~/own/m-tynki/solid-site` — SolidStart SSG site deployed to GitHub Pages.
-Useful for: framework setup, `app.config.ts` structure, SSG prerender config,
-`BASE_PATH` handling, deploy workflow, entry-server/entry-client pattern.
-**Ignore its CSS / visual design** — we are doing our own.
 
 ### 15. Privacy mode (shoulder-surfing protection)
 
@@ -948,8 +943,9 @@ Implemented as opencode subagents in `.opencode/agent/`:
     with reproduction steps.
   - **Read-only on code.** May write tests under `tests/qa/` and write
     findings into the PRD under a `## QA findings` section.
-  - Tools: read + bash (tests, supabase against dev project); no edit
-    on `src/`.
+  - Tools: read + bash (tests, supabase CLI against the local
+    `supabase start` stack or a Supabase preview branch URL — never
+    against prod); no edit on `src/`.
 - **Orchestrator** = the human-facing chat session. Decides when to
   invoke Dev vs QA on a given PRD, merges findings, signs off, updates
   `PROGRESS.md`.
@@ -968,39 +964,88 @@ agent starts cold from the PRD, not from the implementation choices.
   no folder moves on status change. Cleaner git history; status lives
   in `PROGRESS.md` only.
 
-#### 16e. Supabase access model — dev + prod split, I push to dev
+#### 16e. Supabase access model — single project + GitHub branching
 
-- **Two Supabase projects:**
-  - `dev` — I can run migrations against this via Supabase CLI.
-  - `prod` — owner-only access. Migrations get promoted to prod by the
-    owner after QA signs off, by running the same migration files.
+- **One Supabase project**, connected to the GitHub repo via Supabase's
+  **GitHub Integration** (Project Settings → Integrations → GitHub).
+  - Working directory: `.` (the `supabase/` folder lives at repo root).
+  - **Automatic branching: ON.** When a git branch is created in the
+    connected repo, Supabase auto-creates a matching ephemeral
+    "preview branch" — an isolated Supabase environment with its own
+    DB, isolated migrations, and no production data.
+  - **Deploy to production: ON.** Pushes/merges to the production
+    branch (`master`) cause Supabase to apply new migrations to the
+    real production DB.
+- **Why one project, not two:** Supabase's branching is the
+  isolation mechanism. A second separate Supabase project would
+  duplicate config, require its own GitHub integration, and defeat
+  the purpose. Branching gives us per-PRD isolation for free.
 - **Schema work goes via SQL migration files** in
   `supabase/migrations/NNNN_short_name.sql`. Never click-ops in the
   Supabase dashboard for schema changes.
-- **My credentials for the dev project** (project ref + personal access
-  token + service-role key) live only in my local `.env` (gitignored).
-  Anon key is the only Supabase value safe in the browser bundle
-  (RLS-protected); even so, kept out of the repo per §16g.
-- **No migration is considered ready** until it has been applied
-  successfully to the dev project AND a rollback strategy is noted in
-  the PRD.
+- **No local Supabase access tokens or DB passwords needed.**
+  Migrations run inside Supabase's CI runners, authenticated via the
+  GitHub integration, not via my local credentials. The local
+  `supabase` CLI is still useful for **scaffolding migrations
+  (`supabase migration new`), formatting, and local testing**, but it
+  does NOT need a personal access token or DB password for the
+  branch-driven flow.
+- **Anon key + project URL** still ship in the browser bundle (they
+  must — they're the public client credentials). They are surfaced
+  via `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` env vars,
+  documented in `.env.example`. Not secret, but kept out of the
+  source per §16g hygiene.
+- **Required-check (§16e.1):** the Supabase Preview check is
+  configured as a **GitHub branch protection required check** on
+  `master` so a PR with a broken migration cannot merge to prod.
+- **No migration is considered ready** until: (a) the Supabase
+  preview branch CI check goes green on the PR, AND (b) QA has
+  verified the user-visible behavior on the preview environment.
+- **Implication for §16e (older draft):** the prior plan to maintain a
+  separate `dev` project I pushed to manually with a personal access
+  token is **superseded by this section**. Decision recorded
+  2026-06-01.
 
-#### 16f. Git hosting — GitHub, two repos, mirroring m-tynki
+#### 16f. Git hosting — single GitHub repo, branching for environments
 
-- **Two GitHub repos**, matching the m-tynki pattern at
-  `~/own/m-tynki`:
-  - `beta` remote → **default `git push`** target → beta site
-    (continuous deployment, breakable).
-  - `origin` remote → production site (deploy on owner's command).
-- Both repos **public** (license + brand protection make this safe;
-  see §17).
-- Branching: `master` only in MVP (legacy default branch name; we
-  keep it intentionally rather than renaming). PRDs land on `master`
-  via squash merges
-  (or direct commits during early bootstrap). Long-lived branches add
-  ceremony we don't need yet.
-- Configure the dev environment so accidental `git push` goes to `beta`,
-  never to `origin`.
+- **One GitHub repo** (currently `dumbNickname/lp9-beta`; will be
+  renamed when the final app name is locked per §14i).
+  - Public, AGPL-licensed (see §17).
+  - **Default `git push` target** = this repo. No other remote in the
+    plan (the previously planned separate `prod` repo is dropped per
+    §16e: Supabase branching gives us dev/prod isolation; a second
+    repo would duplicate config without adding isolation).
+- **Branching model — Supabase-recommended pattern:**
+  - **`master` = production.** Code on `master` is what's deployed
+    publicly; migrations on `master` are applied to the prod
+    Supabase DB. Protected: PRs only, with required checks.
+  - **Feature branches = previews.** For each PRD that touches code
+    or schema, create `feat/PRD-NN-slug` (or similar). Pushing the
+    branch auto-creates a Supabase preview environment for it. Open
+    a PR; QA verifies on the preview; merge to `master`; delete the
+    branch.
+  - **No permanent `develop` branch in MVP.** Owner explicitly
+    chose this in the same session that locked branching. Revisit
+    only if friendly-tester feedback shows demand for a stable
+    non-prod URL.
+- **Branch protection on `master`:**
+  - Require PR (no direct pushes).
+  - Require Supabase Preview check to pass (§16e.1).
+  - Require gitleaks CI check to pass (added by PRD-09 deploy
+    workflow).
+  - Linear history (squash merges) to keep `master` history clean.
+- **Why one repo:** Supabase's GitHub integration is **branch-aware,
+  not repo-aware**. A second repo would either need its own Supabase
+  project (duplicating §16e) or would have no Supabase coverage at
+  all (defeating the reason for the split). The two-repo
+  default-push-to-beta pattern works fine for static sites with no
+  shared backend state, but it's the wrong pattern for a
+  Supabase-backed app.
+- **Renaming later:** when the final name is chosen (§14i), the
+  GitHub repo gets renamed via the dashboard. The Supabase GitHub
+  integration follows the rename automatically. No code change
+  required beyond updating `APP_NAME` in `src/constants.ts` and
+  any documentation that refers to the repo by name.
 
 #### 16g. Secret hygiene — layered defense
 

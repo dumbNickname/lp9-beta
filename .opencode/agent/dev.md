@@ -7,12 +7,12 @@ permission:
     "*": allow
     "rm -rf *": ask
     "git push*": deny
-    "supabase * --project-ref *prod*": deny
-    "supabase link --project-ref *prod*": deny
+    "supabase db push*": deny
+    "supabase db reset --linked*": deny
+    "supabase link*": ask
   webfetch: ask
   external_directory:
     "*": deny
-    "~/own/m-tynki/**": allow
 ---
 
 # Dev agent
@@ -50,8 +50,11 @@ Skim `HANDOFF.md` only if the PRD references it.
 ## What you may do
 
 - Read, edit, write, glob, grep across the repo.
-- Run bash: pnpm scripts, supabase CLI **against the dev project
-  only**, git operations except `git push`.
+- Run bash: pnpm scripts, supabase CLI for migration scaffolding +
+  local stack (`supabase start` / `supabase migration new`) — NEVER
+  against the production Supabase project's DB directly. Schema
+  changes reach prod only via merge to `master`, applied by the
+  Supabase GitHub integration. Git operations except `git push`.
 - Create unit tests for the feature under `tests/unit/` (or the
   framework's conventional location).
 - Append a `## Dev notes` section to the PRD with: what you did,
