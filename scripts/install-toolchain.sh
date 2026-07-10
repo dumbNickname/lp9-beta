@@ -8,7 +8,7 @@
 #   - git hooks     (pre-commit secret scan via gitleaks)
 #
 # What it assumes is already present (errors clearly if missing):
-#   - node    >= 20  (recommended: install via nvm)
+#   - node    >= 22.13 (pnpm 11 requires it; recommended: install via nvm)
 #   - pnpm    >= 9   (recommended: corepack enable && corepack prepare pnpm@latest --activate)
 #   - git     >= 2.30
 #   - curl, tar

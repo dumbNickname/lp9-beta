@@ -12,7 +12,7 @@ source "$SCRIPT_DIR/lib.sh"
 
 # ---- Required minimums for this project. -----------------------------------
 # These are floors; pinned installer versions in install-*.sh may be higher.
-MIN_NODE="20.0.0"
+MIN_NODE="22.13.0"
 MIN_PNPM="9.0.0"
 MIN_GIT="2.30.0"
 

@@ -64,8 +64,9 @@ in [`DESIGN.md`](./DESIGN.md) §17.
 
 You must have these already installed:
 
-- **Node.js 20 or newer** (recommended: install via
-  [`nvm`](https://github.com/nvm-sh/nvm) — `nvm install --lts`)
+- **Node.js 22.13 or newer** (pnpm 11 requires it; older Node fails on
+  the `node:sqlite` builtin). Recommended: install via
+  [`nvm`](https://github.com/nvm-sh/nvm) — `nvm install --lts`
 - **pnpm 9 or newer** (recommended: `corepack enable && corepack
   prepare pnpm@latest --activate`)
 - **git 2.30 or newer**
