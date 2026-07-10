@@ -23,6 +23,13 @@ the client/server entry points. Public pages are statically generated;
   (`index.tsx`), `/privacy`, `/terms`. SPA shell: `/app` — deep links
   into `/app/*` rely on the GH Pages `404.html` fallback
   (`scripts/post-build.sh`), so keep `/app` client-routable.
+- **Sub-path base (GitHub Pages):** SolidStart does NOT wire `BASE_PATH`
+  into the router. `src/app.tsx` passes
+  `base={import.meta.env.SERVER_BASE_URL}` (trailing slash trimmed) to
+  `<Router>` — without it the router matches the prefixed URL (e.g.
+  `/lp9-beta/`) against root routes, finds nothing, and renders an empty
+  `<main>` (blank page). `app.config.ts` also prefixes the prerender
+  routes with `basePath` for the same reason.
 - **Theming (`src/lib/theme.ts`, `src/styles/`):**
   - Three modes: light / dark / system; default system.
   - No-flash: `THEME_INIT_SCRIPT` is injected into `<head>` in
