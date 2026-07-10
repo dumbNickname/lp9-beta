@@ -52,4 +52,13 @@ fi
 install -m 0755 "$tmp/supabase" "$target_bin"
 log_ok "Installed supabase CLI $PINNED_VERSION to $target_bin"
 
+# Recent releases ship `supabase` as a thin shim that forwards to a
+# sibling `supabase-go` binary. Commands like `supabase init` fail
+# without it (only `--version` works on the shim alone). Install it
+# alongside so the CLI is fully functional.
+if [ -f "$tmp/supabase-go" ]; then
+  install -m 0755 "$tmp/supabase-go" "$INSTALL_BIN/supabase-go"
+  log_ok "Installed supabase-go backend to $INSTALL_BIN/supabase-go"
+fi
+
 "$target_bin" --version

@@ -130,3 +130,33 @@ None.
   PRD-07 itself (the migration-pipeline test does not require local
   client access), but the orchestrator must collect them before
   PRD-08 (SolidStart bootstrap), which will reference them.
+
+## Dev notes
+
+- `supabase init` run at repo root (working dir `.`). Generated
+  `supabase/config.toml` (`project_id = "coupons"`, `major_version =
+  17`) and `supabase/.gitignore`.
+- Added `supabase/migrations/0000_init.sql` (no-op, comment only),
+  empty `supabase/seed.sql`, and `supabase/README.md` documenting the
+  branch-driven workflow, the migrations-only rule, credential source,
+  the EU region (`eu-central-1` Frankfurt), and that no PAT/DB password
+  is needed.
+- Root `README.md` setup section now links to `supabase/README.md`.
+- Secret scan: `gitleaks` against `supabase/config.toml` and the full
+  staged diff → no leaks.
+- **Toolchain fix (in scope by necessity):** `scripts/install-supabase-cli.sh`
+  only copied the `supabase` binary. In v2.103.0 the tarball ships
+  `supabase` as a thin shim that forwards to a sibling `supabase-go`
+  binary; without it, `supabase init` fails. Fixed the installer to
+  also install `supabase-go`. Verification step 1 and `supabase init`
+  both depend on this.
+
+### Owner / orchestrator TODO (live infra — cannot run headless)
+
+- **Verification step 6 (end-to-end pipeline):** push branch, open PR,
+  confirm Supabase posts a status check, creates a preview branch, and
+  applies `0000_init.sql`. Then clean up.
+- **QA adversarial (broken migration):** on a throwaway branch, push a
+  broken migration, open a PR, confirm the Supabase Preview check
+  FAILS. Clean up the branch and any orphan preview environments.
+- These require the live GitHub↔Supabase integration + dashboard access.

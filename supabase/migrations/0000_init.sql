@@ -1,0 +1,3 @@
+-- placeholder
+-- No-op migration. Its only job is to prove the Supabase GitHub
+-- integration applies migrations end-to-end (see supabase/README.md).

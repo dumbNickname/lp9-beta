@@ -110,6 +110,10 @@ bootstrapped in PRD-08 (`prds/PRD-08-solidstart-bootstrap.md`); once
 that PRD lands, `pnpm install` and `pnpm dev` will be the standard
 entrypoints, and this section will be updated to reflect that.
 
+For the database workflow (migrations, the branch-driven Supabase
+GitHub integration, and where the project URL / anon key come from),
+see [`supabase/README.md`](./supabase/README.md).
+
 ## Deployment
 
 The GitHub repository
