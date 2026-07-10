@@ -1,0 +1,53 @@
+/*
+ * Design tokens — warm editorial minimalism.
+ *
+ * These are placeholder-but-defensible values (DESIGN.md §14e / PRD-10):
+ * a warm monochrome base with a single muted accent. The future brand
+ * designer iterates here once the product name + palette are locked.
+ *
+ * Naming convention: semantic role, not raw color. `--color-bg`,
+ * `--color-fg`, etc. — so components never reference a hue directly and
+ * theming stays a single-surface concern.
+ *
+ * Light values live on :root; [data-theme="dark"] overrides the same
+ * tokens. The no-flash inline script (src/lib/theme.ts) sets
+ * data-theme before first paint.
+ */
+
+:root {
+  /* Warm bone canvas, charcoal ink — never pure white / pure black. */
+  --color-bg: #fbfbfa;
+  --color-fg: #2f3437;
+  --color-muted-bg: #f7f6f3;
+  --color-muted-fg: #787774;
+  --color-border: #eaeaea;
+  /* Muted, warm accent — reflection/warmth, not a scoreboard hue. */
+  --color-accent: #9f6b53;
+
+  /* Type — editorial serif display, clean sans body (system stacks so
+     no web-font loading in MVP; a brand face can slot in later). */
+  --font-body:
+    "Geist Sans", "Helvetica Neue", system-ui, -apple-system, sans-serif;
+  --font-display:
+    "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
+
+  /* Spacing scale (logical). */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 1rem;
+  --space-4: 1.5rem;
+  --space-6: 2.5rem;
+  --space-8: 4rem;
+
+  --radius: 8px;
+  --border-thin: 1px solid var(--color-border);
+}
+
+[data-theme="dark"] {
+  --color-bg: #191919;
+  --color-fg: #e9e7e2;
+  --color-muted-bg: #232323;
+  --color-muted-fg: #9a978f;
+  --color-border: #2f2f2d;
+  --color-accent: #c99a83;
+}

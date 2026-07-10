@@ -88,3 +88,53 @@ None (theme stored in `localStorage` only for MVP; a per-user
   or design-system style (`--surface-1`, `--text-primary`)? Defer to
   Dev agent at execution time; document the chosen convention in
   `src/styles/tokens.css`.
+
+## Dev notes
+
+- Token convention chosen: **semantic role names** (`--color-bg`,
+  `--color-fg`, `--color-muted-bg`, `--color-muted-fg`,
+  `--color-border`, `--color-accent`) — documented at the top of
+  `src/styles/tokens.css`. Light values on `:root`, dark overrides on
+  `[data-theme="dark"]`.
+- Design direction: warm-editorial minimalism (per orchestrator's
+  `minimalist-ui` taste). Warm bone canvas `#fbfbfa`, charcoal ink
+  `#2f3437`, single muted warm accent `#9f6b53` (dark: `#c99a83`).
+  Deliberately not gamified/scoreboard hues (product principle). System
+  font stacks (no web-font load in MVP); serif display / sans body slots
+  a brand face can replace later.
+- `src/lib/theme.ts`: pure functions (`normalizeChoice`,
+  `resolveEffectiveTheme`, `nextChoice`) + browser helpers wrapped in
+  try/catch for SSR / private-mode storage failures, plus the
+  `THEME_INIT_SCRIPT` string mirroring those functions.
+- `entry-server.tsx` injects `THEME_INIT_SCRIPT` in `<head>` **before**
+  the stylesheet link (verified in prerendered HTML), so `data-theme`
+  is set before first paint → no flash.
+- `ThemeToggle.tsx` cycles light→dark→system, persists to
+  `localStorage`, and in system mode attaches a `matchMedia` `change`
+  listener (cleaned up on unmount) to follow OS preference live.
+  Mounted in the root layout header (`src/app.tsx`).
+- Tests: `tests/unit/theme.test.ts` covers the three pure functions,
+  including garbage/null → `system` fallback. `pnpm test` → 9/9 pass.
+
+### Verification results
+
+- No-flash: init script position precedes CSS in prerendered
+  `index.html` ✓; script sets `data-theme` from stored choice or
+  `prefers-color-scheme`.
+- Toggle cycles all three modes and persists to `localStorage("theme")`
+  ✓ (pure-fn `nextChoice` + `writeStoredChoice`).
+- Garbage `localStorage` value → `normalizeChoice` falls back to system,
+  no crash ✓. Storage unavailable → helpers degrade silently (try/catch)
+  ✓.
+- CSS audit: `grep` for `margin-left|margin-right|padding-left|
+  padding-right|left:|right:` in `src/styles/*.css` → none; logical
+  properties only ✓.
+- `pnpm typecheck`, `pnpm lint`, `pnpm build` all pass; ThemeToggle and
+  init script present in served HTML ✓.
+
+### Note for QA
+
+- One ESLint suppression: `entry-server.tsx` uses `innerHTML` on the
+  init `<script>` (the standard SolidStart no-flash pattern); the
+  content is a static, non-user string constant, so
+  `solid/no-innerhtml` is disabled on that one line.

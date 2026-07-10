@@ -47,7 +47,7 @@ toolchain. No app logic yet.
 | 07 | Supabase bootstrap (GitHub integration + first migration)  | `prds/PRD-07-supabase-bootstrap.md`            | merged   |
 | 08 | SolidStart + Vinxi bootstrap                          | `prds/PRD-08-solidstart-bootstrap.md`          | merged   |
 | 09 | GitHub Actions deploy workflow + 404 fallback         | `prds/PRD-09-deploy-workflow.md`               | todo     |
-| 10 | Theme toggle + CSS custom properties                  | `prds/PRD-10-theme-toggle.md`                  | todo     |
+| 10 | Theme toggle + CSS custom properties                  | `prds/PRD-10-theme-toggle.md`                  | dev-done |
 
 ### Phase 1 — Supabase + auth foundation
 
