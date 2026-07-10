@@ -43,7 +43,7 @@ toolchain. No app logic yet.
 | 03 | Progress tracker + `prds/` convention                 | `prds/PRD-03-progress-tracking.md`             | qa-done  |
 | 04 | Dev subagent definition                               | `prds/PRD-04-dev-subagent.md`                  | qa-done  |
 | 05 | QA subagent definition                                | `prds/PRD-05-qa-subagent.md`                   | qa-done  |
-| 06 | `.gitignore` + `.env.example` + gitleaks pre-commit   | `prds/PRD-06-secret-hygiene.md`                | todo     |
+| 06 | `.gitignore` + `.env.example` + gitleaks pre-commit   | `prds/PRD-06-secret-hygiene.md`                | dev-done |
 | 07 | Supabase bootstrap (GitHub integration + first migration)  | `prds/PRD-07-supabase-bootstrap.md`            | todo     |
 | 08 | SolidStart + Vinxi bootstrap                          | `prds/PRD-08-solidstart-bootstrap.md`          | todo     |
 | 09 | GitHub Actions deploy workflow + 404 fallback         | `prds/PRD-09-deploy-workflow.md`               | todo     |

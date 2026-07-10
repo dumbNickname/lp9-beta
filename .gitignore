@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Build output (SolidStart / Vinxi)
+.output/
+.vinxi/
+dist/
+
+# Environment / secrets — never commit real values
+.env
+.env.local
+.env.*.local
+
+# Editors / IDE
+.vscode/
+.idea/
+
+# OS cruft
+.DS_Store
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/
+
+# aider
+.aider*

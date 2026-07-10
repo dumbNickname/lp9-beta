@@ -81,3 +81,31 @@ None.
 
 - Should the hook block on `--no-verify` bypass? No — too hostile;
   document the escape hatch instead.
+
+## Dev notes
+
+- Files landed: `.gitignore`, `.env.example`, `.gitleaks.toml`,
+  `scripts/install-git-hooks.sh`, `scripts/git-hooks/pre-commit`;
+  `scripts/install-toolchain.sh` now calls the hook installer.
+- Hook uses `gitleaks protect --staged --redact --config .gitleaks.toml`.
+  `--no-verify` documented in the hook header as the intentional escape
+  hatch.
+- `.gitleaks.toml` uses `[extend] useDefault = true` + two path
+  allowlists (`^LICENSE$`, `^\.env\.example$`).
+- Verification run (all pass):
+  - V2: `.env` created with content → not shown by `git status`
+    (gitignored). ✓
+  - V3: `bash scripts/install-git-hooks.sh` → `.git/hooks/pre-commit`
+    exists, executable, runs gitleaks. ✓
+  - V4: staging a high-entropy fake GitHub PAT and attempting
+    `git commit` is rejected by the hook (exit 1). ✓
+  - V5: `.env.example` passes the scan (allowlist). ✓
+  - LICENSE allowlist path present; AGPL text does not block. ✓
+- Gotcha for QA: gitleaks default rules apply an entropy filter — a
+  low-entropy placeholder like `ghp_aaaa...` will NOT trip a rule. Use a
+  high-entropy string (a realistic-looking `ghp_` + 36 random chars)
+  when writing adversarial tests, or gitleaks reports "no leaks" and the
+  test gives a false sense of a hole.
+- `gitleaks protect` prints "0 commits scanned" for staged scans; this
+  is expected (it scans the staged diff, not commits) and does not mean
+  it skipped the content.

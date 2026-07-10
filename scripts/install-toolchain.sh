@@ -5,6 +5,7 @@
 # What it installs (user-local, no sudo):
 #   - supabase CLI (pinned)
 #   - gitleaks      (pinned)
+#   - git hooks     (pre-commit secret scan via gitleaks)
 #
 # What it assumes is already present (errors clearly if missing):
 #   - node    >= 20  (recommended: install via nvm)
@@ -45,6 +46,10 @@ fi
 bash "$SCRIPT_DIR/install-supabase-cli.sh"
 echo
 bash "$SCRIPT_DIR/install-gitleaks.sh"
+echo
+
+log_info "Installing git hooks"
+bash "$SCRIPT_DIR/install-git-hooks.sh"
 echo
 
 log_info "Running verification"

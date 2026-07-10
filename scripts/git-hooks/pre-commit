@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# Pre-commit hook: block commits that contain secrets.
+#
+# Installed into .git/hooks/pre-commit by scripts/install-git-hooks.sh.
+# Scans only staged changes, redacting any match from the output.
+#
+# Escape hatch (intentional): `git commit --no-verify` skips this hook.
+# Use only when you are certain the flagged content is a false positive
+# that .gitleaks.toml should be taught to allowlist.
+set -euo pipefail
+
+if ! command -v gitleaks >/dev/null 2>&1; then
+  echo "[pre-commit] gitleaks not found on PATH." >&2
+  echo "[pre-commit] Install it: bash scripts/install-toolchain.sh" >&2
+  exit 1
+fi
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+
+gitleaks protect --staged --redact --config "$REPO_ROOT/.gitleaks.toml"

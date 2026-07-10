@@ -1,0 +1,24 @@
+# gitleaks configuration for this project.
+# Used by the pre-commit hook (scripts/git-hooks/pre-commit) and, later,
+# by the CI safety-net scan in the deploy workflow (PRD-09).
+#
+# Strategy: start from gitleaks' built-in ruleset, then allowlist the few
+# files that legitimately contain secret-shaped strings.
+
+title = "APP_NAME secret scan"
+
+[extend]
+# Inherit all of gitleaks' default rules.
+useDefault = true
+
+[[allowlists]]
+description = "AGPL license text contains base64-ish blocks that false-positive"
+paths = [
+  '''^LICENSE$''',
+]
+
+[[allowlists]]
+description = "Env template holds placeholders only, never real secrets"
+paths = [
+  '''^\.env\.example$''',
+]
