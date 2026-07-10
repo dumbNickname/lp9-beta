@@ -93,3 +93,39 @@ None.
   Scope-In. PRD's CI work assumes these exist; document in README.
 - Whether to deploy on every push or only on tags. MVP: every push to
   master; tags are over-process for a side project.
+
+## Dev notes
+
+- `.github/workflows/deploy.yml`: three jobs — `gitleaks` (CI secret
+  scan, `GITLEAKS_CONFIG=.gitleaks.toml`), `build` (pnpm frozen install
+  → `pnpm build` with `BASE_PATH=/lp9-beta/` → `scripts/post-build.sh`
+  for the 404 fallback → upload-pages-artifact), and `deploy`
+  (`actions/deploy-pages`, gated to push-on-master only).
+- Runs on push **and** PR to `master`; deploy step is skipped on PRs so
+  PRs still get the gitleaks + build checks without publishing.
+- 404 fallback: chose option (a) — `scripts/post-build.sh` copies
+  `index.html` → `404.html`. Verified locally: `404.html` is byte-identical
+  to `index.html` and carries `<base href="/lp9-beta/">`.
+- `BASE_PATH` is a workflow-level env; update it here if the repo is
+  renamed (§16f rename note).
+- README "Deployment" section updated with the pipeline description and
+  the one-time owner setup (Pages source + branch-protection rules).
+
+### Owner steps (cannot be done headless — require GitHub dashboard)
+
+- **GitHub Pages source:** Settings → Pages → Source: **GitHub Actions**.
+- **Branch protection on `master`:** require PR, require the **Supabase
+  Preview** check (§16e.1) and the **gitleaks** check, require linear
+  history (squash merges). This also closes Q-07-2 (broken-migration
+  gate) once the Supabase Preview required check is enabled.
+- Until Pages source is set, the `deploy` job cannot publish; the
+  `gitleaks` + `build` jobs still run and validate PRs.
+
+### Verification status
+
+- Local-verifiable steps done: build succeeds with `BASE_PATH`,
+  `post-build.sh` emits a valid `404.html` with the correct base href.
+- Remaining steps (workflow runs green on a PR; production URL serves
+  the four routes; deep-link to `/app/foo` hits the shell; direct push
+  to `master` rejected; failing Supabase Preview blocks merge) require
+  the live GitHub Actions run + the owner dashboard setup above.

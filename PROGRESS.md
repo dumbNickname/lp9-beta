@@ -46,7 +46,7 @@ toolchain. No app logic yet.
 | 06 | `.gitignore` + `.env.example` + gitleaks pre-commit   | `prds/PRD-06-secret-hygiene.md`                | merged   |
 | 07 | Supabase bootstrap (GitHub integration + first migration)  | `prds/PRD-07-supabase-bootstrap.md`            | merged   |
 | 08 | SolidStart + Vinxi bootstrap                          | `prds/PRD-08-solidstart-bootstrap.md`          | merged   |
-| 09 | GitHub Actions deploy workflow + 404 fallback         | `prds/PRD-09-deploy-workflow.md`               | todo     |
+| 09 | GitHub Actions deploy workflow + 404 fallback         | `prds/PRD-09-deploy-workflow.md`               | dev-done |
 | 10 | Theme toggle + CSS custom properties                  | `prds/PRD-10-theme-toggle.md`                  | merged   |
 
 ### Phase 1 — Supabase + auth foundation

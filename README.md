@@ -137,9 +137,30 @@ custom domain is wired up in Phase 10 of [`HANDOFF.md`](./HANDOFF.md).
 
 The deploy + branching model is documented in
 [`DESIGN.md`](./DESIGN.md) §16e (Supabase access via GitHub
-integration) and §16f (single-repo, branch-driven environments). The
-actual GitHub Actions workflow lands in PRD-09
-(`prds/PRD-09-deploy-workflow.md`).
+integration) and §16f (single-repo, branch-driven environments).
+
+### Pipeline
+
+`.github/workflows/deploy.yml` runs on every push and PR to `master`:
+
+1. **gitleaks** — CI secret scan (mirrors the PRD-06 pre-commit hook).
+2. **build** — `pnpm install --frozen-lockfile`, `pnpm build` with
+   `BASE_PATH` set (currently `/lp9-beta/`; update this env in the
+   workflow if the repo is renamed), then `scripts/post-build.sh`
+   copies `index.html` → `404.html` so deep-links into `/app/*` land on
+   the SPA shell.
+3. **deploy** — pushes the static `.output/public` tree to GitHub Pages
+   (only on push to `master`, not on PRs).
+
+### One-time owner setup
+
+- **GitHub Pages source:** Settings → Pages → Source: **GitHub
+  Actions**.
+- **Branch protection on `master`** (Settings → Branches → add rule):
+  - Require a pull request before merging (no direct pushes).
+  - Require status checks to pass: the **Supabase Preview** check
+    (§16e.1) and the **gitleaks** check.
+  - Require linear history (squash merges).
 
 ## Credits
 
