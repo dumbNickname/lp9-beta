@@ -105,10 +105,19 @@ non-zero if anything required is missing or too old.
 
 ### Build / run
 
-There is no `package.json` yet. The SolidStart + Vinxi project gets
-bootstrapped in PRD-08 (`prds/PRD-08-solidstart-bootstrap.md`); once
-that PRD lands, `pnpm install` and `pnpm dev` will be the standard
-entrypoints, and this section will be updated to reflect that.
+Install dependencies and start the dev server:
+
+```bash
+pnpm install
+pnpm dev
+```
+
+Other scripts: `pnpm build` (static site to `.output/public/`),
+`pnpm preview`, `pnpm typecheck`, `pnpm lint`, `pnpm test`.
+
+`BASE_PATH` (default `/`) prefixes built asset URLs; set it to the
+GitHub Pages sub-path (e.g. `/lp9-beta/`) at build time when deploying
+to a project page.
 
 For the database workflow (migrations, the branch-driven Supabase
 GitHub integration, and where the project URL / anon key come from),

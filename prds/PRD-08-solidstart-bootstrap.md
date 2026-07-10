@@ -90,3 +90,45 @@ None.
   the version installed at execution time.
 - Linter choice: ESLint is the default; pick whatever the SolidStart
   template scaffolds, or add ESLint if it scaffolds nothing.
+
+## Dev notes
+
+- Used the current SolidStart package `@solidjs/start` 1.3.2 (the older
+  `solid-start` package name is deprecated). Router `@solidjs/router`,
+  `vinxi` 0.5.11, `solid-js` 1.9.13.
+- `app.config.ts`: `preset: "static"`, `baseURL`/`vite.base` from
+  `BASE_PATH` env (default `/`), and an explicit
+  `prerender.routes: ["/", "/privacy", "/terms", "/app"]` with
+  `crawlLinks`. Without the explicit list the crawler only found `/`
+  (no inter-page links yet), so the other three weren't emitted.
+- `src/entry-server.tsx` HTML shell renders `<base href>` from
+  `import.meta.env.BASE_URL` and has an empty theme-init comment slot
+  for PRD-10.
+- `APP_NAME` in `src/constants.ts`; all four routes import it (no
+  duplicated literals).
+- Tests: Vitest + `@solidjs/testing-library` (`vitest.config.ts`,
+  `vitest.setup.ts`). `tests/unit/routes.test.tsx` smoke-tests all four
+  route components render with `APP_NAME`. `pnpm test` → 4/4 pass.
+- Lint: ESLint 9 flat config (`eslint.config.js`) with
+  `typescript-eslint` + `eslint-plugin-solid`. `pnpm lint` clean.
+- `.env.example` updated with `BASE_PATH=/`.
+
+### Deviations / notes for QA
+
+- Added `@types/node` (dev dep) + `"node"` in tsconfig `types` — the
+  `process.env.BASE_PATH` read in `app.config.ts` needs it. TypeScript
+  pinned `~5.7.3`.
+- Dependency versions are pinned to **mature** releases (some pinned
+  exact: `solid-js 1.9.13`, `vitest 4.1.9`) because this environment's
+  pnpm enforces a `minimumReleaseAge` supply-chain policy that blocks
+  packages published in the last ~14 days.
+- `pnpm-workspace.yaml` contains `allowBuilds: { esbuild: true,
+  '@parcel/watcher': true }` — required because pnpm here runs with
+  `strictDepBuilds`, which makes un-approved native build scripts
+  (esbuild) a hard error. esbuild must build or `vinxi build` fails.
+- Verification results: `pnpm install` ✓; `pnpm dev` serves `/`,
+  `/privacy`, `/terms`, `/app` (all 200) ✓; `pnpm build` emits static
+  `.output/public` with an `index.html` per route ✓; `.output/server`
+  is absent (static-only) ✓; `pnpm typecheck` and `pnpm lint` exit 0 ✓;
+  `BASE_PATH=/coupons-beta/ pnpm build` prefixes asset URLs and
+  `<base href>` with `/coupons-beta/` ✓.

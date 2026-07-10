@@ -45,7 +45,7 @@ toolchain. No app logic yet.
 | 05 | QA subagent definition                                | `prds/PRD-05-qa-subagent.md`                   | qa-done  |
 | 06 | `.gitignore` + `.env.example` + gitleaks pre-commit   | `prds/PRD-06-secret-hygiene.md`                | merged   |
 | 07 | Supabase bootstrap (GitHub integration + first migration)  | `prds/PRD-07-supabase-bootstrap.md`            | merged   |
-| 08 | SolidStart + Vinxi bootstrap                          | `prds/PRD-08-solidstart-bootstrap.md`          | todo     |
+| 08 | SolidStart + Vinxi bootstrap                          | `prds/PRD-08-solidstart-bootstrap.md`          | dev-done |
 | 09 | GitHub Actions deploy workflow + 404 fallback         | `prds/PRD-09-deploy-workflow.md`               | todo     |
 | 10 | Theme toggle + CSS custom properties                  | `prds/PRD-10-theme-toggle.md`                  | todo     |
 
