@@ -70,108 +70,23 @@ authoritative table.
 `HANDOFF.md` Phase 1 tasks 1.1–1.9 and `DESIGN.md` §13 (data model),
 then execute one at a time on `feat/PRD-NN-slug` branches.
 
-PRD-06 lands `.gitignore`, `.env.example`, and the gitleaks
-pre-commit hook. **Must land before any `.env` exists** so a real
-`.env` is automatically excluded from git the moment you create it.
-
-Invoke the **Dev subagent** with `prds/PRD-06-secret-hygiene.md` per
-the orchestrator pattern used in the previous session. The subagent
-definitions are at `.opencode/agent/dev.md` and `.opencode/agent/qa.md`;
-they self-document required reads, allowed/forbidden actions, and
-the execution loop.
-
-After PRD-06 reaches `qa-done`:
-
-### 2. Collect Supabase client values from owner (PRD-07 prerequisite)
-
-Owner needs to share these from the Supabase dashboard:
-
-- **Project URL** (Settings → API → Project URL,
-  `https://<ref>.supabase.co`)
-- **anon/public key** (Settings → API → Project API keys →
-  `anon public`)
-
-Both are public-by-design (RLS-protected; ship in browser bundle).
-But per §16g hygiene, they go into a local `.env` file at repo root,
-not into git. Owner should paste them into `.env` directly; do not
-ask owner to paste them into chat.
-
-**No personal access token, no DB password is needed** for the
-branch-driven flow (per §16e). Don't ask for them.
-
-### 3. Execute PRD-07: Supabase bootstrap
-
-Invoke Dev subagent with `prds/PRD-07-supabase-bootstrap.md`. Notable
-verification steps:
-
-- The PRD includes a **real end-to-end pipeline test**: push a
-  throwaway feature branch, confirm Supabase auto-creates a preview
-  branch and applies the no-op migration. This proves the GitHub
-  integration is wired correctly.
-- The PRD's adversarial QA test pushes a deliberately broken
-  migration on a throwaway branch and confirms the Supabase Preview
-  CI check fails on the PR. Critical: **clean up the broken branch +
-  any orphan preview environments after testing.**
-
-### 4. Continue with PRDs 08, 09, 10 in order
-
-PRD-08 (SolidStart bootstrap) → PRD-09 (deploy workflow + branch
-protection) → PRD-10 (theme toggle).
-
-After PRD-09 lands, branch protection on `master` requires PRs +
-Supabase Preview check + gitleaks check. From that point on, no
-direct push to `master`.
-
 ## Owner action items still open
 
-These are owner tasks (not Dev/QA agent tasks):
-
-- **Provide Supabase project URL + anon key** (when prompted, per
-  step 2 above).
-- **Configure GitHub Pages** (Settings → Pages → Source: GitHub
-  Actions) when PRD-09 is being executed. The Dev agent will guide.
-- **Configure branch protection** on `master` after PRD-09 lands:
-  require PR, require Supabase Preview check, require gitleaks
-  check, linear history (squash merges). Documented in PRD-09.
-- **Sign Supabase DPA** before public launch — Phase 8 / Phase 10,
-  not a near-term blocker.
-- **Pick the final app name** before Phase 9 (homepage). Until then,
-  `APP_NAME` placeholder is in code; repo name `lp9-beta` is also a
-  placeholder.
-
-## Subagent invocation pattern (reminder)
-
-The previous session used the `task` tool with `subagent_type: general`
-to invoke each subagent, with a prompt that:
-
-1. Tells the subagent to read its own definition file
-   (`.opencode/agent/dev.md` or `qa.md`) first.
-2. Names the exactly-one PRD to execute.
-3. Restates the hard constraints (no scope creep, no commits, no
-   prod-touching commands).
-
-This worked cleanly on PRD-02. Replicate the pattern.
-
-## Gotchas to remember
-
-- **Don't push to `master` directly.** Once PRD-09 lands, branch
-  protection will block this; until then, it's a discipline thing.
-- **Don't run `supabase db push`** from local. The branch-driven
-  flow handles all DB changes via the GitHub integration.
-- **Don't commit anything matching a real-secret pattern.** Once
-  PRD-06 lands, gitleaks will block at commit time. Until then, be
-  careful — the only real risk in the next ~15 min is creating a
-  `.env` and accidentally `git add -A`'ing it. Solution: land PRD-06
-  first, before creating `.env`.
-- **`HANDOFF.md` is a strategic doc, not the source of truth.**
-  `DESIGN.md` §16 supersedes any conflicting wording in HANDOFF.
+- **Configure branch protection** on `master`: require PR + Supabase
+  Preview check + gitleaks check + linear history (documented in
+  PRD-09 / `.github/AGENTS.md`). Until then, do not push to `master`
+  directly — discipline only.
+- **Provide Supabase URL + anon key** into local `.env` when Phase 1
+  starts (public-safe, still not committed).
+- **Sign Supabase DPA** before public launch (Phase 8 / 10).
+- **Pick the final app name** before Phase 9. Until then `APP_NAME`
+  (code) + `lp9-beta` (repo/`BASE_PATH`) are placeholders.
 
 ## If anything is unclear
 
-- For ambiguity in a PRD: load the `grill-me` skill and stop.
-- For ambiguity in the design itself: ask the owner before changing
-  `DESIGN.md`. Decisions get written back to `DESIGN.md` per the
-  meta-rule (see `HANDOFF.md` "Meta-rule for future sessions").
-- For the opencode subagent / config mechanics: load
-  `customize-opencode` skill.
-- For careful code work: load `pragmatic` skill.
+- Operational rules + learned gotchas now live in `AGENTS.md` (root DOX
+  rail) and the child `AGENTS.md` files. Read the DOX chain for the
+  paths you touch.
+- PRD ambiguity → load `grill-me` and stop. Design ambiguity → ask the
+  owner, then write the decision back to `DESIGN.md` (meta-rule).
+- Careful code work → load `pragmatic`. Terse comms → `caveman`.
