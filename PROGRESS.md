@@ -67,9 +67,9 @@ Source: `HANDOFF.md` Phase 2.
 
 | #  | Title                                                 | PRD                                            | Status |
 |----|-------------------------------------------------------|------------------------------------------------|--------|
-| 15 | `relationships` + `pairing_invites` tables + RLS      | `prds/PRD-15-relationships-pairing-tables.md`  | in-progress |
-| 16 | Pairing RPCs (create/redeem/revoke)                   | `prds/PRD-16-pairing-rpcs.md`                  | in-progress |
-| 17 | WebCrypto helpers (AES-GCM)                           | `prds/PRD-17-webcrypto-helpers.md`             | todo   |
+| 15 | `relationships` + `pairing_invites` tables + RLS      | `prds/PRD-15-relationships-pairing-tables.md`  | merged      |
+| 16 | Pairing RPCs (create/redeem/revoke)                   | `prds/PRD-16-pairing-rpcs.md`                  | merged      |
+| 17 | WebCrypto helpers (AES-GCM)                           | `prds/PRD-17-webcrypto-helpers.md`             | merged   |
 | 18 | IndexedDB per-relationship key store                  | `prds/PRD-18-indexeddb-keystore.md`            | todo   |
 | 19 | QR generation (invite payload + key)                  | `prds/PRD-19-qr-generation.md`                 | todo   |
 | 20 | QR scanning (camera + manual fallback)                | `prds/PRD-20-qr-scanning.md`                   | todo   |

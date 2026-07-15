@@ -65,3 +65,21 @@ None (pure lib).
 - Does the Vitest jsdom environment expose `crypto.subtle`? If not, Dev
   records the chosen fix (Node webcrypto global, or a test-env tweak)
   rather than adding a crypto dependency.
+
+## Dev notes
+
+**File:** `src/lib/crypto/aes.ts`
+
+**crypto.subtle in tests:** Node provides `globalThis.crypto.subtle`
+natively in the jsdom env — no polyfill or dependency needed. Verified
+with a probe test.
+
+**Choices:**
+- 12-byte IV per message (AES-GCM standard).
+- Keys are extractable (`true`) so they can be exported for QR embedding
+  (PRD-19) and IndexedDB (PRD-18).
+- base64 via `btoa`/`atob` with byte-string bridging (browser-safe).
+
+**Self-test:** typecheck, lint, 23/23 tests (7 new: round-trip, emoji,
+200-char, distinct IV, wrong-key fail, tamper fail, export/import,
+base64), build all pass.
