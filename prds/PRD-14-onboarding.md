@@ -62,3 +62,23 @@ tokens; logical CSS only.
 
 - Where to store the archetype hint pre-pairing (profile column vs
   local)? Dev decides and records; a new column needs its own migration.
+
+## Dev notes
+
+**Decision: archetype hint stored in `localStorage`** — no migration
+needed. Moves to the `relationships.archetype` column at pair time
+(Phase 2). Avoids a profiles column for a temporary pre-pair value.
+
+**Files created/changed:**
+- `src/components/Onboarding.tsx` — form: name, locale, archetype
+- `src/routes/app.tsx` — gate: onboarding vs dashboard based on
+  `display_name`; wires profile store + focus refresh
+- `tests/unit/routes.test.tsx` — updated with mocks for session/profile
+
+**Choices:**
+- Name validation: required, max 50 chars, trimmed.
+- Data-loss nudge shown at top of form per DESIGN.md §3.
+- Uses `<For>` per Solid eslint rules.
+- `archetype_hint` key in localStorage, read at pair time.
+
+**Self-test:** typecheck, lint, 16/16 tests, build all pass.

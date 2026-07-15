@@ -58,8 +58,8 @@ Phase 1 task list 1.1–1.9.
 |----|-------------------------------------------------------|------------------------------------------------|--------|
 | 11 | Supabase client + anonymous sign-in                   | `prds/PRD-11-supabase-client-anon-auth.md`     | merged   |
 | 12 | `profiles` table + trigger + RLS                      | `prds/PRD-12-profiles-table-rls.md`            | merged   |
-| 13 | Data-access layer + reactive profile store            | `prds/PRD-13-data-access-layer.md`             | in-progress |
-| 14 | First-launch onboarding                               | `prds/PRD-14-onboarding.md`                    | todo   |
+| 13 | Data-access layer + reactive profile store            | `prds/PRD-13-data-access-layer.md`             | merged   |
+| 14 | First-launch onboarding                               | `prds/PRD-14-onboarding.md`                    | in-progress |
 
 ### Phase 2 — Pairing + encryption foundation
 
