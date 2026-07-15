@@ -63,3 +63,20 @@ None.
   and records.
 - Test IndexedDB: does jsdom provide it, or is `fake-indexeddb` needed
   (dev dependency, check `minimumReleaseAge`)? Dev records.
+
+## Dev notes
+
+**File:** `src/lib/crypto/keystore.ts`
+
+**Decisions:**
+- **Store `CryptoKey` directly** via structured clone (IndexedDB
+  supports it) — simpler than raw bytes, no re-import step.
+- **jsdom has NO IndexedDB** → added `fake-indexeddb@6.2.4` as a dev
+  dependency (30+ days old, passes minimumReleaseAge). Tests import
+  `fake-indexeddb/auto` and reset with a fresh `IDBFactory` per test.
+- `getKey`/`hasKey` swallow read errors → null (corrupt/missing store
+  handled gracefully). Each op opens+closes its own connection, so keys
+  persist across "reloads".
+
+**Self-test:** typecheck, lint, 29/29 tests (6 new: put/get, unknown,
+delete, has, two-key isolation, persistence), build all pass.

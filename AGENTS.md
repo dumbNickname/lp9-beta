@@ -170,6 +170,9 @@ files add operational contracts; they do not replace `DESIGN.md`.
 - **PostgREST requires explicit `.eq()` filters** even when RLS
   restricts to own rows. Without a filter, UPDATE/SELECT return 400 Bad
   Request. Always add `.eq("id", user.id)` (or equivalent) on queries.
+- **jsdom test env has `crypto.subtle` (Node global) but NOT
+  `indexedDB`.** For IndexedDB tests, add `fake-indexeddb` dev dep and
+  import `fake-indexeddb/auto`; reset with a fresh `IDBFactory` per test.
 
 ## User preferences (durable)
 
