@@ -58,3 +58,35 @@ existing session resumes.
 ## Open questions
 
 (none)
+
+## Dev notes
+
+**Choices made:**
+- Pinned `@supabase/supabase-js@2.108.2` (30+ days old, passes
+  minimumReleaseAge).
+- Used new `sb_publishable_` key format (Supabase 2026+ default).
+  Works identically to legacy JWT anon key with `createClient()`.
+- Session wired via `SessionProvider` component wrapping the router root
+  in `app.tsx`. Uses `onMount` + `subscribeToAuthChanges` for reactivity.
+- `supabase.ts` throws at module load time (not lazily) for missing env
+  vars — fail-fast pattern.
+
+**Files created/changed:**
+- `src/lib/supabase.ts` — client singleton.
+- `src/lib/session.ts` — reactive session signals + init.
+- `src/components/SessionProvider.tsx` — boot-time init wrapper.
+- `src/app.tsx` — wired SessionProvider.
+- `.env.example` — updated comment for new key format.
+- `tests/unit/supabase.test.ts` — env-var validation tests.
+
+**Self-test results:**
+- `pnpm typecheck` — pass
+- `pnpm lint` — pass
+- `pnpm test` — 12/12 pass (3 new tests for supabase module)
+- `pnpm build` — pass (static output, no server runtime)
+
+**Gotchas for QA:**
+- Vitest 4.x lacks `vi.importModule()`. Tests use `vi.resetModules()` +
+  dynamic `import()` to re-evaluate the module with different env stubs.
+- The `sb_publishable_` key is short (~40 chars) vs legacy JWT (~170
+  chars). QA adversarial tests should test both formats.

@@ -1,6 +1,7 @@
 import { Router } from "@solidjs/router";
 import { FileRoutes } from "@solidjs/start/router";
 import { Suspense } from "solid-js";
+import SessionProvider from "~/components/SessionProvider";
 import ThemeToggle from "~/components/ThemeToggle";
 import "~/styles/global.css";
 
@@ -19,12 +20,12 @@ export default function App() {
     <Router
       base={routerBase}
       root={(props) => (
-        <>
+        <SessionProvider>
           <header class="app-header">
             <ThemeToggle />
           </header>
           <Suspense>{props.children}</Suspense>
-        </>
+        </SessionProvider>
       )}
     >
       <FileRoutes />

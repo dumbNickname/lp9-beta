@@ -147,6 +147,26 @@ files add operational contracts; they do not replace `DESIGN.md`.
 - **`gitleaks protect` entropy filter:** low-entropy fake secrets (e.g.
   `ghp_aaaa...`) do NOT trip rules. Use high-entropy strings in
   adversarial tests. "0 commits scanned" on a staged scan is normal.
+- **Supabase API keys have new format (2026+):** Supabase now issues
+  `sb_publishable_...` keys (replaces legacy `eyJ...` JWT anon keys).
+  Both formats work with `@supabase/supabase-js` 2.x `createClient()`.
+  The publishable key uses the `anon` Postgres role, same RLS behavior.
+  Legacy JWT keys still work; Supabase calls them "Legacy anon,
+  service_role API keys" in the dashboard.
+- **Vitest 4.x has no `vi.importModule()`:** use `vi.resetModules()` +
+  dynamic `import()` in `beforeEach` to test modules that throw at load
+  time (e.g. env-var validation). `vi.stubEnv()` + `vi.unstubAllEnvs()`
+  work for `import.meta.env`.
+- **Vinxi prerender runs SSR bundle in a separate Node process** where
+  `VITE_*` env vars are NOT available (they're compile-time Vite
+  replacements, not runtime env). Any module imported during prerender
+  must not eagerly read `import.meta.env.VITE_*` at top level — use
+  lazy init (getter/proxy). `supabase.ts` uses this pattern.
+- **Git remote is `beta`, not `origin`.** Push with `git push beta master`.
+- **Gitleaks trips on `sb_publishable_*` test strings:** use low-entropy
+  fakes like `fake-key` in test stubs, not `sb_publishable_test123`.
+- **Keep git workflow simple:** branch, work, merge to master, push.
+  Don't fuss over perfect history.
 
 ## User preferences (durable)
 

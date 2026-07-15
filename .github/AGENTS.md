@@ -42,6 +42,11 @@ Owns `.github/`. Currently one workflow: `workflows/deploy.yml`.
 - Pages source = GitHub Actions.
 - Branch protection on `master`: require PR, require Supabase Preview +
   gitleaks checks, linear history.
+- **Repository secrets** (Settings → Secrets → Actions):
+  - `VITE_SUPABASE_URL` — project URL (public-safe, needed at build time
+    for prerender).
+  - `VITE_SUPABASE_ANON_KEY` — publishable/anon key (public-safe, needed
+    at build time for prerender).
 
 ## Child DOX Index
 

@@ -46,6 +46,14 @@ the client/server entry points. Public pages are statically generated;
 - **CSS uses logical properties only** (`margin-inline`, `padding-block`,
   `border-*-end`, etc.) — RTL-ready from day one (`DESIGN.md` §12e). No
   `margin-left`/`right`/`top`-style physical properties.
+- **Supabase client (`src/lib/supabase.ts`):** single `createClient`
+  instance; throws at module load if `VITE_SUPABASE_URL` or
+  `VITE_SUPABASE_ANON_KEY` is missing. Accepts both `sb_publishable_`
+  and legacy JWT anon keys.
+- **Session (`src/lib/session.ts`):** reactive `session()`, `user()`,
+  `loading()` signals. `initSession()` resumes existing session or
+  calls `signInAnonymously()`. `subscribeToAuthChanges()` keeps signals
+  in sync. Wired into the app via `SessionProvider` component.
 - **Storage access is defensive:** wrap `localStorage`/`matchMedia` in
   try/catch (private-mode / SSR). See `src/lib/theme.ts` for the pattern.
 - Path alias `~/*` → `src/*`.
