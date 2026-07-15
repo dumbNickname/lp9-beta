@@ -67,7 +67,7 @@ Source: `HANDOFF.md` Phase 2.
 
 | #  | Title                                                 | PRD                                            | Status |
 |----|-------------------------------------------------------|------------------------------------------------|--------|
-| 15 | `relationships` + `pairing_invites` tables + RLS      | `prds/PRD-15-relationships-pairing-tables.md`  | todo   |
+| 15 | `relationships` + `pairing_invites` tables + RLS      | `prds/PRD-15-relationships-pairing-tables.md`  | in-progress |
 | 16 | Pairing RPCs (create/redeem/revoke)                   | `prds/PRD-16-pairing-rpcs.md`                  | todo   |
 | 17 | WebCrypto helpers (AES-GCM)                           | `prds/PRD-17-webcrypto-helpers.md`             | todo   |
 | 18 | IndexedDB per-relationship key store                  | `prds/PRD-18-indexeddb-keystore.md`            | todo   |

@@ -75,3 +75,21 @@ None.
 - Add the `profiles` co-member SELECT policy (§13c) here or in PRD-16?
   Dev decides and records; it needs `is_relationship_member`, which this
   PRD introduces.
+
+## Dev notes
+
+**Migration:** `supabase/migrations/0002_relationships_pairing.sql`
+
+**Decisions:**
+- Added the `profiles` co-member SELECT policy HERE (not PRD-16) — this
+  PRD introduces the relationship linkage the policy needs. Policy uses
+  a direct EXISTS on `relationships` (not `is_relationship_member`,
+  which takes a rel_id, not a profile id).
+- Unique index uses `least/greatest` on member pair per §13a.
+- No INSERT policy on `relationships` — direct insert denied; PRD-16
+  RPC (`SECURITY DEFINER`) creates rows.
+- `on delete cascade` on member FKs — GDPR account delete cascades.
+- `gen_random_uuid()` for PKs (pgcrypto/pg built-in).
+
+**Self-test:** SQL-only; applied via Supabase preview/prod on merge.
+Local `pnpm` checks unaffected (no app code changed).
