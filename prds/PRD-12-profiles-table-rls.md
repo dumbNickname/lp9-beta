@@ -54,3 +54,19 @@ None.
 ## Open questions
 
 (none)
+
+## Dev notes
+
+**Migration:** `supabase/migrations/0001_profiles.sql`
+
+**Choices:**
+- `on delete cascade` on FK → auth.users — GDPR account delete cascades.
+- `security definer set search_path = ''` on trigger fn — Supabase best
+  practice to avoid search_path injection.
+- No INSERT policy for profiles — rows created only via trigger. Direct
+  inserts blocked by RLS (no INSERT policy = deny).
+- Co-member SELECT policy deferred to Phase 2 (needs `relationships`
+  table).
+
+**Self-test:** migration is SQL-only; verified via Supabase preview
+branch on merge.
