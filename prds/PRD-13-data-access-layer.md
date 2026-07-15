@@ -55,3 +55,22 @@ None directly; provides data to PRD-14.
 ## Open questions
 
 (none)
+
+## Dev notes
+
+**Files created:**
+- `src/lib/data/types.ts` — `Profile`, `ProfileUpdate` types
+- `src/lib/data/profile.ts` — `getMyProfile()`, `updateMyProfile()`
+- `src/lib/stores/profile.ts` — reactive signals + `refreshProfile()`,
+  `saveProfile()`, `useProfileFocusRefresh()`
+- `tests/unit/data-profile.test.ts` — 4 tests (mock supabase client)
+
+**Choices:**
+- Throttle focus-refresh to 2s to avoid thrashing.
+- `PGRST116` (no rows) returns null, not throw — new users briefly have
+  no profile until trigger fires.
+- `updateMyProfile` uses `.update()` without explicit `.eq('id', ...)` —
+  RLS ensures only own row is matched (Supabase applies `auth.uid()`
+  filter via policy).
+
+**Self-test:** typecheck, lint, 16/16 tests, build all pass.
