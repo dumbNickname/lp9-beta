@@ -65,9 +65,17 @@ Phase 1 task list 1.1–1.9.
 
 Source: `HANDOFF.md` Phase 2.
 
-| #  | Title                                                 | PRD | Status |
-|----|-------------------------------------------------------|-----|--------|
-| —  | (Phase 2 PRDs not yet decomposed)                     | —   | todo   |
+| #  | Title                                                 | PRD                                            | Status |
+|----|-------------------------------------------------------|------------------------------------------------|--------|
+| 15 | `relationships` + `pairing_invites` tables + RLS      | `prds/PRD-15-relationships-pairing-tables.md`  | todo   |
+| 16 | Pairing RPCs (create/redeem/revoke)                   | `prds/PRD-16-pairing-rpcs.md`                  | todo   |
+| 17 | WebCrypto helpers (AES-GCM)                           | `prds/PRD-17-webcrypto-helpers.md`             | todo   |
+| 18 | IndexedDB per-relationship key store                  | `prds/PRD-18-indexeddb-keystore.md`            | todo   |
+| 19 | QR generation (invite payload + key)                  | `prds/PRD-19-qr-generation.md`                 | todo   |
+| 20 | QR scanning (camera + manual fallback)                | `prds/PRD-20-qr-scanning.md`                   | todo   |
+| 21 | Pair flow UI (invite + redeem, end-to-end)            | `prds/PRD-21-pair-flow-ui.md`                  | todo   |
+| 22 | Password-wrapped key recovery                         | `prds/PRD-22-password-key-recovery.md`         | todo   |
+| 23 | Pairing / recovery warning UI                         | `prds/PRD-23-pairing-warning-ui.md`            | todo   |
 
 ### Phase 3 — Core points loop (hearts) — first vertical slice
 
