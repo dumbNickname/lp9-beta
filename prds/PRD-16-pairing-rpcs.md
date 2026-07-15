@@ -72,3 +72,25 @@ None (called by PRD-21).
   and records.
 - Code generation: length/charset and collision-retry strategy — Dev
   picks a reasonable opaque scheme (avoid ambiguous chars) and records.
+
+## Dev notes
+
+**Migration:** `supabase/migrations/0003_pairing_rpcs.sql`
+
+**Decisions:**
+- **Included `revoke_pair_invite`** (HANDOFF Q-A) — deletes an
+  unconsumed invite owned by the caller.
+- **Code scheme:** 8 chars from `ABCDEFGHJKMNPQRSTUVWXYZ23456789`
+  (no ambiguous 0/O/1/I/L). `gen_pair_code()` helper; insert retries up
+  to 5x on unique violation.
+- **Race safety:** `redeem_pair_code` uses `SELECT ... FOR UPDATE` to
+  lock the invite row, so concurrent double-redeem yields one
+  relationship (the second sees `consumed_at`).
+- All RPCs `SECURITY DEFINER` + `search_path = ''`.
+- `member_a = created_by`, `member_b = auth.uid()` — redeemer is always
+  the caller, so nobody can pair two arbitrary users.
+- Errors use `raise exception` with plain messages; the invalid-code and
+  expired/consumed cases are distinct messages (acceptable — codes are
+  high-entropy opaque, enumeration isn't a practical risk at 30^8).
+
+**Self-test:** SQL-only; verified via preview/prod on merge.
