@@ -1,20 +1,27 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
 const mockSingle = vi.fn();
-const mockSelect = vi.fn(() => ({ single: mockSingle }));
-const mockUpdate = vi.fn(() => ({ select: mockSelect }));
+const mockEq = vi.fn(() => ({ single: mockSingle, select: vi.fn(() => ({ single: mockSingle })) }));
+const mockSelect = vi.fn(() => ({ eq: mockEq, single: mockSingle }));
+const mockUpdate = vi.fn(() => ({ eq: mockEq }));
 const mockFrom = vi.fn(() => ({ select: mockSelect, update: mockUpdate }));
+const mockGetUser = vi.fn();
 
 vi.mock("~/lib/supabase", () => ({
-  supabase: { from: mockFrom },
+  supabase: {
+    from: mockFrom,
+    auth: { getUser: mockGetUser },
+  },
   getSupabase: vi.fn(),
 }));
 
 describe("data/profile", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockSelect.mockReturnValue({ single: mockSingle });
-    mockUpdate.mockReturnValue({ select: mockSelect });
+    mockGetUser.mockResolvedValue({ data: { user: { id: "u1" } } });
+    mockSelect.mockReturnValue({ eq: mockEq, single: mockSingle });
+    mockEq.mockReturnValue({ single: mockSingle, select: vi.fn(() => ({ single: mockSingle })) });
+    mockUpdate.mockReturnValue({ eq: mockEq });
     mockFrom.mockReturnValue({ select: mockSelect, update: mockUpdate });
   });
 
@@ -26,6 +33,7 @@ describe("data/profile", () => {
     const result = await getMyProfile();
 
     expect(mockFrom).toHaveBeenCalledWith("profiles");
+    expect(mockEq).toHaveBeenCalledWith("id", "u1");
     expect(result).toEqual(row);
   });
 
@@ -37,14 +45,15 @@ describe("data/profile", () => {
     expect(result).toBeNull();
   });
 
-  it("getMyProfile throws on other errors", async () => {
-    mockSingle.mockResolvedValue({ data: null, error: { code: "42501", message: "denied" } });
+  it("getMyProfile returns null when no user", async () => {
+    mockGetUser.mockResolvedValue({ data: { user: null } });
 
     const { getMyProfile } = await import("~/lib/data/profile");
-    await expect(getMyProfile()).rejects.toEqual({ code: "42501", message: "denied" });
+    const result = await getMyProfile();
+    expect(result).toBeNull();
   });
 
-  it("updateMyProfile calls update with patch and returns data", async () => {
+  it("updateMyProfile calls update with eq filter and returns data", async () => {
     const updated = { id: "u1", display_name: "Bob", locale: "en", theme: "dark", created_at: "2026-01-01" };
     mockSingle.mockResolvedValue({ data: updated, error: null });
 
@@ -52,6 +61,7 @@ describe("data/profile", () => {
     const result = await updateMyProfile({ display_name: "Bob" });
 
     expect(mockUpdate).toHaveBeenCalledWith({ display_name: "Bob" });
+    expect(mockEq).toHaveBeenCalledWith("id", "u1");
     expect(result).toEqual(updated);
   });
 });
