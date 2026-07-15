@@ -167,6 +167,9 @@ files add operational contracts; they do not replace `DESIGN.md`.
   fakes like `fake-key` in test stubs, not `sb_publishable_test123`.
 - **Keep git workflow simple:** branch, work, merge to master, push.
   Don't fuss over perfect history.
+- **PostgREST requires explicit `.eq()` filters** even when RLS
+  restricts to own rows. Without a filter, UPDATE/SELECT return 400 Bad
+  Request. Always add `.eq("id", user.id)` (or equivalent) on queries.
 
 ## User preferences (durable)
 
