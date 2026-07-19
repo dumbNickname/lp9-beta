@@ -22,6 +22,9 @@
   - PRD-17 (merged) — WebCrypto AES-GCM helpers `src/lib/crypto/aes.ts`.
   - PRD-18 (merged) — IndexedDB key store `src/lib/crypto/keystore.ts`
     (added `fake-indexeddb` dev dep).
+  - PRD-19 (merged) — QR generation: `src/lib/pairing/qr.ts`
+    (`buildInvitePayload`/`parseInvitePayload`, format `v1:<code>:<keyB64>`)
+    + `src/components/InviteQR.tsx`. Lib `qrcode@1.5.4` (MIT).
 - Single GitHub repo: `dumbNickname/lp9-beta`. Git remote is `beta`
   (`git push beta master`).
 - Single Supabase project, `eu-central-1` (Frankfurt), GitHub
@@ -29,17 +32,36 @@
   to master. GH Actions secrets `VITE_SUPABASE_URL` +
   `VITE_SUPABASE_ANON_KEY` are set.
 
-## What to do next — resume at PRD-19
+## Deployment URLs to check
 
-Execute the remaining Phase 2 PRDs in order: **19 → 20 → 21 → 22 → 23**.
+**Static public pages** (SSR, work without JS):
+- `https://dumbnickname.github.io/lp9-beta/` — homepage
+- `https://dumbnickname.github.io/lp9-beta/privacy` — privacy page
+- `https://dumbnickname.github.io/lp9-beta/terms` — terms page
+
+**App (SPA, needs JS + Supabase):**
+- `https://dumbnickname.github.io/lp9-beta/app` — anon sign-in →
+  onboarding form (name/locale/archetype) first visit; "Welcome back"
+  after. Use incognito for a fresh anon user. NOTE: pairing/QR UI not
+  built yet (PRD-21) — only onboarding + placeholder dashboard for now.
+
+**Supabase dashboard** (not public URLs):
+- Table Editor → `profiles`, `relationships`, `pairing_invites`
+- Database → Functions → `create_pair_invite`, `redeem_pair_code`,
+  `revoke_pair_invite`, `gen_pair_code`, `is_relationship_member`,
+  `handle_new_user`
+- Authentication → Users → anon users appear after visiting `/app`
+
+## What to do next — resume at PRD-20
+
+Execute the remaining Phase 2 PRDs in order: **20 → 21 → 22 → 23**.
 
 **Flagged design questions to resolve (owner input useful before coding
 the wiring PRDs):**
 
-- **PRD-19 / PRD-20 add browser libraries** (QR generation + scanning).
-  PRD-19: pick smaller of `qrcode` / `qr-code-styling` (verify MIT +
-  minimumReleaseAge). PRD-20: prefer native `BarcodeDetector`, add
-  `html5-qrcode` only as fallback. Confirm the dependency choices.
+- **PRD-20 adds a browser library** (QR scanning). Prefer native
+  `BarcodeDetector`, add `html5-qrcode` only as fallback. Confirm the
+  dependency choice. (PRD-19 done: chose `qrcode@1.5.4`, MIT.)
 - **PRD-20 manual fallback + key transfer:** the key rides in the QR, so
   a pasted code alone can't recover the key. Decide: (a) manual path
   also asks for the key string, or (b) code-only + key via recovery
