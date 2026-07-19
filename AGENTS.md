@@ -98,6 +98,8 @@ placeholder. See `DESIGN.md` §14i.
 - `PROGRESS.md` — single source of truth for PRD status.
 - `NEXT_SESSION.md` — orientation for resuming work.
 - `prds/PRD-NN-*.md` — one tiny PRD per behavior; the executable unit.
+- `no-human-decisions.md` — review queue of decisions agents made
+  autonomously (momentum mode) that a human may want to revisit.
 - `LICENSE` (AGPL-3.0-or-later), `TRADEMARK.md` — legal.
 
 These predate DOX and remain authoritative for their content. AGENTS.md
