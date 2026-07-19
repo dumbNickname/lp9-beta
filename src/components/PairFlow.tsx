@@ -115,7 +115,9 @@ export default function PairFlow() {
   };
 
   // When a relationship appears, migrate the temp key onto the real id,
-  // clean up, and let the gate switch to the dashboard.
+  // clean up, and refresh the store so AppGate switches to the dashboard.
+  // The "set recovery password" prompt lives in the app shell (D-22.3),
+  // not here, so pairing enters the app immediately.
   const onPaired = async (relationshipId: string, code: string) => {
     stopPolling();
     const key = await getKey(tempKeyId(code));
@@ -126,6 +128,7 @@ export default function PairFlow() {
     clearPendingInvite();
     await refreshRelationship();
   };
+
 
   const startPolling = (code: string) => {
     stopPolling();
@@ -210,6 +213,7 @@ export default function PairFlow() {
   return (
     <section class="pair-flow">
       <Show when={view() === "landing"}>
+
         <div class="pair-flow-landing">
           <h2>Pair with your partner</h2>
           <p>

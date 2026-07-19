@@ -11,6 +11,33 @@
 
 ## PRD-22 — Password-wrapped key recovery
 
+### D-22.0 Not using Supabase Vault (kept client-side wrap)
+- **Decision:** hand-rolled client-side PBKDF2+AES-GCM wrap, NOT Supabase
+  Vault / pgsodium.
+- **Why:** Vault encrypts with a Supabase-managed server-held root key,
+  so the server could decrypt — breaks the E2E promise (DESIGN §12b:
+  server must never see the key/password). No out-of-box Supabase feature
+  does client-only key wrapping by definition. Our design is the correct
+  safe architecture.
+
+### D-22.3 Recovery prompt lives in the app shell, not gating PairFlow
+- **Decision:** on pair-success, immediately `refreshRelationship()` so
+  the relationship becomes active in the store right away; the "set
+  recovery password" prompt then renders as a one-time, skippable overlay
+  in the app shell/dashboard (after a relationship first appears), NOT as
+  a blocking step inside PairFlow.
+- **Why:** avoids a fragile "DB has relationship but store doesn't yet"
+  gap; keeps polling-stop semantics clean; PairFlow unmounts as soon as
+  the relationship is active (AppGate swap). Sounder UX: pairing
+  completes instantly, recovery is an optional follow-up.
+- **Scope expansion:** PRD-22 now also touches `src/routes/app.tsx`
+  (hosts the overlay). Approved by owner. The merged PRD-21 QA timing
+  barrier that assumed `refreshRelationship` fires on the poll tick is
+  updated by QA (contract changed legitimately; test's real subject —
+  polling stops — still holds; §16c: test the contract not incidentals).
+- **Alternatives:** keep the prompt gating inside PairFlow (simpler diff,
+  keeps the store/DB gap).
+
 ### D-22.1 Wrap method = AES-GCM encrypt of raw key bytes
 - **Decision:** wrap the per-relationship AES key by exporting it raw
   and AES-GCM-encrypting those bytes with a PBKDF2-SHA256 (600k iters,

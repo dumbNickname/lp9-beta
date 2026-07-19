@@ -175,6 +175,11 @@ files add operational contracts; they do not replace `DESIGN.md`.
 - **jsdom test env has `crypto.subtle` (Node global) but NOT
   `indexedDB`.** For IndexedDB tests, add `fake-indexeddb` dev dep and
   import `fake-indexeddb/auto`; reset with a fresh `IDBFactory` per test.
+- **PostgREST serializes `bytea` as `\x`-prefixed hex** (Postgres default
+  `bytea_output = hex`). Convert with the `bytesToBytea`/`byteaToBytes`
+  helpers in `src/lib/data/relationship.ts`; pass the same `\x` hex text
+  as RPC `bytea` args. NOTE: unverified against live DB — QA must confirm
+  bytea round-trips on the preview branch (see PRD-22 Dev notes).
 
 ## User preferences (durable)
 

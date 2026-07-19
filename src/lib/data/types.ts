@@ -24,3 +24,13 @@ export interface Relationship {
   created_at: string;
   paired_at: string | null;
 }
+
+// The password-wrapped-key columns on a relationship (DESIGN.md §12b).
+// Decoded to bytes for use in the crypto layer; null until a recovery
+// password has been set.
+export interface RelationshipWrap {
+  wrapped_key_blob: Uint8Array;
+  wrap_salt: Uint8Array;
+  wrap_iterations: number;
+  wrap_algo: string;
+}

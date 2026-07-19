@@ -74,7 +74,7 @@ Source: `HANDOFF.md` Phase 2.
 | 19 | QR generation (invite payload + key)                  | `prds/PRD-19-qr-generation.md`                 | merged   |
 | 20 | QR scanning (camera + manual fallback)                | `prds/PRD-20-qr-scanning.md`                   | merged |
 | 21 | Pair flow UI (invite + redeem, end-to-end)            | `prds/PRD-21-pair-flow-ui.md`                  | merged    |
-| 22 | Password-wrapped key recovery                         | `prds/PRD-22-password-key-recovery.md`         | todo   |
+| 22 | Password-wrapped key recovery                         | `prds/PRD-22-password-key-recovery.md`         | merged |
 | 23 | Pairing / recovery warning UI                         | `prds/PRD-23-pairing-warning-ui.md`            | todo   |
 
 ### Phase 3 — Core points loop (hearts) — first vertical slice

@@ -33,6 +33,13 @@
     `app.tsx`. Inviter key stored under `invite:<code>` then migrated to
     rel id; 3s poll + focus-refresh detects consume. See
     `no-human-decisions.md` D-21.1/D-21.2.
+  - PRD-22 (merged) — Password-wrapped key recovery: `lib/crypto/recovery.ts`
+    (PBKDF2-SHA256 600k + AES-GCM wrap, blob = iv||ct), RPC migration
+    `0004_set_recovery_password.sql`, `RecoveryPassword.tsx` (set/change/
+    restore). Post-pair "set password" prompt is a one-time skippable
+    overlay in the app shell (D-22.3). Server never sees key/password.
+    NOTE: bytea `\x` hex round-trip unverified vs live DB — owner
+    preview-branch check pending (see PRD-22 Dev notes + AGENTS.md gotcha).
 - Single GitHub repo: `dumbNickname/lp9-beta`. Git remote is `beta`
   (`git push beta master`).
 - Single Supabase project, `eu-central-1` (Frankfurt), GitHub
@@ -60,9 +67,9 @@
   `handle_new_user`
 - Authentication → Users → anon users appear after visiting `/app`
 
-## What to do next — resume at PRD-22
+## What to do next — resume at PRD-23
 
-Execute the remaining Phase 2 PRDs in order: **22 → 23**.
+Execute the remaining Phase 2 PRD: **23** (last of Phase 2).
 
 **Flagged design questions to resolve (owner input useful before coding
 the wiring PRDs):**
@@ -73,7 +80,12 @@ the wiring PRDs):**
 
 - **Verify Phase 2 migrations applied** on Supabase (Table Editor should
   show `relationships`, `pairing_invites`; Database → Functions should
-  show the pairing RPCs).
+  show the pairing RPCs + `set_recovery_password`).
+- **Verify bytea round-trip on live/preview DB (PRD-22):** set a recovery
+  password, then on a fresh browser (no IndexedDB key) fetch blob + enter
+  password → key restored → an existing encrypted comment decrypts.
+  Confirms the `\x`-hex bytea encode/decode assumption. If it fails, only
+  `bytesToBytea`/`byteaToBytes` in `src/lib/data/relationship.ts` change.
 - **Branch protection on `master`** not yet set (discipline-only).
 - **Sign Supabase DPA** before public launch (Phase 8 / 10).
 - **Pick the final app name** before Phase 9 (`APP_NAME` placeholder).
