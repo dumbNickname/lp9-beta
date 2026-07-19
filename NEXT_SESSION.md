@@ -25,6 +25,9 @@
   - PRD-19 (merged) — QR generation: `src/lib/pairing/qr.ts`
     (`buildInvitePayload`/`parseInvitePayload`, format `v1:<code>:<keyB64>`)
     + `src/components/InviteQR.tsx`. Lib `qrcode@1.5.4` (MIT).
+  - PRD-20 (merged) — QR scanning: `src/lib/pairing/scan.ts`
+    (`isSupported`/`startScan`, native `BarcodeDetector`, no lib) +
+    `src/components/QRScanner.tsx`. Manual fallback = paste full payload.
 - Single GitHub repo: `dumbNickname/lp9-beta`. Git remote is `beta`
   (`git push beta master`).
 - Single Supabase project, `eu-central-1` (Frankfurt), GitHub
@@ -52,20 +55,13 @@
   `handle_new_user`
 - Authentication → Users → anon users appear after visiting `/app`
 
-## What to do next — resume at PRD-20
+## What to do next — resume at PRD-21
 
-Execute the remaining Phase 2 PRDs in order: **20 → 21 → 22 → 23**.
+Execute the remaining Phase 2 PRDs in order: **21 → 22 → 23**.
 
 **Flagged design questions to resolve (owner input useful before coding
 the wiring PRDs):**
 
-- **PRD-20 adds a browser library** (QR scanning). Prefer native
-  `BarcodeDetector`, add `html5-qrcode` only as fallback. Confirm the
-  dependency choice. (PRD-19 done: chose `qrcode@1.5.4`, MIT.)
-- **PRD-20 manual fallback + key transfer:** the key rides in the QR, so
-  a pasted code alone can't recover the key. Decide: (a) manual path
-  also asks for the key string, or (b) code-only + key via recovery
-  password later. See PRD-20 Open questions.
 - **PRD-21 inviter key-before-relationship-id problem:** the AES key is
   generated before the relationship id exists. Decide storage strategy
   (temp key under invite code, migrate to rel id on consume) so the
