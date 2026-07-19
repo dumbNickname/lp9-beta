@@ -9,6 +9,27 @@
 > ratified or changed, move the rationale into `DESIGN.md`/the PRD and
 > trim the entry here.
 
+## PRD-22 — Password-wrapped key recovery
+
+### D-22.1 Wrap method = AES-GCM encrypt of raw key bytes
+- **Decision:** wrap the per-relationship AES key by exporting it raw
+  and AES-GCM-encrypting those bytes with a PBKDF2-SHA256 (600k iters,
+  per-relationship random salt) derived wrapping key. `wrapped_key_blob`
+  = `iv (12 bytes) ‖ ciphertext`.
+- **Why:** reuses the existing AES-GCM patterns in `src/lib/crypto/aes.ts`;
+  GCM auth tag gives tamper detection (wrong password / tampered blob ->
+  decrypt throws -> "couldn't unlock").
+- **Alternatives:** `crypto.subtle.wrapKey` with **AES-KW** (purpose-built
+  key wrap, no IV) — cleaner semantically but a separate algo path not
+  otherwise used in the codebase.
+
+### D-22.2 Recovery password skippable at pair time
+- **Decision:** the "set recovery password" prompt after pairing is
+  skippable, with the honest data-loss warning (copy lands in PRD-23).
+- **Why:** DESIGN §12b + PRD-22 open question say prompt-but-honest;
+  forcing it would block pairing. Skipping = comments unrecoverable on
+  device loss until a password is set later in settings.
+
 ## PRD-21 — Pair flow UI
 
 ### D-21.1 Inviter key storage before relationship id exists
