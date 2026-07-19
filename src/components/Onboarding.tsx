@@ -1,5 +1,6 @@
 import { createSignal, For, Show } from "solid-js";
 import { saveProfile, refreshProfile } from "~/lib/stores/profile";
+import Callout from "~/components/Callout";
 
 const ARCHETYPES = [
   { value: "getting_to_know", label: "Getting to know each other" },
@@ -50,10 +51,12 @@ export default function Onboarding() {
 
   return (
     <form class="onboarding" onSubmit={handleSubmit}>
-      <p class="nudge">
-        Without linking an account, you cannot recover your data if you
-        clear your browser or switch devices.
-      </p>
+      <Callout variant="info">
+        <p class="nudge">
+          Without linking an account, you cannot recover your data if you
+          clear your browser or switch devices.
+        </p>
+      </Callout>
 
       <label>
         Display name

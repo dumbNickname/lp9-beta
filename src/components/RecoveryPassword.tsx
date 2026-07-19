@@ -12,6 +12,7 @@ import {
   getRelationshipWrap,
   setRecoveryPassword,
 } from "~/lib/data/relationship";
+import RecoveryWarning from "~/components/RecoveryWarning";
 
 export type RecoveryMode = "set" | "change" | "restore";
 
@@ -122,6 +123,10 @@ export default function RecoveryPassword(props: Props) {
   return (
     <form class="recovery-password" onSubmit={handleSubmit}>
       <h2>{HEADINGS[props.mode]}</h2>
+
+      <Show when={needsConfirm()}>
+        <RecoveryWarning />
+      </Show>
 
       <label>
         {props.mode === "restore" ? "Recovery password" : "New password"}
