@@ -9,6 +9,29 @@
 > ratified or changed, move the rationale into `DESIGN.md`/the PRD and
 > trim the entry here.
 
+## PRD-24 — Pairing UX fixes
+
+### D-24.1 QR encodes a deep-link URL with key in the fragment
+- **Decision:** the pairing QR encodes an app URL
+  `<origin><basePath>app#pair=<v1:code:keyB64>` instead of the raw
+  payload. iOS native Camera then recognizes it as a URL, opens the app,
+  and the app reads `#pair=` on load to auto-run/pre-fill Join. Plus a
+  Copy button + selectable full-invite field on the invite screen, and an
+  html5-qrcode in-app scanner fallback for browsers lacking
+  `BarcodeDetector` (iOS).
+- **Why:** raw-text QR (`v1:...`) is unusable by iOS native Camera ("No
+  usable data found") and the manual code shown was the short code, not
+  the full payload -> manual pairing was impossible.
+- **Owner input given:** chose deep-link URL over raw-payload-only.
+- **Tradeoff (accepted):** the AES key rides in the URL fragment. It is
+  never sent to the server (fragments aren't transmitted), but it lands
+  in the joiner device's browser history. Acceptable for beta; a paired
+  device already holds the key. Revisit if history exposure matters.
+- **Alternatives:** (a) keep raw payload + in-app scanner only (key never
+  in a URL, but iOS native Camera still can't act on the QR — scan must
+  happen inside the app); (b) put key in a query param (would be sent to
+  the server — rejected).
+
 ## PRD-22 — Password-wrapped key recovery
 
 ### D-22.0 Not using Supabase Vault (kept client-side wrap)
