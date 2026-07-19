@@ -7,13 +7,24 @@ import {
   refreshProfile,
   useProfileFocusRefresh,
 } from "~/lib/stores/profile";
+import {
+  relationship,
+  relationshipLoading,
+  refreshRelationship,
+  useRelationshipFocusRefresh,
+} from "~/lib/stores/relationship";
 import Onboarding from "~/components/Onboarding";
+import PairFlow from "~/components/PairFlow";
 
 export default function AppShell() {
   createEffect(() => {
-    if (user()) void refreshProfile();
+    if (user()) {
+      void refreshProfile();
+      void refreshRelationship();
+    }
   });
   useProfileFocusRefresh();
+  useRelationshipFocusRefresh();
 
   return (
     <main>
@@ -21,7 +32,11 @@ export default function AppShell() {
       <Show when={!sessionLoading() && user()} fallback={<p>Loading...</p>}>
         <Show when={!profileLoading()} fallback={<p>Loading...</p>}>
           <Show when={profile()?.display_name} fallback={<Onboarding />}>
-            <p>Welcome back, {profile()!.display_name}!</p>
+            <Show when={!relationshipLoading()} fallback={<p>Loading...</p>}>
+              <Show when={relationship()} fallback={<PairFlow />}>
+                <p>Welcome back, {profile()!.display_name}!</p>
+              </Show>
+            </Show>
           </Show>
         </Show>
       </Show>

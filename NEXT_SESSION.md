@@ -28,6 +28,11 @@
   - PRD-20 (merged) — QR scanning: `src/lib/pairing/scan.ts`
     (`isSupported`/`startScan`, native `BarcodeDetector`, no lib) +
     `src/components/QRScanner.tsx`. Manual fallback = paste full payload.
+  - PRD-21 (merged) — Pair flow UI end-to-end: `PairFlow.tsx`,
+    `lib/data/relationship.ts`, `lib/stores/relationship.ts`, gated in
+    `app.tsx`. Inviter key stored under `invite:<code>` then migrated to
+    rel id; 3s poll + focus-refresh detects consume. See
+    `no-human-decisions.md` D-21.1/D-21.2.
 - Single GitHub repo: `dumbNickname/lp9-beta`. Git remote is `beta`
   (`git push beta master`).
 - Single Supabase project, `eu-central-1` (Frankfurt), GitHub
@@ -55,18 +60,14 @@
   `handle_new_user`
 - Authentication → Users → anon users appear after visiting `/app`
 
-## What to do next — resume at PRD-21
+## What to do next — resume at PRD-22
 
-Execute the remaining Phase 2 PRDs in order: **21 → 22 → 23**.
+Execute the remaining Phase 2 PRDs in order: **22 → 23**.
 
 **Flagged design questions to resolve (owner input useful before coding
 the wiring PRDs):**
 
-- **PRD-21 inviter key-before-relationship-id problem:** the AES key is
-  generated before the relationship id exists. Decide storage strategy
-  (temp key under invite code, migrate to rel id on consume) so the
-  inviter doesn't lose the key on reload while waiting. See PRD-21 Open
-  questions.
+- (No open PRD-22/23 flags yet — review before coding those.)
 
 ## Owner action items (parked)
 

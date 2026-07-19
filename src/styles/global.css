@@ -77,3 +77,18 @@ a {
 .theme-toggle:active {
   transform: scale(0.98);
 }
+
+.pair-flow-actions {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  margin-block-start: var(--space-4);
+}
+
+.pair-flow-waiting {
+  color: var(--color-accent);
+}
+
+.pair-flow .error {
+  color: var(--color-accent);
+}
