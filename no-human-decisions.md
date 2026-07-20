@@ -9,6 +9,48 @@
 > ratified or changed, move the rationale into `DESIGN.md`/the PRD and
 > trim the entry here.
 
+## PRD-25 — Pairing flow correctness
+
+### D-25.1 Join requires an explicit confirm step (no auto-redeem)
+- **Decision:** opening the deep-link / scanning no longer immediately
+  redeems. It shows a "Join <inviter name>?" confirm screen; redemption
+  happens only on the Join tap. Lets the user move the link between
+  browsers before burning the invite.
+- **Why:** auto-redeem on open silently consumed the invite on whatever
+  browser opened it (e.g. iOS Safari), stranding the user who wanted to
+  use another browser and yanking the QR from the inviter.
+- **Owner input given:** chose confirm step over instant redeem.
+
+### D-25.2 peek_pair_code RPC for the confirm preview
+- **Decision:** add a read-only `peek_pair_code(p_code)` RPC returning the
+  inviter's `display_name` + `archetype` (NEVER the key) for a valid,
+  unconsumed, unexpired code. Used only to render "Join <name>?".
+- **Why:** RLS lets only the invite creator SELECT the invite, and the
+  co-member profile policy needs an existing relationship — so the
+  redeemer can't read the inviter name pre-pairing without an RPC.
+- **Alternative:** generic "Join this relationship?" with no name (no
+  migration) — rejected for weaker trust/clarity.
+
+### D-25.3 Persist + re-show the inviter's pending invite; drop short code
+- **Decision:** the inviter's pending invite stays visible/re-openable
+  (QR + link + cancel) until consumed or cancelled, surviving reload.
+  Remove the standalone short 8-char code from the invite UI (it can't
+  pair on its own — the key lives in the link), or demote it to a
+  non-actionable reference at most.
+- **Why:** the short code confused the owner ("what is this code?") and
+  is useless for joining; losing the QR on reload/consume was jarring.
+
+## PRD-26 — App shell polish + navigation
+
+### D-26.1 Header nav + <select> dropdowns + light styling pass
+- **Decision:** add header navigation links (home / app / privacy /
+  terms); convert the archetype and locale pickers to native `<select>`
+  dropdowns (current layout breaks on mobile); apply a first-pass visual
+  polish using existing theme tokens (no brand overhaul — name/brand
+  still pending §14i).
+- **Owner input given:** nav + selectors + light polish now; full
+  redesign deferred.
+
 ## PRD-24 — Pairing UX fixes
 
 ### D-24.1 QR encodes a deep-link URL with key in the fragment
