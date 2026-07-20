@@ -3,7 +3,9 @@ import QRCode from "qrcode";
 import { buildInvitePayload, buildInviteUrl } from "~/lib/pairing/qr";
 
 interface InviteQRProps {
-  // The human-readable pairing code (also shown as a reference).
+  // The pairing code. Used only to build the QR + invite link; it is NOT
+  // shown as a standalone code (it cannot pair on its own — the key lives in
+  // the link — and it confused testers). See PRD-25 (D-25.3).
   code: string;
   // The base64-encoded AES key that rides in the invite.
   keyBase64: string;
@@ -101,10 +103,6 @@ export default function InviteQR(props: InviteQRProps) {
       >
         {copied() ? "Copied" : "Copy invite link"}
       </button>
-
-      <p class="invite-qr-code">
-        <span class="invite-qr-code-label">Code</span> {props.code}
-      </p>
     </div>
   );
 }

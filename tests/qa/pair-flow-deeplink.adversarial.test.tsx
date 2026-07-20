@@ -1,24 +1,33 @@
-import { cleanup, render, waitFor } from "@solidjs/testing-library";
+import { cleanup, fireEvent, render, waitFor } from "@solidjs/testing-library";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-// QA adversarial suite for PRD-24 — PairFlow #pair= deep-link consume+clear.
+// QA adversarial suite for PRD-24 deep-link, RECONCILED for PRD-25 (D-25.1).
 //
-// Contract (PRD-24 / D-24.1):
-//   - mounting /app with `#pair=<valid payload>` routes into Join, redeems
-//     with the PARSED code, imports+stores the key under the returned rel id,
-//     and CLEARS the fragment (history.replaceState) so it can't re-trigger.
-//   - mounting with `#pair=<junk>` must NOT crash and must NOT redeem.
+// PRD-25 changed the trigger point: a `#pair=` deep link no longer
+// auto-redeems on mount. It now routes into the CONFIRM view (peek only);
+// redemption fires ONLY on the explicit Join tap. The fragment is still
+// cleared up-front so a reload / moving the link cannot re-fire or burn the
+// invite before the user confirms.
+//
+// Contract (PRD-24 fragment clearing + PRD-25 D-25.1 confirm step):
+//   - mounting /app with `#pair=<valid payload>` routes into the CONFIRM
+//     view, PEEKS the parsed code (no redeem), and CLEARS the fragment
+//     (history.replaceState) so it can't re-trigger. Tapping Join then
+//     redeems with the PARSED code and stores the key under the returned id.
+//   - mounting with `#pair=<junk>` must NOT crash and must NOT peek/redeem.
 //   - a normal mount (no fragment) and the inviter path (outstanding pending
 //     invite) are unaffected by the deep-link logic — the inviter path wins.
-//   - the AES key is never sent to the server: redeem gets ONLY the code.
+//   - the AES key is never sent to the server: redeem/peek get ONLY the code.
 
 const mockRedeemPairCode = vi.fn();
+const mockPeekPairCode = vi.fn();
 const mockGetMyActiveRelationship = vi.fn();
 const mockCreatePairInvite = vi.fn();
 const mockRevokePairInvite = vi.fn();
 
 vi.mock("~/lib/data/relationship", () => ({
   redeemPairCode: mockRedeemPairCode,
+  peekPairCode: mockPeekPairCode,
   getMyActiveRelationship: mockGetMyActiveRelationship,
   createPairInvite: mockCreatePairInvite,
   revokePairInvite: mockRevokePairInvite,
@@ -66,6 +75,10 @@ beforeEach(() => {
   (globalThis as { BarcodeDetector?: unknown }).BarcodeDetector = undefined;
   vi.clearAllMocks();
   mockGetMyActiveRelationship.mockResolvedValue(null);
+  mockPeekPairCode.mockResolvedValue({
+    display_name: "Partner Name",
+    archetype: "getting_to_know",
+  });
   mockGetKey.mockResolvedValue("temp-key" as unknown as CryptoKey);
   localStorage.clear();
   resetUrl();
@@ -87,8 +100,8 @@ async function importDeps() {
 // deep-link path survives the special chars through encode+decode.
 const KEY_B64 = "AB+/cd+/ef==";
 
-describe("PRD-24 QA: deep-link consume + clear (valid payload)", () => {
-  it("routes into Join, redeems the parsed code, stores the key, clears the fragment", async () => {
+describe("PRD-25 QA: deep-link routes to confirm + clear (valid payload)", () => {
+  it("peeks the parsed code (no redeem), clears the fragment, then Join redeems once", async () => {
     mockRedeemPairCode.mockResolvedValue("rel-deep");
     const { PairFlow, buildInvitePayload, buildInviteUrl } = await importDeps();
 
@@ -99,7 +112,28 @@ describe("PRD-24 QA: deep-link consume + clear (valid payload)", () => {
 
     const { findByRole } = render(() => <PairFlow />);
 
-    // Redeemed with the PARSED code only (no key/base64 crosses the wire).
+    // Deep link routes to the confirm view: PEEK with the parsed code, and
+    // NO redeem yet (invite is not burned on open).
+    await waitFor(() =>
+      expect(mockPeekPairCode).toHaveBeenCalledWith("DEEPCODE1"),
+    );
+    expect(mockRedeemPairCode).not.toHaveBeenCalled();
+    // Peek arg carried ONLY the code (no key on the wire).
+    for (const call of mockPeekPairCode.mock.calls) {
+      expect(JSON.stringify(call)).not.toContain(KEY_B64);
+    }
+
+    // Fragment cleared up-front so it cannot re-trigger / burn on reload.
+    expect(window.location.hash).toBe("");
+    expect(window.location.href).not.toContain("pair=");
+
+    // Confirm view shown with the peeked inviter name.
+    await findByRole("heading", { name: /Join Partner Name\?/ });
+
+    // Redemption fires only on the explicit Join tap.
+    const joinButton = await findByRole("button", { name: "Join" });
+    fireEvent.click(joinButton);
+
     await waitFor(() =>
       expect(mockRedeemPairCode).toHaveBeenCalledWith("DEEPCODE1"),
     );
@@ -114,17 +148,9 @@ describe("PRD-24 QA: deep-link consume + clear (valid payload)", () => {
       expect(mockPutKey).toHaveBeenCalledWith("rel-deep", "imported-key"),
     );
     expect(mockImportKeyRaw).toHaveBeenCalledTimes(1);
-
-    // Fragment cleared so it cannot re-trigger on re-render / reload.
-    expect(window.location.hash).toBe("");
-    expect(window.location.href).not.toContain("pair=");
-
-    // We landed on the Join view.
-    await findByRole("heading", { name: "Join your partner" });
   });
 
-  it("clears the fragment even when redeem REJECTS (no lingering #pair=)", async () => {
-    mockRedeemPairCode.mockRejectedValue(new Error("code expired"));
+  it("clears the fragment up-front regardless of what happens on confirm", async () => {
     const { PairFlow, buildInvitePayload, buildInviteUrl } = await importDeps();
     const url = buildInviteUrl(buildInvitePayload("EXPIRED1", KEY_B64), {
       origin: window.location.origin,
@@ -132,11 +158,12 @@ describe("PRD-24 QA: deep-link consume + clear (valid payload)", () => {
     window.history.replaceState(null, "", url);
 
     const { findByRole } = render(() => <PairFlow />);
-    await waitFor(() => expect(mockRedeemPairCode).toHaveBeenCalled());
-    // Fragment was stripped up-front (consume clears before redeem resolves).
+    // Fragment was stripped up-front (consume clears before peek resolves).
+    await waitFor(() => expect(mockPeekPairCode).toHaveBeenCalled());
     expect(window.location.hash).toBe("");
-    // Friendly error surfaced, no crash.
-    await findByRole("alert");
+    // Confirm view rendered, no crash, no redeem on open.
+    await findByRole("heading", { name: /Join Partner Name\?/ });
+    expect(mockRedeemPairCode).not.toHaveBeenCalled();
   });
 });
 
@@ -152,10 +179,11 @@ describe("PRD-24 QA: deep-link with junk does not redeem or crash", () => {
     );
 
     const { findByRole } = render(() => <PairFlow />);
-    // Routed into Join (fragment had a pair=), but redeem never fires.
+    // Routed into Join (fragment had a pair=), but neither peek nor redeem fires.
     await findByRole("heading", { name: "Join your partner" });
     await Promise.resolve();
     await Promise.resolve();
+    expect(mockPeekPairCode).not.toHaveBeenCalled();
     expect(mockRedeemPairCode).not.toHaveBeenCalled();
     expect(mockPutKey).not.toHaveBeenCalled();
     // Fragment cleared regardless.
@@ -172,6 +200,7 @@ describe("PRD-24 QA: deep-link with junk does not redeem or crash", () => {
     const { findByRole } = render(() => <PairFlow />);
     // No deep link consumed -> landing view remains.
     await findByRole("heading", { name: "Pair with your partner" });
+    expect(mockPeekPairCode).not.toHaveBeenCalled();
     expect(mockRedeemPairCode).not.toHaveBeenCalled();
   });
 });
@@ -199,7 +228,8 @@ describe("PRD-24 QA: deep-link does not interfere with normal / inviter paths", 
 
     const { findByText } = render(() => <PairFlow />);
     await findByText(/waiting for your partner/i);
-    // Deep link ignored: joiner redeem never fires for the inviter device.
+    // Deep link ignored: joiner peek/redeem never fires for the inviter device.
+    expect(mockPeekPairCode).not.toHaveBeenCalled();
     expect(mockRedeemPairCode).not.toHaveBeenCalled();
     // The inviter path left the fragment untouched (it returned before
     // consuming the deep link).

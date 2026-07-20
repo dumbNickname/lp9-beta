@@ -12,12 +12,13 @@ import { deleteKey, getKey, putKey } from "~/lib/crypto/keystore";
 import {
   createPairInvite,
   getMyActiveRelationship,
+  peekPairCode,
   redeemPairCode,
   revokePairInvite,
 } from "~/lib/data/relationship";
 import { normalizeScannedInput, parseInviteUrl, parseInvitePayload } from "~/lib/pairing/qr";
 import { refreshRelationship } from "~/lib/stores/relationship";
-import type { Archetype } from "~/lib/data/types";
+import type { Archetype, PairInvitePeek } from "~/lib/data/types";
 
 const POLL_MS = 3000;
 const PENDING_INVITE_KEY = "pair_invite_pending";
@@ -91,7 +92,19 @@ function friendlyRedeemError(err: unknown): string {
   return "Could not pair. Please try again.";
 }
 
-type View = "landing" | "invite" | "join";
+type View = "landing" | "invite" | "join" | "confirm";
+
+// The parsed invite payload held in memory until the user taps Join on the
+// confirm view (D-25.1). The redeem/import/store only fires on that tap.
+interface ConfirmState {
+  code: string;
+  keyBase64: string;
+  peek: PairInvitePeek | null;
+  peekLoading: boolean;
+  peekError: string;
+  busy: boolean;
+  redeemError: string;
+}
 
 export default function PairFlow() {
   const [view, setView] = createSignal<View>("landing");
@@ -102,8 +115,10 @@ export default function PairFlow() {
   const [inviteError, setInviteError] = createSignal("");
 
   // Join subview state.
-  const [joinBusy, setJoinBusy] = createSignal(false);
   const [joinError, setJoinError] = createSignal("");
+
+  // Confirm subview state (parsed payload + peek preview, D-25.1/D-25.2).
+  const [confirm, setConfirm] = createSignal<ConfirmState | null>(null);
 
   let pollTimer: ReturnType<typeof setInterval> | undefined;
 
@@ -176,28 +191,72 @@ export default function PairFlow() {
     setView("landing");
   };
 
-  const handleDecode = async (input: string) => {
+  // Parse a scanned/pasted/deep-linked invite and route into the CONFIRM
+  // view (D-25.1). This does NOT redeem — it only parses the payload, holds
+  // it in memory, and peeks the inviter name for the confirm preview.
+  const handleDecode = (input: string) => {
     // Accept either a full invite URL (deep link / scanned QR) or a bare
     // `v1:...` payload before parsing.
     const payload = normalizeScannedInput(input);
     const parsed = payload ? parseInvitePayload(payload) : null;
     if (!parsed) {
       setJoinError("That does not look like a valid invite.");
+      setView("join");
       return;
     }
     setJoinError("");
-    setJoinBusy(true);
+    setConfirm({
+      code: parsed.code,
+      keyBase64: parsed.keyBase64,
+      peek: null,
+      peekLoading: true,
+      peekError: "",
+      busy: false,
+      redeemError: "",
+    });
+    setView("confirm");
+    void loadPeek(parsed.code);
+  };
+
+  const loadPeek = async (code: string) => {
     try {
-      const relationshipId = await redeemPairCode(parsed.code);
-      const key = await importKeyRaw(base64ToBytes(parsed.keyBase64));
+      const peek = await peekPairCode(code);
+      // Ignore if the user already navigated away or a newer decode replaced
+      // this confirm state.
+      if (confirm()?.code !== code) return;
+      setConfirm((c) => (c ? { ...c, peek, peekLoading: false } : c));
+    } catch (err) {
+      if (confirm()?.code !== code) return;
+      const msg = err instanceof Error ? err.message : "Could not load this invite.";
+      setConfirm((c) =>
+        c ? { ...c, peekLoading: false, peekError: msg } : c,
+      );
+    }
+  };
+
+  // Redeem happens ONLY here, on the explicit Join tap (D-25.1).
+  const confirmJoin = async () => {
+    const current = confirm();
+    if (!current || current.busy || current.peekError) return;
+    setConfirm((c) => (c ? { ...c, busy: true, redeemError: "" } : c));
+    try {
+      const relationshipId = await redeemPairCode(current.code);
+      const key = await importKeyRaw(base64ToBytes(current.keyBase64));
       await putKey(relationshipId, key);
       await refreshRelationship();
       // Gate re-renders into the dashboard on the active relationship.
     } catch (err) {
-      setJoinError(friendlyRedeemError(err));
-    } finally {
-      setJoinBusy(false);
+      // Stay on the confirm view with a Back option; no key was stored.
+      setConfirm((c) =>
+        c ? { ...c, busy: false, redeemError: friendlyRedeemError(err) } : c,
+      );
     }
+  };
+
+  const cancelConfirm = () => {
+    setConfirm(null);
+    setJoinError("");
+    setView("join");
   };
 
   // Read a `#pair=<payload>` deep link off the current URL, if present, then
@@ -221,11 +280,12 @@ export default function PairFlow() {
   };
 
   // Reload-safety + deep-link handoff. A device is either the inviter (has an
-  // outstanding pending invite -> resume the waiting screen) or the joiner
-  // (opened a `#pair=` deep link -> auto-run Join). The inviter path wins if
-  // both somehow appear, so we only consume the deep link when no invite is
-  // outstanding. The AES key persists in IndexedDB; pending metadata in
-  // localStorage.
+  // outstanding pending invite -> RESTORE and re-show the waiting screen with
+  // the QR/link/cancel, resume polling) or the joiner (opened a `#pair=` deep
+  // link -> route into the CONFIRM view, no auto-redeem). The inviter path
+  // wins if both somehow appear, so we only consume the deep link when no
+  // invite is outstanding. The AES key persists in IndexedDB; pending
+  // metadata in localStorage. (D-25.3)
   onMount(() => {
     const pending = readPendingInvite();
     if (pending) {
@@ -236,8 +296,7 @@ export default function PairFlow() {
     }
     const deepLink = consumeDeepLink();
     if (deepLink) {
-      setView("join");
-      void handleDecode(deepLink);
+      handleDecode(deepLink);
     }
   });
 
@@ -309,18 +368,61 @@ export default function PairFlow() {
         <div class="pair-flow-join">
           <h2>Join your partner</h2>
           <p>Scan the QR code your partner is showing, or paste their invite.</p>
-          <Show when={joinBusy()}>
-            <p class="pair-flow-waiting" role="status">Pairing...</p>
-          </Show>
           <Show when={joinError()}>
             <p class="error" role="alert">{joinError()}</p>
           </Show>
-          <QRScanner onDecode={(payload) => void handleDecode(payload)} />
+          <QRScanner onDecode={(payload) => handleDecode(payload)} />
           <div class="pair-flow-actions">
             <button type="button" onClick={() => setView("landing")}>
               Back
             </button>
           </div>
+        </div>
+      </Show>
+
+      <Show when={view() === "confirm"}>
+        <div class="pair-flow-confirm">
+          <Show when={confirm()?.peekLoading}>
+            <p class="pair-flow-waiting" role="status">Loading invite...</p>
+          </Show>
+
+          <Show when={confirm() && !confirm()!.peekLoading && confirm()!.peekError}>
+            <h2>Invite unavailable</h2>
+            <p class="error" role="alert">{confirm()!.peekError}</p>
+            <div class="pair-flow-actions">
+              <button type="button" onClick={cancelConfirm}>
+                Back
+              </button>
+            </div>
+          </Show>
+
+          <Show when={confirm() && !confirm()!.peekLoading && !confirm()!.peekError}>
+            <h2>
+              Join {confirm()!.peek?.display_name || "your partner"}?
+            </h2>
+            <p>
+              Pairing links your two accounts so you can start giving hearts.
+            </p>
+            <Show when={confirm()!.redeemError}>
+              <p class="error" role="alert">{confirm()!.redeemError}</p>
+            </Show>
+            <div class="pair-flow-actions">
+              <button
+                type="button"
+                onClick={() => void confirmJoin()}
+                disabled={confirm()!.busy}
+              >
+                {confirm()!.busy ? "Joining..." : "Join"}
+              </button>
+              <button
+                type="button"
+                onClick={cancelConfirm}
+                disabled={confirm()!.busy}
+              >
+                Cancel
+              </button>
+            </div>
+          </Show>
         </div>
       </Show>
     </section>

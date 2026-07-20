@@ -28,12 +28,13 @@ describe("InviteQR", () => {
     vi.restoreAllMocks();
   });
 
-  it("renders the QR canvas, the invite link field, and the short code", () => {
-    const { getByLabelText, getByText, container } = render(() => (
+  it("renders the QR canvas and the invite link field, but NOT a standalone code (PRD-25 D-25.3)", () => {
+    const { getByLabelText, queryByText, container } = render(() => (
       <InviteQR code={CODE} keyBase64={KEY_B64} />
     ));
     expect(container.querySelector("canvas")).toBeTruthy();
-    expect(getByText(CODE)).toBeInTheDocument();
+    // The standalone short code line is gone — it cannot pair on its own.
+    expect(queryByText(CODE)).toBeNull();
     const field = getByLabelText("Full invite link") as HTMLTextAreaElement;
     expect(field.value).toBe(expectedUrl());
   });

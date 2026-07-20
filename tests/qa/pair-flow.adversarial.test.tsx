@@ -1,7 +1,11 @@
 import { cleanup, fireEvent, render, waitFor } from "@solidjs/testing-library";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-// QA adversarial suite for PRD-21 — PairFlow component behavior.
+// QA adversarial suite for PairFlow component behavior.
+// Reconciled for PRD-25 (D-25.1): scan/paste no longer auto-redeems. It
+// routes to the CONFIRM view (peek preview); redemption fires ONLY on the
+// confirm view's Join tap. These invariants are unchanged and re-pointed to
+// the new trigger point below.
 //
 // Covers, beyond the Dev happy-path tests:
 //  - poll lifecycle (D-21.2): interval polls ~3s while waiting, STOPS on
@@ -10,18 +14,22 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 //    (RPC) call; only code/archetype cross the wire.
 //  - inviter migration on pair-detect: getKey(temp) -> putKey(relId) ->
 //    deleteKey(temp).
-//  - friendly error mapping for all five RPC exception strings.
-//  - malformed/non-invite scan payload -> parse null -> no redeem RPC call.
+//  - friendly error mapping for the redeem RPC exception strings, now
+//    surfaced on the confirm view after Join.
+//  - malformed/non-invite paste -> parse null -> no peek/redeem RPC call.
 //  - reload-safety: a pair_invite_pending marker resumes the waiting screen
 //    and starts polling; cleared on cancel.
+//  - no duplicate relationship on a double Join tap (redeem-once busy guard).
 
 const mockRedeemPairCode = vi.fn();
+const mockPeekPairCode = vi.fn();
 const mockGetMyActiveRelationship = vi.fn();
 const mockCreatePairInvite = vi.fn();
 const mockRevokePairInvite = vi.fn();
 
 vi.mock("~/lib/data/relationship", () => ({
   redeemPairCode: mockRedeemPairCode,
+  peekPairCode: mockPeekPairCode,
   getMyActiveRelationship: mockGetMyActiveRelationship,
   createPairInvite: mockCreatePairInvite,
   revokePairInvite: mockRevokePairInvite,
@@ -62,6 +70,10 @@ beforeEach(() => {
   (globalThis as { BarcodeDetector?: unknown }).BarcodeDetector = undefined;
   vi.clearAllMocks();
   mockGetMyActiveRelationship.mockResolvedValue(null);
+  mockPeekPairCode.mockResolvedValue({
+    display_name: "Partner Name",
+    archetype: "getting_to_know",
+  });
   mockGetKey.mockResolvedValue("temp-key" as unknown as CryptoKey);
   localStorage.clear();
 });
@@ -188,18 +200,29 @@ describe("PRD-21 QA: inviter pair-detect migration + key never on server", () =>
   it("redeem flow sends ONLY the code to the server — key stays client-side", async () => {
     mockRedeemPairCode.mockResolvedValue("rel-redeem");
     const PairFlow = await importPairFlow();
-    const { getByRole, getByLabelText } = render(() => <PairFlow />);
+    const { getByRole, getByLabelText, findByRole } = render(() => <PairFlow />);
 
     fireEvent.click(getByRole("button", { name: "Join" }));
     const input = getByLabelText("Paste invite") as HTMLInputElement;
     fireEvent.input(input, { target: { value: "v1:JOINCODE:AQIDBAUGBwgJCgsMDQ4PEA==" } });
     fireEvent.click(getByRole("button", { name: "Continue" }));
 
+    // Paste routes to the confirm view (peek), NOT a direct redeem.
+    await waitFor(() => expect(mockPeekPairCode).toHaveBeenCalledWith("JOINCODE"));
+    expect(mockRedeemPairCode).not.toHaveBeenCalled();
+
+    // Redeem fires only on the explicit Join tap.
+    fireEvent.click(await findByRole("button", { name: "Join" }));
+
     await waitFor(() => expect(mockRedeemPairCode).toHaveBeenCalled());
     // redeemPairCode called with just the code, no key base64.
     expect(mockRedeemPairCode).toHaveBeenCalledWith("JOINCODE");
     for (const call of mockRedeemPairCode.mock.calls) {
       expect(call).toEqual(["JOINCODE"]);
+    }
+    // Neither peek nor redeem ever received the key base64.
+    for (const call of mockPeekPairCode.mock.calls) {
+      expect(JSON.stringify(call)).not.toContain("AQIDBAUGBwgJCgsMDQ4PEA==");
     }
     // The key WAS stored locally under the returned rel id.
     await waitFor(() =>
@@ -212,7 +235,7 @@ describe("PRD-21 QA: inviter pair-detect migration + key never on server", () =>
 // Friendly error mapping for every RPC exception string
 // -------------------------------------------------------------------------
 
-describe("PRD-21 QA: friendly error mapping (all five RPC strings)", () => {
+describe("PRD-25 QA: friendly redeem-error mapping on the confirm view (Join tap)", () => {
   const cases: Array<[string, RegExp]> = [
     ["invalid code", /not valid/i],
     ["code already used", /already been used/i],
@@ -222,31 +245,36 @@ describe("PRD-21 QA: friendly error mapping (all five RPC strings)", () => {
   ];
 
   for (const [rpcMsg, expected] of cases) {
-    it(`maps "${rpcMsg}" to a friendly message, no crash, key not stored`, async () => {
+    it(`maps "${rpcMsg}" to a friendly message on Join, no crash, key not stored`, async () => {
       mockRedeemPairCode.mockRejectedValue(new Error(rpcMsg));
       const PairFlow = await importPairFlow();
-      const { getByRole, getByLabelText } = render(() => <PairFlow />);
+      const { getByRole, getByLabelText, findByRole } = render(() => <PairFlow />);
 
       fireEvent.click(getByRole("button", { name: "Join" }));
       const input = getByLabelText("Paste invite") as HTMLInputElement;
       fireEvent.input(input, { target: { value: "v1:BADCODE0:AQID" } });
       fireEvent.click(getByRole("button", { name: "Continue" }));
 
+      // Confirm view -> Join tap -> redeem rejects -> friendly error shown.
+      fireEvent.click(await findByRole("button", { name: "Join" }));
       await waitFor(() => expect(getByRole("alert")).toHaveTextContent(expected));
       expect(mockPutKey).not.toHaveBeenCalled();
+      // Stays on the confirm view with a Cancel/Back option.
+      expect(getByRole("button", { name: "Cancel" })).toBeInTheDocument();
     });
   }
 
   it("an unknown RPC error falls back to a generic friendly message", async () => {
     mockRedeemPairCode.mockRejectedValue(new Error("some internal 500"));
     const PairFlow = await importPairFlow();
-    const { getByRole, getByLabelText } = render(() => <PairFlow />);
+    const { getByRole, getByLabelText, findByRole } = render(() => <PairFlow />);
 
     fireEvent.click(getByRole("button", { name: "Join" }));
     const input = getByLabelText("Paste invite") as HTMLInputElement;
     fireEvent.input(input, { target: { value: "v1:CODE9999:AQID" } });
     fireEvent.click(getByRole("button", { name: "Continue" }));
 
+    fireEvent.click(await findByRole("button", { name: "Join" }));
     await waitFor(() => expect(getByRole("alert")).toHaveTextContent(/could not pair/i));
   });
 });
@@ -255,10 +283,10 @@ describe("PRD-21 QA: friendly error mapping (all five RPC strings)", () => {
 // Malformed / non-invite payload -> no RPC call
 // -------------------------------------------------------------------------
 
-describe("PRD-21 QA: malformed scan payload never hits the redeem RPC", () => {
+describe("PRD-25 QA: malformed paste never peeks or redeems", () => {
   const bad = ["https://evil.example", "not-a-payload", "v2:CODE:key==", "", "v1:CODE"];
   for (const payload of bad) {
-    it(`rejects ${JSON.stringify(payload)} before any redeem RPC`, async () => {
+    it(`rejects ${JSON.stringify(payload)} before any peek/redeem RPC`, async () => {
       const PairFlow = await importPairFlow();
       const { getByRole, getByLabelText } = render(() => <PairFlow />);
 
@@ -267,8 +295,10 @@ describe("PRD-21 QA: malformed scan payload never hits the redeem RPC", () => {
       fireEvent.input(input, { target: { value: payload } });
       fireEvent.click(getByRole("button", { name: "Continue" }));
 
-      // Give any async path a tick; redeem must never be called.
+      // Give any async path a tick; neither peek nor redeem may be called.
       await Promise.resolve();
+      await Promise.resolve();
+      expect(mockPeekPairCode).not.toHaveBeenCalled();
       expect(mockRedeemPairCode).not.toHaveBeenCalled();
       expect(mockPutKey).not.toHaveBeenCalled();
     });

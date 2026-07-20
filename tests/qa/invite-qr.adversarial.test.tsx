@@ -4,14 +4,18 @@ import InviteQR from "~/components/InviteQR";
 import { buildInvitePayload, buildInviteUrl, parseInviteUrl } from "~/lib/pairing/qr";
 
 // QA adversarial suite for PRD-24 — InviteQR copy button.
+// Reconciled for PRD-25 (D-25.3): the standalone actionable short code is
+// REMOVED from the invite UI. QR + copyable invite link are the only
+// shareables. The copy-full-URL invariant is unchanged.
 //
-// Contract (PRD-24):
+// Contract (PRD-24 + PRD-25 D-25.3):
 //   - the Copy button copies the FULL invite URL (deep link), NOT the short
 //     8-char code — pasting the short code was the original dead-end bug.
 //   - when navigator.clipboard.writeText REJECTS (blocked / insecure
 //     context), the component must NOT crash and must still surface the full
 //     invite text for manual copy (select the field).
-//   - the short code stays visible for reference.
+//   - the standalone short code is ABSENT (it cannot pair on its own; the
+//     key lives only in the invite link). D-25.3.
 //
 // jsdom's <canvas> has no 2d context, so stub qrcode's canvas renderer.
 vi.mock("qrcode", () => ({
@@ -68,11 +72,18 @@ describe("PRD-24 QA: Copy button copies the FULL invite URL, not the short code"
     expect(payload).toContain(KEY_B64);
   });
 
-  it("still shows the short code for reference", () => {
-    const { getByText } = render(() => (
+  it("does NOT show a standalone actionable short code (PRD-25 D-25.3)", () => {
+    const { queryByText, getByRole, getByLabelText } = render(() => (
       <InviteQR code={CODE} keyBase64={KEY_B64} />
     ));
-    expect(getByText(CODE)).toBeInTheDocument();
+    // The standalone code line is gone; the code appears only embedded inside
+    // the invite-link URL (a textarea value / QR), never as its own text node.
+    expect(queryByText(CODE)).toBeNull();
+    // The two real shareables remain: the copyable invite link + copy button.
+    expect(getByLabelText("Full invite link")).toBeInTheDocument();
+    expect(
+      getByRole("button", { name: "Copy invite link" }),
+    ).toBeInTheDocument();
   });
 });
 

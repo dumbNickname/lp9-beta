@@ -15,6 +15,13 @@ export type Archetype =
 
 export type RelationshipStatus = "active" | "archived";
 
+// Read-only preview of an invite for the join confirm view (PRD-25, D-25.2).
+// Never carries key material; the AES key lives only in the invite link.
+export interface PairInvitePeek {
+  display_name: string | null;
+  archetype: Archetype;
+}
+
 export interface Relationship {
   id: string;
   member_a: string;
