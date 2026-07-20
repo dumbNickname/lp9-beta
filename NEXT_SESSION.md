@@ -11,8 +11,8 @@
 - **Phase 1 complete and deployed.** Supabase client, anon auth,
   profiles table + trigger + RLS, data-access layer, onboarding form.
   Live at `https://dumbnickname.github.io/lp9-beta/app`.
-- **Phase 2 IN PROGRESS** (pairing + encryption). Decomposed into
-  PRD-15..23. Done so far:
+- **Phase 2 COMPLETE and deployed** (pairing + encryption). PRD-15..24
+  all merged. Pairing works end-to-end (invite/QR/scan/paste/recovery).
   - PRD-15 (merged) — relationships + pairing_invites tables + RLS +
     `is_relationship_member` + co-member profile SELECT policy.
     Migration `0002_relationships_pairing.sql`.
@@ -40,6 +40,15 @@
     overlay in the app shell (D-22.3). Server never sees key/password.
     NOTE: bytea `\x` hex round-trip unverified vs live DB — owner
     preview-branch check pending (see PRD-22 Dev notes + AGENTS.md gotcha).
+  - PRD-23 (merged) — Pairing/recovery warning UI: `Callout.tsx`,
+    `RecoveryWarning.tsx` (honest §3/§12b copy), wired into
+    RecoveryPassword set/change modes.
+  - PRD-24 (merged) — Pairing UX fixes (device bugs): QR now encodes a
+    deep-link URL `<origin><base>app#pair=<payload>` (iOS Camera opens
+    app), copy button on invite screen, `html5-qrcode@2.3.8` lazy
+    fallback scanner for browsers without `BarcodeDetector` (iOS),
+    `#pair=` deep-link auto-drives Join. See `no-human-decisions.md`
+    D-24.1. Key rides in URL fragment (never sent to server).
 - Single GitHub repo: `dumbNickname/lp9-beta`. Git remote is `beta`
   (`git push beta master`).
 - Single Supabase project, `eu-central-1` (Frankfurt), GitHub
@@ -57,24 +66,34 @@
 **App (SPA, needs JS + Supabase):**
 - `https://dumbnickname.github.io/lp9-beta/app` — anon sign-in →
   onboarding form (name/locale/archetype) first visit; "Welcome back"
-  after. Use incognito for a fresh anon user. NOTE: pairing/QR UI not
-  built yet (PRD-21) — only onboarding + placeholder dashboard for now.
+  after. Use incognito for a fresh anon user. Pairing flow live:
+  Invite (QR deep-link + copyable invite URL + short code) / Join
+  (camera scan via native or html5-qrcode fallback, or paste URL/payload).
+  After pairing, a skippable "set recovery password" overlay appears.
 
 **Supabase dashboard** (not public URLs):
 - Table Editor → `profiles`, `relationships`, `pairing_invites`
 - Database → Functions → `create_pair_invite`, `redeem_pair_code`,
   `revoke_pair_invite`, `gen_pair_code`, `is_relationship_member`,
-  `handle_new_user`
+  `handle_new_user`, `set_recovery_password`
 - Authentication → Users → anon users appear after visiting `/app`
 
-## What to do next — resume at PRD-23
+## What to do next — Phase 3 (core hearts loop)
 
-Execute the remaining Phase 2 PRD: **23** (last of Phase 2).
+Phase 2 is `merged`, so per the decomposition rule (`PROGRESS.md`) the
+next step is to **decompose Phase 3** into concrete PRDs (currently a
+`(not yet decomposed)` placeholder). Source: `HANDOFF.md` Phase 3 +
+`DESIGN.md` §16a (from Phase 3 every PRD is a vertical slice:
+migration → RLS → RPC → data layer → UI → tests).
 
-**Flagged design questions to resolve (owner input useful before coding
-the wiring PRDs):**
+Phase 3 = the first user-visible feature slice: giving **hearts** with an
+E2E-encrypted comment (`points` table, §13a; encryption §12a; edit/delete
+windows §5c/§5d). Write PRD-25+ and add rows to `PROGRESS.md`.
 
-- (No open PRD-22/23 flags yet — review before coding those.)
+**Before Phase 3 coding, resolve/keep in mind:**
+- Owner: verify PRD-22 bytea round-trip on the live/preview DB (see
+  Owner action items) — hearts comments reuse the same crypto + bytea
+  path, so confirming it now de-risks Phase 3.
 
 ## Owner action items (parked)
 

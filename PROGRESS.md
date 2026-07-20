@@ -76,7 +76,7 @@ Source: `HANDOFF.md` Phase 2.
 | 21 | Pair flow UI (invite + redeem, end-to-end)            | `prds/PRD-21-pair-flow-ui.md`                  | merged    |
 | 22 | Password-wrapped key recovery                         | `prds/PRD-22-password-key-recovery.md`         | merged |
 | 23 | Pairing / recovery warning UI                         | `prds/PRD-23-pairing-warning-ui.md`            | merged |
-| 24 | Pairing UX fixes (deep-link QR, copy, iOS scan)       | `prds/PRD-24-pairing-ux-fixes.md`              | todo   |
+| 24 | Pairing UX fixes (deep-link QR, copy, iOS scan)       | `prds/PRD-24-pairing-ux-fixes.md`              | merged |
 
 ### Phase 3 — Core points loop (hearts) — first vertical slice
 

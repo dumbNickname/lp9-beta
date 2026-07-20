@@ -15,7 +15,7 @@ import {
   redeemPairCode,
   revokePairInvite,
 } from "~/lib/data/relationship";
-import { buildInvitePayload, parseInvitePayload } from "~/lib/pairing/qr";
+import { normalizeScannedInput, parseInviteUrl, parseInvitePayload } from "~/lib/pairing/qr";
 import { refreshRelationship } from "~/lib/stores/relationship";
 import type { Archetype } from "~/lib/data/types";
 
@@ -176,8 +176,11 @@ export default function PairFlow() {
     setView("landing");
   };
 
-  const handleDecode = async (payload: string) => {
-    const parsed = parseInvitePayload(payload);
+  const handleDecode = async (input: string) => {
+    // Accept either a full invite URL (deep link / scanned QR) or a bare
+    // `v1:...` payload before parsing.
+    const payload = normalizeScannedInput(input);
+    const parsed = payload ? parseInvitePayload(payload) : null;
     if (!parsed) {
       setJoinError("That does not look like a valid invite.");
       return;
@@ -197,14 +200,44 @@ export default function PairFlow() {
     }
   };
 
-  // Reload-safety: if an invite was outstanding, resume the waiting screen.
-  // The AES key persists in IndexedDB; the pending metadata in localStorage.
+  // Read a `#pair=<payload>` deep link off the current URL, if present, then
+  // strip the fragment so it never re-triggers on re-render/reload. Guarded
+  // for SSR (no window/history). Returns the raw payload or null.
+  const consumeDeepLink = (): string | null => {
+    if (typeof window === "undefined" || !window.location) return null;
+    const payload = parseInviteUrl(window.location.href);
+    if (payload === null) return null;
+    try {
+      if (window.history?.replaceState) {
+        const { pathname, search } = window.location;
+        window.history.replaceState(null, "", `${pathname}${search}`);
+      } else {
+        window.location.hash = "";
+      }
+    } catch {
+      // History API unavailable; the fragment lingers but pairing still runs.
+    }
+    return payload;
+  };
+
+  // Reload-safety + deep-link handoff. A device is either the inviter (has an
+  // outstanding pending invite -> resume the waiting screen) or the joiner
+  // (opened a `#pair=` deep link -> auto-run Join). The inviter path wins if
+  // both somehow appear, so we only consume the deep link when no invite is
+  // outstanding. The AES key persists in IndexedDB; pending metadata in
+  // localStorage.
   onMount(() => {
     const pending = readPendingInvite();
     if (pending) {
       setInvite(pending);
       setView("invite");
       startPolling(pending.code);
+      return;
+    }
+    const deepLink = consumeDeepLink();
+    if (deepLink) {
+      setView("join");
+      void handleDecode(deepLink);
     }
   });
 
@@ -260,8 +293,8 @@ export default function PairFlow() {
               Waiting for your partner to join...
             </p>
             <InviteQR
-              payload={buildInvitePayload(invite()!.code, invite()!.keyBase64)}
               code={invite()!.code}
+              keyBase64={invite()!.keyBase64}
             />
             <div class="pair-flow-actions">
               <button type="button" onClick={cancelInvite}>

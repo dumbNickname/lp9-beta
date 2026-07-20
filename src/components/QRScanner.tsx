@@ -1,58 +1,64 @@
-import { createSignal, onCleanup, onMount, Show } from "solid-js";
-import { parseInvitePayload } from "~/lib/pairing/qr";
-import { isSupported, startScan, type Scanner } from "~/lib/pairing/scan";
+import { createSignal, createUniqueId, onCleanup, onMount, Show } from "solid-js";
+import { normalizeScannedInput, parseInvitePayload } from "~/lib/pairing/qr";
+import { isNativeSupported, startScan, type Scanner } from "~/lib/pairing/scan";
+import { startFallbackScan } from "~/lib/pairing/scan-fallback";
 
 interface QRScannerProps {
-  // Called with the raw invite payload string on a successful scan or a
-  // valid manual paste. Parsing/redemption is the caller's job (PRD-21);
-  // this component only guarantees the string parses via PRD-19 when it
-  // originates from manual entry.
-  onDecode: (payload: string) => void;
+  // Called with the raw decoded string on a successful scan or a valid
+  // manual paste. The caller (PairFlow) normalizes URL-or-payload and
+  // redeems (PRD-21); manual entry is validated here before it fires.
+  onDecode: (raw: string) => void;
 }
 
-type CameraState = "idle" | "starting" | "running" | "denied" | "unsupported";
+type CameraState = "idle" | "starting" | "running" | "denied";
 
 export default function QRScanner(props: QRScannerProps) {
   const [cameraState, setCameraState] = createSignal<CameraState>("idle");
   const [manual, setManual] = createSignal("");
   const [manualError, setManualError] = createSignal("");
 
+  // Unique id so the html5-qrcode fallback can address its mount container.
+  const fallbackContainerId = `qr-fallback-${createUniqueId()}`;
+
   let video: HTMLVideoElement | undefined;
+  let fallbackContainer: HTMLDivElement | undefined;
   let scanner: Scanner | undefined;
   let stream: MediaStream | undefined;
+  let disposed = false;
 
   const cleanup = () => {
     scanner?.stop();
     scanner = undefined;
-    // scanner.stop() releases tracks, but if we failed before startScan we
-    // may still hold a raw stream — release it defensively.
+    // scanner.stop() releases tracks (native path), but if we failed before
+    // startScan we may still hold a raw stream — release it defensively.
     if (stream) {
       for (const track of stream.getTracks()) track.stop();
       stream = undefined;
     }
   };
 
-  onMount(async () => {
-    if (!isSupported()) {
-      setCameraState("unsupported");
-      return;
-    }
+  const onDecoded = (raw: string) => {
+    cleanup();
+    setCameraState("idle");
+    props.onDecode(raw);
+  };
+
+  // Native BarcodeDetector path: we own the <video> + MediaStream.
+  const startNative = async () => {
     if (
       typeof navigator === "undefined" ||
       !navigator.mediaDevices?.getUserMedia
     ) {
-      setCameraState("unsupported");
+      setCameraState("denied");
       return;
     }
-
     setCameraState("starting");
     try {
       const media = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: "environment" },
       });
       stream = media;
-      if (!video) {
-        // Component unmounted before the video element resolved.
+      if (!video || disposed) {
         for (const track of media.getTracks()) track.stop();
         stream = undefined;
         return;
@@ -63,25 +69,56 @@ export default function QRScanner(props: QRScannerProps) {
         startScan({
           video,
           stream: media,
-          onDecode: (raw) => {
-            cleanup();
-            setCameraState("idle");
-            props.onDecode(raw);
-          },
+          onDecode: onDecoded,
         }) ?? undefined;
       setCameraState("running");
     } catch {
-      // Permission denied or no camera. Fall through to manual entry.
       cleanup();
       setCameraState("denied");
     }
+  };
+
+  // html5-qrcode fallback path: the library owns its camera + video element,
+  // rendered into our container. Used when BarcodeDetector is unsupported.
+  const startFallback = async () => {
+    if (!fallbackContainer || disposed) {
+      setCameraState("denied");
+      return;
+    }
+    setCameraState("starting");
+    try {
+      scanner = await startFallbackScan({
+        container: fallbackContainer,
+        onDecode: onDecoded,
+      });
+      if (disposed) {
+        scanner.stop();
+        scanner = undefined;
+        return;
+      }
+      setCameraState("running");
+    } catch {
+      cleanup();
+      setCameraState("denied");
+    }
+  };
+
+  onMount(() => {
+    if (isNativeSupported()) {
+      void startNative();
+    } else {
+      void startFallback();
+    }
   });
 
-  onCleanup(cleanup);
+  onCleanup(() => {
+    disposed = true;
+    cleanup();
+  });
 
   const submitManual = (e: Event) => {
     e.preventDefault();
-    const payload = manual().trim();
+    const payload = normalizeScannedInput(manual());
     if (!payload) {
       setManualError("Paste an invite to continue.");
       return;
@@ -102,16 +139,16 @@ export default function QRScanner(props: QRScannerProps) {
         </div>
       </Show>
 
+      {/* Fallback mount target — html5-qrcode renders its own video here. */}
+      <div
+        ref={fallbackContainer}
+        id={fallbackContainerId}
+        class="qr-scanner-fallback"
+      />
+
       <Show when={cameraState() === "denied"}>
         <p class="qr-scanner-notice" role="status">
           Camera access is unavailable. Paste the invite below instead.
-        </p>
-      </Show>
-
-      <Show when={cameraState() === "unsupported"}>
-        <p class="qr-scanner-notice" role="status">
-          Scanning is not supported on this device. Paste the invite below
-          instead.
         </p>
       </Show>
 

@@ -31,9 +31,14 @@ function getBarcodeDetectorCtor(): BarcodeDetectorCtor | undefined {
 
 // True when the browser exposes the native BarcodeDetector API. Never
 // throws; returns false during SSR/prerender or on unsupported browsers.
+// When false, QRScanner uses the html5-qrcode fallback (scan-fallback.ts),
+// so a scanner is now always available in the browser.
 export function isSupported(): boolean {
   return getBarcodeDetectorCtor() !== undefined;
 }
+
+// Clearer alias for the native check now that a fallback path exists.
+export const isNativeSupported = isSupported;
 
 export interface Scanner {
   // Stop the detector loop and stop every track on the MediaStream so the

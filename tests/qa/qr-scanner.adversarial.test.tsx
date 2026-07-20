@@ -189,18 +189,25 @@ describe("PRD-20 QA: camera permission denial is graceful", () => {
     expect(onDecode).not.toHaveBeenCalled();
   });
 
-  it("getUserMedia absent -> unsupported notice, no throw, manual usable", async () => {
+  // PRD-24 contract change (reconciled): the "scanning is not supported"
+  // dead-end is REMOVED. When the native BarcodeDetector path is chosen but
+  // getUserMedia is missing, the scanner degrades to the "unavailable"
+  // notice (denied state) and manual entry stays usable — it must NOT show
+  // the old "not supported" copy, and it must NOT crash.
+  it("native path + getUserMedia absent -> 'unavailable' notice (no dead 'not supported'), manual usable", async () => {
     setBarcodeDetector(class {
       detect = vi.fn();
     });
     setMediaDevices({}); // no getUserMedia method
     const onDecode = vi.fn();
-    const { getByRole, getByLabelText } = render(() => (
+    const { getByRole, getByLabelText, queryByText } = render(() => (
       <QRScanner onDecode={onDecode} />
     ));
     await waitFor(() =>
-      expect(getByRole("status")).toHaveTextContent(/not supported/i),
+      expect(getByRole("status")).toHaveTextContent(/unavailable/i),
     );
+    // The removed dead-end copy must be gone.
+    expect(queryByText(/not supported/i)).toBeNull();
     const input = getByLabelText("Paste invite") as HTMLInputElement;
     fireEvent.input(input, { target: { value: "v1:CODE:key==" } });
     fireEvent.click(getByRole("button", { name: "Continue" }));
