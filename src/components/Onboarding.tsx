@@ -70,37 +70,29 @@ export default function Onboarding() {
         />
       </label>
 
-      <fieldset>
-        <legend>Language</legend>
-        <For each={LOCALES}>{(l) => (
-          <label>
-            <input
-              type="radio"
-              name="locale"
-              value={l.value}
-              checked={locale() === l.value}
-              onChange={() => setLocale(l.value)}
-            />
-            {l.label}
-          </label>
-        )}</For>
-      </fieldset>
+      <label>
+        Language
+        <select
+          value={locale()}
+          onChange={(e) => setLocale(e.currentTarget.value as "en" | "pl" | "de")}
+        >
+          <For each={LOCALES}>
+            {(l) => <option value={l.value}>{l.label}</option>}
+          </For>
+        </select>
+      </label>
 
-      <fieldset>
-        <legend>What describes you best?</legend>
-        <For each={ARCHETYPES}>{(a) => (
-          <label>
-            <input
-              type="radio"
-              name="archetype"
-              value={a.value}
-              checked={archetype() === a.value}
-              onChange={() => setArchetype(a.value)}
-            />
-            {a.label}
-          </label>
-        )}</For>
-      </fieldset>
+      <label>
+        What describes you best?
+        <select
+          value={archetype()}
+          onChange={(e) => setArchetype(e.currentTarget.value)}
+        >
+          <For each={ARCHETYPES}>
+            {(a) => <option value={a.value}>{a.label}</option>}
+          </For>
+        </select>
+      </label>
 
       <Show when={error()}>
         <p class="error" role="alert">{error()}</p>

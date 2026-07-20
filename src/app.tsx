@@ -2,6 +2,7 @@ import { Router } from "@solidjs/router";
 import { FileRoutes } from "@solidjs/start/router";
 import { Suspense } from "solid-js";
 import SessionProvider from "~/components/SessionProvider";
+import SiteNav from "~/components/SiteNav";
 import ThemeToggle from "~/components/ThemeToggle";
 import "~/styles/global.css";
 
@@ -22,6 +23,7 @@ export default function App() {
       root={(props) => (
         <SessionProvider>
           <header class="app-header">
+            <SiteNav />
             <ThemeToggle />
           </header>
           <Suspense>{props.children}</Suspense>

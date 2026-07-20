@@ -57,3 +57,9 @@ export function deleteKey(relationshipId: string): Promise<void> {
 export async function hasKey(relationshipId: string): Promise<boolean> {
   return (await getKey(relationshipId)) !== null;
 }
+
+// Remove every stored key. Used by the "Reset account" escape hatch so a
+// device can be returned to a clean, unpaired state for re-testing.
+export function clearKeys(): Promise<void> {
+  return tx("readwrite", (s) => s.clear()).then(() => undefined);
+}

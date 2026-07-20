@@ -51,6 +51,29 @@
 - **Owner input given:** nav + selectors + light polish now; full
   redesign deferred.
 
+### D-26.2 "Reset account" escape hatch (dev/testing)
+- **Decision:** add a small "Reset account" action in the app shell that
+  clears local device state (IndexedDB keys, pairing/recovery localStorage
+  markers) and signs out -> a fresh anonymous user on reload. Lets the
+  owner re-test pairing on a real device (no incognito on mobile) without
+  being stuck on a stale already-paired anon account (which skips PairFlow
+  and lands on the recovery-password overlay).
+- **Why:** owner hit "B jumped to recovery password" because that browser's
+  anon user was already paired from a prior test. Reset unblocks testing.
+- **Owner input given:** "2" (nav + a reset/re-test escape hatch), plus
+  "write down idea for unpair feature in future".
+- **Scope note:** this only resets the LOCAL device/account (client-side +
+  sign-out). It does NOT dissolve the server-side relationship for the
+  partner. That is the future "unpair" feature below.
+- **Alternatives:** full server-side unpair (dissolve relationship for both
+  members) — deferred; see Future ideas.
+
+### Future idea — Unpair / dissolve relationship
+- Real product feature (not just local reset): a member ends a
+  relationship, which dissolves it server-side for both parties (RLS +
+  RPC + confirmation UI + key cleanup). Likely needed once multiple
+  relationships per user are allowed. Own PRD later; not in PRD-26.
+
 ## PRD-24 — Pairing UX fixes
 
 ### D-24.1 QR encodes a deep-link URL with key in the fragment

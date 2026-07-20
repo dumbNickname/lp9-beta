@@ -78,7 +78,7 @@ Source: `HANDOFF.md` Phase 2.
 | 23 | Pairing / recovery warning UI                         | `prds/PRD-23-pairing-warning-ui.md`            | merged |
 | 24 | Pairing UX fixes (deep-link QR, copy, iOS scan)       | `prds/PRD-24-pairing-ux-fixes.md`              | merged |
 | 25 | Pairing flow correctness (confirm, pending, peek)     | `prds/PRD-25-pairing-flow-correctness.md`      | merged |
-| 26 | App shell polish + nav + mobile selectors             | `prds/PRD-26-app-shell-polish.md`              | todo   |
+| 26 | App shell polish + nav + mobile selectors             | `prds/PRD-26-app-shell-polish.md`              | dev-done |
 
 ### Phase 3 — Core points loop (hearts) — first vertical slice
 

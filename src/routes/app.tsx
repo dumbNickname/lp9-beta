@@ -1,6 +1,6 @@
 import { Show, createEffect, createSignal } from "solid-js";
 import { APP_NAME } from "~/constants";
-import { loading as sessionLoading, user } from "~/lib/session";
+import { loading as sessionLoading, resetAccount, user } from "~/lib/session";
 import {
   profile,
   profileLoading,
@@ -62,6 +62,21 @@ export default function AppShell() {
     setRecoveryDone(true);
   };
 
+  const [resetting, setResetting] = createSignal(false);
+  const handleReset = async () => {
+    if (
+      typeof window !== "undefined" &&
+      !window.confirm(
+        "Reset this device? This clears your local keys and signs you out so you start fresh. Your partner's account is not affected.",
+      )
+    ) {
+      return;
+    }
+    setResetting(true);
+    await resetAccount();
+    if (typeof window !== "undefined") window.location.reload();
+  };
+
   return (
     <main>
       <h1>{APP_NAME}</h1>
@@ -84,6 +99,16 @@ export default function AppShell() {
           </Show>
         </Show>
       </Show>
+      <footer class="app-reset">
+        <button
+          type="button"
+          class="app-reset-button"
+          onClick={() => void handleReset()}
+          disabled={resetting()}
+        >
+          {resetting() ? "Resetting..." : "Reset account (start fresh)"}
+        </button>
+      </footer>
     </main>
   );
 }
