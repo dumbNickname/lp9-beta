@@ -166,9 +166,12 @@ files add operational contracts; they do not replace `DESIGN.md`.
   lazy init (getter/proxy). `supabase.ts` uses this pattern.
 - **Git remote is `beta`, not `origin`.** Push with `git push beta master`.
 - **Gitleaks trips on `sb_publishable_*` test strings:** use low-entropy
-  fakes like `fake-key` in test stubs, not `sb_publishable_test123`.
-- **Keep git workflow simple:** branch, work, merge to master, push.
+  fakes like `fake-key` in test stubs, not `sb_publishable_test123`. branch, work, merge to master, push.
   Don't fuss over perfect history.
+- **High-entropy test fixtures (e.g. base64 AES keys) trip
+  `generic-api-key`:** tests deliberately need high entropy (see
+  `tests/AGENTS.md`), so mark intentional fixtures with a trailing
+  `// gitleaks:allow` comment on the line rather than lowering entropy.
 - **PostgREST requires explicit `.eq()` filters** even when RLS
   restricts to own rows. Without a filter, UPDATE/SELECT return 400 Bad
   Request. Always add `.eq("id", user.id)` (or equivalent) on queries.
@@ -185,6 +188,9 @@ files add operational contracts; they do not replace `DESIGN.md`.
 
 - Communicate in **caveman style** (terse; drop filler, keep all
   technical substance) unless the user says otherwise.
+- **Always load this skill set for orchestration work here:** `caveman`
+  (comms), `pragmatic` (surgical, verify-first coding), and `grill-me`
+  (interrogate before acting on any ambiguity). Load at session start.
 - Merge stable branches to `master` promptly; avoid a pile of open PRs.
   Fix issues via follow-up PRs.
 - Do not request out-of-workspace or wide access without explaining why;
