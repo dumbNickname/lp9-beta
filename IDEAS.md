@@ -35,7 +35,58 @@ Thinking so far, to pick up when Phase 6 resumes:
 - **Multi-device** also depends on linking (§10); the key comes via
   recovery password (already built).
 
-## Product / UX
+## Discussed 2026-09-29 (owner questions)
+
+### Notifications about new hearts?
+- **Recommendation: yes, but gentle and later.** DESIGN §8 already
+  planned a throttled daily email (max 1/day, content-free: "Ben
+  appreciated you", no count, no preview). Email is parked (needs
+  account linking).
+- **Web Push via PWA** is the natural fit once installable (see below):
+  works on Android + desktop; on iOS only after "Add to Home Screen"
+  (iOS 16.4+). Needs a service worker + VAPID keys + a Supabase Edge
+  Function to send, plus a `push_subscriptions` table. Same rules:
+  opt-in, max 1/day for hearts, content-free text, immediate only for
+  coupon-flow events (claim / yes / delivered).
+- Anti-pattern to avoid: a push per heart (feels like likes/scoreboard).
+- Interim (no infra): the in-app "new" markers (PRD-46) and the tab
+  badges already exist.
+
+### "Watch rings" gadget around the balance
+- Owner idea: a smartwatch-style ring/bars around the heart number.
+- **Take:** good for attractiveness, but must stay non-competitive
+  (never partner vs partner, never totals). Candidate rings, all
+  self-referential and gentle:
+  1. **Noticing ring** — did *I* give at least one heart today / this
+     week (a personal habit, e.g. 3 days a week goal chosen by the
+     user). Fills with rose.
+  2. **Saving ring** — progress to my next wish (balance / cheapest
+     not-yet-affordable coupon). Fills with amber. This naturally
+     motivates without comparing.
+  3. **Together ring** — a plan in the next 7 days (Coming up has a
+     dated claim). Fills with sage.
+- Tap -> a small sheet explaining each ring; goals are optional and
+  default off (DESIGN: "hoarding accepted", "no nudges against it").
+- Risks: streak guilt. Mitigate: weekly (not daily) targets, no
+  streak counter, rings reset quietly, never show the partner's ring.
+- Needs a scoreboard-risk decision in DESIGN before building (§5b).
+
+### Install as an app (PWA)
+- **Recommended next polish PRD.** Add `manifest.webmanifest`
+  (name=APP_NAME, `start_url` = `<base>app`, `scope` = `<base>`,
+  `display: standalone`, `theme_color`/`background_color` = paper/ember),
+  icons (192/512 + maskable; heart mark placeholder until branding),
+  `<meta name="theme-color">` per theme (light #f4ebe0, dark #3a1f19)
+  so the browser chrome matches, `apple-mobile-web-app-capable` +
+  status-bar style + apple-touch-icon for iOS.
+- A minimal service worker (cache the app shell for offline launch) is
+  needed for Chrome's install prompt; keep data network-only.
+- GH Pages sub-path: the manifest + SW must live under `/lp9-beta/`
+  with the scope set; the SW must not cache Supabase requests.
+- A small "Add to home screen" hint in Settings (iOS has no prompt).
+- Note DESIGN §8a said "no PWA install flow in MVP"; owner now asks
+  for it -> record the change in DESIGN when building.
+
 
 ### Seen while testing (2026-09-29)
 - **Worlds redesign follow-ups (PRD-49):** the tab icons are text glyphs

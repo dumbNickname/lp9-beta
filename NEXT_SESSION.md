@@ -39,6 +39,25 @@
 
 ## What to do next
 
+**0. Start here (2026-09-29 end of session):**
+- Read `REVIEW.md`. **Fix finding #1 first (HIGH security):** members
+  can directly UPDATE any relationship column (swap a member ->
+  hijack; archive; destroy the recovery blob). Drop the UPDATE policy
+  in a new migration + revoke EXECUTE on helper functions (#2).
+  Re-run the live probe (see REVIEW) to confirm.
+- The independent review subagents timed out (gateway). Re-run them in
+  small scopes: (a) SQL/security only, (b) src/lib only, (c) CSS dedupe
+  only, (d) UX review with Playwright DOM probing (prompts: keep each
+  under ~10 min of work).
+- Owner asked about: notifications, "watch rings" gadget, PWA install.
+  Recommendations are in `IDEAS.md` -> "Discussed 2026-09-29". PWA
+  (manifest + theme-color + icons + minimal SW) is the recommended next
+  polish PRD; rings + push need owner decisions first.
+- Browser E2E scripts are in `/tmp/opencode/pw/*.mjs` (claims-e2e,
+  worlds, fix50, settings, layout). They may be gone; move them into
+  `tests/e2e/` (REVIEW #17).
+
+
 1. Owner tries the full loop on phones (hearts -> wish -> yes -> claim
    -> plan -> delivered), and a 2nd pair via "Add someone".
 2. QA pass on the dev-done PRDs (28–34, 36–40, 42, 43), then mark them

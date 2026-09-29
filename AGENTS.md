@@ -102,6 +102,8 @@ placeholder. See `DESIGN.md` §14i.
   autonomously (momentum mode) that a human may want to revisit.
 - `IDEAS.md` — backlog of ideas, tech debt and owner actions. Not
   decisions; promote an item to a PRD before building it.
+- `REVIEW.md` — latest technical + UX review findings (ranked). Fix via
+  PRDs; strike items when done.
 - `LICENSE` (AGPL-3.0-or-later), `TRADEMARK.md` — legal.
 
 These predate DOX and remain authoritative for their content. AGENTS.md
