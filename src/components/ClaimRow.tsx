@@ -1,7 +1,7 @@
 import { createSignal, For, Show } from "solid-js";
 import { friendlyClaimError } from "~/lib/data/claims";
 import type { Claim, Coupon } from "~/lib/data/types";
-import { addDays, formatEventDay, localDateString } from "~/lib/format/date";
+import { addDays, localDateString } from "~/lib/format/date";
 import { accept, cancel, declineC, deliver, nudge, withdraw } from "~/lib/stores/claims";
 
 interface Props {
@@ -14,12 +14,11 @@ interface Props {
 const DAY_MS = 86_400_000;
 
 export function claimStatusText(c: Claim, mine: boolean, partner: string): string {
-  const when = c.scheduled_date ? ` · ${formatEventDay(c.scheduled_date)}` : "";
   switch (c.status) {
     case "pending":
       return mine ? `Waiting for ${partner}` : "Waiting for you";
     case "accepted":
-      return (mine ? `${partner} said yes` : "You said yes") + when;
+      return mine ? `${partner} said yes` : "You said yes";
     case "delivered":
       return "Delivered";
     case "declined":
@@ -33,8 +32,26 @@ export function claimStatusText(c: Claim, mine: boolean, partner: string): strin
   }
 }
 
+export type Urgency = "today" | "soon" | "later" | "undated";
+
+// How soon an accepted claim happens: today/tomorrow, within a week, later.
+export function urgencyOf(date: string | null): Urgency {
+  if (!date) return "undated";
+  const today = localDateString();
+  if (date <= addDays(today, 1)) return "today";
+  if (date <= addDays(today, 7)) return "soon";
+  return "later";
+}
+
+const fmtStamp = (iso: string | null) =>
+  iso
+    ? new Intl.DateTimeFormat("en", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" }).format(
+        new Date(iso),
+      )
+    : null;
+
 // Future-facing date label, e.g. "tomorrow" / "Sat, Oct 3".
-function scheduleLabel(date: string): string {
+export function scheduleLabel(date: string): string {
   const today = localDateString();
   if (date === today) return "today";
   if (date === addDays(today, 1)) return "tomorrow";
@@ -51,6 +68,23 @@ export default function ClaimRow(props: Props) {
   const [busy, setBusy] = createSignal(false);
   const [error, setError] = createSignal("");
 
+  const [details, setDetails] = createSignal(false);
+  const stamps = (): [string, string][] => {
+    const c = props.claim;
+    const rows: [string, string | null][] = [
+      ["Claimed", fmtStamp(c.claimed_at)],
+      ["Accepted", fmtStamp(c.accepted_at)],
+      ["Planned for", c.scheduled_date ? scheduleLabel(c.scheduled_date) : null],
+      ["Delivered", fmtStamp(c.delivered_at)],
+      ["Declined", fmtStamp(c.declined_at)],
+      ["Withdrawn", fmtStamp(c.withdrawn_at)],
+      ["Cancelled", fmtStamp(c.cancelled_at)],
+      ["Returned automatically", fmtStamp(c.auto_refunded_at)],
+      ["Reminder sent", fmtStamp(c.nudged_at)],
+      ["Hearts", String(c.price_at_claim)],
+    ];
+    return rows.filter((r): r is [string, string] => r[1] !== null);
+  };
   const mine = () => props.claim.claimer_id === props.userId;
   const deliverer = () => props.claim.deliverer_id === props.userId;
   const canNudge = () => {
@@ -102,9 +136,13 @@ export default function ClaimRow(props: Props) {
             <strong>{props.coupon?.title ?? "a coupon"}</strong>
           </p>
           <p class="claim-status">
-            {claimStatusText(props.claim, mine(), props.partnerName)}
-            <Show when={props.claim.status === "accepted" && props.claim.scheduled_date}>
-              {" "}({scheduleLabel(props.claim.scheduled_date!)})
+            <span class="claim-state" classList={{ [`claim-state--${props.claim.status}`]: true }}>
+              {claimStatusText(props.claim, mine(), props.partnerName)}
+            </span>
+            <Show when={props.claim.status === "accepted"}>
+              <span class="when-chip" classList={{ [`when-chip--${urgencyOf(props.claim.scheduled_date)}`]: true }}>
+                {props.claim.scheduled_date ? scheduleLabel(props.claim.scheduled_date) : "date to agree"}
+              </span>
             </Show>
           </p>
           <Show when={props.claim.accept_note && props.claim.status === "accepted"}>
@@ -119,6 +157,19 @@ export default function ClaimRow(props: Props) {
         </div>
         <span class="coupon-price">{props.claim.price_at_claim}</span>
       </div>
+
+      <Show when={details()}>
+        <dl class="claim-details">
+          <For each={stamps()}>
+            {([k, v]) => (
+              <>
+                <dt>{k}</dt>
+                <dd>{v}</dd>
+              </>
+            )}
+          </For>
+        </dl>
+      </Show>
 
       <Show when={mode() === "idle"}>
         <div class="claim-actions">
@@ -150,6 +201,14 @@ export default function ClaimRow(props: Props) {
               Send a gentle reminder
             </button>
           </Show>
+          <button
+            type="button"
+            class="link-button claim-details-toggle"
+            aria-expanded={details()}
+            onClick={() => setDetails((v) => !v)}
+          >
+            {details() ? "Less" : "Details"}
+          </button>
         </div>
       </Show>
 

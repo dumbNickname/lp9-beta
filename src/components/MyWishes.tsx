@@ -19,7 +19,16 @@ interface Props {
 
 // "My wishes" world (PRD-49): collect + spend. Grouped by what you can do.
 export default function MyWishes(props: Props) {
-  const [adding, setAdding] = createSignal(false);
+  // Desktop has room: open the "add a wish" form by default (owner
+  // 2026-09-29). Mobile keeps it collapsed.
+  const isWide = () => {
+    try {
+      return window.matchMedia("(min-width: 56rem)").matches;
+    } catch {
+      return false;
+    }
+  };
+  const [adding, setAdding] = createSignal(isWide());
   const [editingId, setEditingId] = createSignal<string | null>(null);
   const [showIdeas, setShowIdeas] = createSignal(false);
   const [showPast, setShowPast] = createSignal(false);
@@ -45,9 +54,12 @@ export default function MyWishes(props: Props) {
   const claimIt = async (id: string) => {
     await claim(id);
   };
+  // Bumped after each submit so the form remounts empty.
+  const [formKey, setFormKey] = createSignal(1);
   const createWish = async (input: CouponInput) => {
     await addCoupon(props.relationship.id, input);
-    setAdding(false);
+    if (isWide()) setFormKey((k) => k + 1);
+    else setAdding(false);
   };
   const saveEdit = async (id: string, input: CouponInput) => {
     await editCoupon(id, input);
@@ -105,13 +117,16 @@ export default function MyWishes(props: Props) {
   return (
     <div class="world world--mine">
       <div class="world-main">
-        <Show when={adding()}>
-          <CouponForm
-            partnerName={props.partnerName}
-            submitLabel={`Ask ${props.partnerName}`}
-            onSubmit={createWish}
-            onCancel={() => setAdding(false)}
-          />
+        <Show when={adding() && formKey()} keyed>
+          <div class="add-wish">
+            <h2 class="add-wish-title">Add a wish</h2>
+            <CouponForm
+              partnerName={props.partnerName}
+              submitLabel={`Ask ${props.partnerName}`}
+              onSubmit={createWish}
+              onCancel={() => setAdding(false)}
+            />
+          </div>
         </Show>
 
         <Show when={active().length === 0 || showIdeas()}>
@@ -174,7 +189,7 @@ export default function MyWishes(props: Props) {
           </Section>
         </Show>
 
-        <Show when={active().length > 0 && ready().length + saving().length + waiting().length === 0}>
+        <Show when={ready().length + saving().length + waiting().length === 0}>
           <div class="world-empty-action">{addButton}</div>
         </Show>
 

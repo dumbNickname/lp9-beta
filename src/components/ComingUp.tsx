@@ -35,18 +35,38 @@ export default function ComingUp(props: Props) {
 
   return (
     <section class="card coming-up" aria-labelledby="coming-title">
-      <h3 id="coming-title" class="templates-title">Coming up</h3>
+      <div class="coming-head">
+        <h3 id="coming-title" class="templates-title">Coming up</h3>
+        <span class="cal-legend">
+          <span class="cal-legend-item cal-legend-item--mine">for you</span>
+          <span class="cal-legend-item cal-legend-item--theirs">for {props.partnerName}</span>
+        </span>
+      </div>
       <ol class="cal-strip" aria-label="Next two weeks">
         <For each={days()}>
           {(d, i) => (
             <li
               class="cal-day"
-              classList={{ "is-today": i() === 0, "has-plan": on(d).length > 0 }}
+              classList={{
+                "is-today": i() === 0,
+                "has-plan": on(d).length > 0,
+                "plan-mine": on(d).some((c) => c.claimer_id === props.userId),
+                "plan-theirs": on(d).some((c) => c.claimer_id !== props.userId),
+              }}
               aria-label={`${d}${on(d).length ? `: ${on(d).map(title).join(", ")}` : ""}`}
             >
               <span class="cal-wd" aria-hidden="true">{weekday(d)}</span>
               <span class="cal-num" aria-hidden="true">{dayNum(d)}</span>
-              <span class="cal-dot" aria-hidden="true" />
+              <span class="cal-dots" aria-hidden="true">
+                <For each={on(d)}>
+                  {(c) => (
+                    <span
+                      class="cal-dot"
+                      classList={{ "cal-dot--mine": c.claimer_id === props.userId }}
+                    />
+                  )}
+                </For>
+              </span>
             </li>
           )}
         </For>
@@ -61,7 +81,7 @@ export default function ComingUp(props: Props) {
             {(d) => (
               <For each={on(d)}>
                 {(c) => (
-                  <li class="plan">
+                  <li class="plan" classList={{ "plan--mine": c.claimer_id === props.userId }}>
                     <span class="plan-date">
                       {new Intl.DateTimeFormat("en", { weekday: "short", day: "numeric", month: "short" }).format(
                         new Date(Number(d.slice(0, 4)), Number(d.slice(5, 7)) - 1, dayNum(d)),
@@ -77,7 +97,7 @@ export default function ComingUp(props: Props) {
           </For>
           <For each={[...undated(), ...later()]}>
             {(c) => (
-              <li class="plan plan--undated">
+              <li class="plan plan--undated" classList={{ "plan--mine": c.claimer_id === props.userId }}>
                 <span class="plan-date">{c.scheduled_date ? "Later" : "Some day soon"}</span>
                 <span aria-hidden="true">{emoji(c)}</span>
                 <span class="plan-title">{title(c)}</span>

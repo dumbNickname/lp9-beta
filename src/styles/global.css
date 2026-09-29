@@ -1656,7 +1656,7 @@ button.is-danger {
 .appbar {
   position: sticky;
   inset-block-start: 0;
-  z-index: 20;
+  z-index: 40;
   margin-inline: calc(var(--space-4) * -1);
   padding-inline: var(--space-4);
   padding-block: var(--space-2);
@@ -2011,9 +2011,8 @@ a.pair-menu-item {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  margin-inline: calc(var(--space-2) * -1);
   margin-block-end: var(--space-3);
-  padding: var(--space-2);
+  padding: var(--space-2) var(--space-3);
   background-color: color-mix(in srgb, var(--w-soft) 92%, var(--color-bg));
   border-inline-start: 4px solid var(--w);
   border-radius: var(--radius);
@@ -2055,6 +2054,16 @@ a.pair-menu-item {
   margin-block: calc(var(--space-2) * -1) var(--space-3);
   font-size: var(--text-sm);
   font-style: italic;
+}
+
+/* Both columns start on the same line: no top margin on first children. */
+.world-main > :first-child,
+.world-side > :first-child {
+  margin-block-start: 0;
+}
+
+.world-side .coming-up {
+  margin-block-end: var(--space-4);
 }
 
 .world-empty-action {
@@ -2223,4 +2232,193 @@ a.pair-menu-item {
   .world--give .world-side {
     order: 0;
   }
+}
+
+.add-wish-title {
+  margin-block: 0 var(--space-2);
+  font-size: var(--text-lg);
+}
+
+.add-wish .coupon-form {
+  margin-block-end: var(--space-4);
+}
+
+/* --- Claim state + when chips (PRD-50) ---------------------------------- */
+
+.claim-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.claim-state::before {
+  content: "";
+  display: inline-block;
+  inline-size: 0.55rem;
+  block-size: 0.55rem;
+  margin-inline-end: 0.35rem;
+  border-radius: 50%;
+  background-color: var(--color-muted-fg);
+  vertical-align: 0.05em;
+}
+
+.claim-state--pending::before {
+  background-color: transparent;
+  border: 1.5px dashed var(--color-accent);
+}
+
+.claim-state--accepted::before {
+  background-color: var(--world-theirs);
+}
+
+.claim-state--delivered::before {
+  background-color: var(--color-heart);
+}
+
+.when-chip {
+  display: inline-flex;
+  align-items: center;
+  padding-inline: var(--space-2);
+  padding-block: 0.1rem;
+  border-radius: 999px;
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+
+.when-chip--today {
+  background-color: var(--color-heart);
+  color: var(--color-accent-fg);
+}
+
+.when-chip--soon {
+  background-color: var(--world-mine-soft);
+  color: var(--color-fg);
+}
+
+.when-chip--later,
+.when-chip--undated {
+  background-color: var(--color-muted-bg);
+  color: var(--color-muted-fg);
+}
+
+.claim-details {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.15rem var(--space-3);
+  margin: var(--space-2) 0 0;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius);
+  background-color: var(--color-bg);
+  font-size: var(--text-xs);
+}
+
+.claim-details dt {
+  color: var(--color-muted-fg);
+}
+
+.claim-details dd {
+  margin: 0;
+  color: var(--color-fg);
+}
+
+.claim-details-toggle {
+  margin-inline-start: auto;
+  color: var(--color-muted-fg);
+}
+
+/* --- Coming up: whose wish (PRD-50) ------------------------------------ */
+
+.coming-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.cal-legend {
+  display: inline-flex;
+  gap: var(--space-3);
+  font-size: var(--text-xs);
+  color: var(--color-muted-fg);
+}
+
+.cal-legend-item::before {
+  content: "";
+  display: inline-block;
+  inline-size: 0.6rem;
+  block-size: 0.6rem;
+  margin-inline-end: 0.3rem;
+  border-radius: 50%;
+  vertical-align: -0.05em;
+  background-color: var(--world-theirs);
+}
+
+.cal-legend-item--mine::before {
+  background-color: var(--world-mine);
+}
+
+.cal-dots {
+  display: inline-flex;
+  gap: 2px;
+  min-block-size: 6px;
+}
+
+.cal-day.has-plan .cal-dot {
+  background-color: var(--world-theirs);
+}
+
+.cal-day.has-plan .cal-dot--mine {
+  background-color: var(--world-mine);
+}
+
+.cal-day.plan-theirs {
+  background-color: var(--world-theirs-soft);
+}
+
+.cal-day.plan-mine {
+  background-color: var(--world-mine-soft);
+}
+
+.cal-day.plan-mine.plan-theirs {
+  background-image: linear-gradient(135deg, var(--world-mine-soft) 50%, var(--world-theirs-soft) 50%);
+}
+
+.plan {
+  padding-inline-start: var(--space-2);
+  border-inline-start: 3px solid var(--world-theirs);
+}
+
+.plan--mine {
+  border-inline-start-color: var(--world-mine);
+}
+
+/* Coupon state chips with a leading glyph so state reads at a glance. */
+.chip--approved {
+  background-color: var(--world-theirs-soft);
+  color: var(--color-fg);
+}
+
+.chip--approved::before {
+  content: "✓ ";
+  color: var(--world-theirs);
+  font-weight: 700;
+}
+
+.chip--draft::before {
+  content: "… ";
+}
+
+.chip--declined {
+  background-color: var(--color-muted-bg);
+  color: var(--color-muted-fg);
+}
+
+.chip--affordable::before {
+  content: "♥ ";
+}
+
+.chip--claimed::before {
+  content: "➜ ";
 }

@@ -113,6 +113,10 @@ the client/server entry points. Public pages are statically generated;
   tinted header). The site header is hidden on `/app`. `routes/app.tsx`
   only gates (session → profile → relationship).
 
+- **Z-index scale**: section heads 5, site header 10, tabbar 25,
+  appbar (+ its popovers) 40, confirm sheet 50/51. Popovers inherit
+  their parent's stacking context, so raise the container, not the
+  popover.
 - **Confirms**: use `confirmSheet()` from `components/ConfirmSheet.tsx`,
   never `window.confirm` (host is mounted in `routes/app.tsx`).
 - **Device-local markers** (localStorage): `private_coupons`,
