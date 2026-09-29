@@ -14,6 +14,14 @@
 
 ## Product / UX
 
+- **Coming up -> .ics export** ("add to my calendar") for accepted
+  claims with a date.
+- **Delivered moment**: after "Mark delivered", prompt the claimer to
+  send hearts back ("How was it?") — closes the loop without scoring.
+- **Coupon "claimed N times"** stays hidden (no scoreboard); maybe show
+  "last enjoyed 3 weeks ago" instead.
+- **Claim confirm**: replace `window.confirm` with an in-app sheet.
+
 - **Private nickname for partner** (only I see it, e.g. "Bear"), stored
   per relationship on my side. Asked owner 2026-09-29; unconfirmed.
 - **Relationship switcher** once multi-pair UI unlocks (§4).

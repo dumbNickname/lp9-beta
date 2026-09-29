@@ -25,6 +25,13 @@
   The live-site browser E2E (2 partners) passes 14/14.
 - PRD-33 (ember dark palette + sand/glow light) and PRD-34 (pair badge
   + edit own name) are dev-done per owner feedback.
+- **Phase 5 (claims/escrow) built:** PRD-41 merged (migration
+  `0008_coupon_claims.sql`, live smoke 30/30 incl. the parallel-claim
+  race). PRD-40 (affordable highlight), PRD-42 (claim UI + Coming-up
+  14-day strip + history) and PRD-43 (multi-relationship switcher,
+  `?rel=`) are dev-done. The live 3-user browser E2E passes 18/18
+  (give -> approve -> claim -> accept w/ date -> deliver; A pairs with a
+  2nd partner and switches).
 - CI (`deploy.yml`) now runs typecheck, lint and test before build.
 - Owner decisions this session are recorded in `no-human-decisions.md`
   (Phase 3 section): 30-day backdate, one timeline, per-entry hearts
@@ -32,15 +39,16 @@
 
 ## What to do next
 
-1. Owner checks the ember dark mode + the Coupons tab on a phone.
-2. QA pass on PRD-28..34, 36..39 (QA agent → `tests/qa/`), then mark
-   them merged.
-3. Decompose **Phase 5 (claim/escrow)**: `coupon_claims` table + RPCs,
-   the claim confirm, and the deliverer accept/propose/decline flow.
-   **Must amend `retire_coupon`** to refund pending claims (PRD-35 Dev
-   notes) and make balance subtract escrow (`computeSpendable` already
-   accepts claims).
-4. Backlog and polish ideas are in `IDEAS.md`.
+1. Owner tries the full loop on phones (hearts -> wish -> yes -> claim
+   -> plan -> delivered), and a 2nd pair via "Add someone".
+2. QA pass on the dev-done PRDs (28–34, 36–40, 42, 43), then mark them
+   merged.
+3. Phase 6 (email notifications) needs owner input: Supabase SMTP only
+   works for auth emails, so transactional mail probably needs an Edge
+   Function + provider (Resend). Anonymous users have no email at all,
+   so email needs Google linking first (Phase 1 left linking undone).
+   Grill before decomposing.
+4. Backlog and polish are in `IDEAS.md`.
 
 ## Deployment URLs
 
