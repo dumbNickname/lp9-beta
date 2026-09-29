@@ -18,6 +18,13 @@
     decrypted the comment. No horizontal scroll at 390px in light or
     dark.
   - bytea `\x` hex round-trip verified on the live DB.
+- **Phase 4 (wishlists) built:** PRD-35 merged (migration
+  `0007_coupons.sql`, live smoke 21/21). PRD-36..39 dev-done: a
+  Notes/Coupons tab (`#coupons`), my list + partner's list, approve /
+  gentle decline / retire, starter templates, per-coupon private flag.
+  The live-site browser E2E (2 partners) passes 14/14.
+- PRD-33 (ember dark palette + sand/glow light) and PRD-34 (pair badge
+  + edit own name) are dev-done per owner feedback.
 - CI (`deploy.yml`) now runs typecheck, lint and test before build.
 - Owner decisions this session are recorded in `no-human-decisions.md`
   (Phase 3 section): 30-day backdate, one timeline, per-entry hearts
@@ -25,13 +32,15 @@
 
 ## What to do next
 
-1. Owner eyeballs the deployed design on a phone. Tune tokens or
-   veto. Then mark PRD-28..32 `qa-done` → `merged` (QA agent can write
-   adversarial suites under `tests/qa/`).
-2. Phase 3 is effectively done, so decompose **Phase 4 (wishlists +
-   coupon approval)** into PRDs (`HANDOFF.md` Phase 4, `DESIGN.md`
-   §6, §13a coupons, §15b per-coupon private flag).
-3. Backlog and polish ideas are in `IDEAS.md`.
+1. Owner checks the ember dark mode + the Coupons tab on a phone.
+2. QA pass on PRD-28..34, 36..39 (QA agent → `tests/qa/`), then mark
+   them merged.
+3. Decompose **Phase 5 (claim/escrow)**: `coupon_claims` table + RPCs,
+   the claim confirm, and the deliverer accept/propose/decline flow.
+   **Must amend `retire_coupon`** to refund pending claims (PRD-35 Dev
+   notes) and make balance subtract escrow (`computeSpendable` already
+   accepts claims).
+4. Backlog and polish ideas are in `IDEAS.md`.
 
 ## Deployment URLs
 
