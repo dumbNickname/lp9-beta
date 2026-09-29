@@ -93,6 +93,8 @@ its own end-to-end PRD per `DESIGN.md` §16a.
 | 30 | Spendable balance                                     | `prds/PRD-30-spendable-balance.md`             | dev-done |
 | 31 | Privacy mode (shoulder-surf veil)                     | `prds/PRD-31-privacy-mode.md`                  | dev-done |
 | 32 | Warm editorial design system + dashboard layout       | `prds/PRD-32-editorial-design-system.md`       | dev-done |
+| 33 | Palette refresh: ember dark + livelier light          | `prds/PRD-33-palette-ember-dark.md`            | dev-done |
+| 34 | Pair badge + edit my display name                     | `prds/PRD-34-pair-badge-edit-name.md`          | dev-done |
 
 ### Phase 4 — Wishlists + coupon approval
 

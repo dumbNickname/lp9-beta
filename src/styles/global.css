@@ -15,6 +15,12 @@ body {
   margin: 0;
   min-block-size: 100vh;
   background-color: var(--color-bg);
+  background-image: radial-gradient(
+    120% 60% at 50% 0%,
+    var(--color-bg-glow) 0%,
+    transparent 70%
+  );
+  background-repeat: no-repeat;
   color: var(--color-fg);
   font-family: var(--font-body);
   font-size: var(--text-md);
@@ -792,4 +798,95 @@ button.small,
     animation: none !important;
     transition: none !important;
   }
+}
+
+/* --- Pair badge (PRD-34) ---------------------------------------------- */
+
+.pair-badge {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding-block: var(--space-2) var(--space-4);
+  margin-block-end: var(--space-4);
+  border-block-end: var(--border-thin);
+}
+
+.pair-avatars {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+  border-radius: 50%;
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 500;
+  border: 2px solid var(--color-bg);
+}
+
+.avatar--me {
+  background-color: var(--color-accent);
+  color: var(--color-accent-fg);
+}
+
+.avatar--partner {
+  background-color: var(--color-heart-soft);
+  color: var(--color-fg);
+  margin-inline-start: -0.5rem;
+}
+
+.avatar-heart {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  inline-size: 1.5rem;
+  block-size: 1.5rem;
+  margin-inline: -0.75rem -0.25rem;
+  border-radius: 50%;
+  background-color: var(--color-surface);
+  color: var(--color-heart);
+  font-size: 0.8rem;
+  box-shadow: var(--shadow-soft);
+}
+
+.pair-names {
+  min-inline-size: 0;
+}
+
+.pair-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  color: var(--color-fg);
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.pair-title .amp {
+  font-style: italic;
+  color: var(--color-accent);
+}
+
+.pair-sub {
+  margin: 0;
+  font-size: var(--text-xs);
+}
+
+.pair-edit {
+  flex: 1;
+}
+
+.pair-edit label {
+  margin-block-end: var(--space-2);
+}
+
+.pair-edit-actions {
+  display: flex;
+  gap: var(--space-2);
 }

@@ -10,17 +10,19 @@
  */
 
 :root {
-  --color-bg: #f6f1ea;
-  --color-surface: #fffcf7;
+  /* Warm sand paper, ink text, burnt terracotta accent (PRD-33). */
+  --color-bg: #f4ebe0;
+  --color-bg-glow: #f9e3d3;
+  --color-surface: #fffaf3;
   --color-fg: #2b2622;
-  --color-muted-bg: #efe8de;
-  --color-muted-fg: #6f665d;
-  --color-border: #e3d9cc;
-  --color-accent: #a4553a;
+  --color-muted-bg: #ecdfd0;
+  --color-muted-fg: #6a5f55;
+  --color-border: #e2d3c2;
+  --color-accent: #96482e;
   --color-accent-fg: #fffaf4;
-  --color-heart: #c4546a;
-  --color-heart-soft: #f3d9dc;
-  --color-focus: #a4553a;
+  --color-heart: #b03f58;
+  --color-heart-soft: #f5d9dc;
+  --color-focus: #96482e;
   /* QR codes need a true light quiet zone to scan, in both themes. */
   --color-qr-bg: #ffffff;
 
@@ -53,17 +55,20 @@
 }
 
 [data-theme="dark"] {
-  --color-bg: #1b1714;
-  --color-surface: #241f1b;
-  --color-fg: #efe6da;
-  --color-muted-bg: #2c2621;
-  --color-muted-fg: #a89c8e;
-  --color-border: #3a322b;
-  --color-accent: #e0967a;
-  --color-accent-fg: #1b1714;
-  --color-heart: #e58395;
-  --color-heart-soft: #4a2b31;
-  --color-focus: #e0967a;
+  /* "Ember": the accent terracotta deepened into the canvas; cream ink,
+     peach accent, pink hearts. All text pairs >= 4.5:1 (PRD-33). */
+  --color-bg: #3a1f19;
+  --color-bg-glow: #57291e;
+  --color-surface: #4a2a22;
+  --color-fg: #fbeee2;
+  --color-muted-bg: #553229;
+  --color-muted-fg: #dcbfae;
+  --color-border: #6a3f33;
+  --color-accent: #f2a07b;
+  --color-accent-fg: #2c1511;
+  --color-heart: #ff9aac;
+  --color-heart-soft: #6b3036;
+  --color-focus: #f2a07b;
 
-  --shadow-soft: 0 1px 2px rgb(0 0 0 / 30%), 0 10px 30px -14px rgb(0 0 0 / 60%);
+  --shadow-soft: 0 1px 2px rgb(0 0 0 / 25%), 0 12px 32px -14px rgb(20 5 0 / 60%);
 }

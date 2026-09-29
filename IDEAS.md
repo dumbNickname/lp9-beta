@@ -6,14 +6,17 @@
 
 ## Owner actions
 
-- Look at the new design (PRD-32) on a real phone, light + dark. Veto or
-  tune freely; tokens live in `src/styles/tokens.css`.
+- Re-check the dark "ember" palette (PRD-33) on a phone.
 - Supabase free tier pauses after about a week idle. Consider a weekly
   keep-alive ping (GH Actions cron hitting `/auth/v1/health`) during beta.
 - Branch protection on `master` is still unset.
 - Pick the final app name (blocks Phase 9).
 
 ## Product / UX
+
+- **Private nickname for partner** (only I see it, e.g. "Bear"), stored
+  per relationship on my side. Asked owner 2026-09-29; unconfirmed.
+- **Relationship switcher** once multi-pair UI unlocks (§4).
 
 - **Heart comment prompts per archetype**: rotate prompts tuned to
   getting_to_know / established_couple / close_friends.

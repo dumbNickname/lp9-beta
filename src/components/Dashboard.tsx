@@ -1,6 +1,7 @@
-import { createEffect, createResource, createSignal, Show } from "solid-js";
+import { createEffect, createResource, createSignal, onCleanup, onMount, Show } from "solid-js";
 import HeartComposer from "~/components/HeartComposer";
 import HeartsFeed from "~/components/HeartsFeed";
+import PairBadge from "~/components/PairBadge";
 import PrivacyToggle from "~/components/PrivacyToggle";
 import RecoveryPassword from "~/components/RecoveryPassword";
 import { getDisplayName } from "~/lib/data/profile";
@@ -23,10 +24,20 @@ export default function Dashboard(props: Props) {
     props.relationship.member_a === props.userId
       ? props.relationship.member_b
       : props.relationship.member_a;
-  const [partnerNameRes] = createResource(partnerId, (id) =>
-    getDisplayName(id).catch(() => null),
+  // Re-fetched on tab focus so a partner's rename shows up (PRD-34).
+  const [partnerTick, setPartnerTick] = createSignal(0);
+  const [partnerNameRes] = createResource(
+    () => ({ id: partnerId(), tick: partnerTick() }),
+    ({ id }) => getDisplayName(id).catch(() => null),
   );
-  const partnerName = () => partnerNameRes() || "your partner";
+  const partnerName = () => partnerNameRes.latest || "your partner";
+  onMount(() => {
+    const onFocus = () => {
+      if (document.visibilityState === "visible") setPartnerTick((t) => t + 1);
+    };
+    document.addEventListener("visibilitychange", onFocus);
+    onCleanup(() => document.removeEventListener("visibilitychange", onFocus));
+  });
 
   const [restoring, setRestoring] = createSignal(false);
 
@@ -39,6 +50,7 @@ export default function Dashboard(props: Props) {
 
   return (
     <div class="dashboard">
+      <PairBadge myName={props.displayName} partnerName={partnerNameRes.latest ?? null} />
       <div class="dashboard-head">
         <div>
           <p class="eyebrow">Welcome back, {props.displayName}.</p>

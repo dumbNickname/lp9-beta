@@ -39,11 +39,14 @@ the client/server entry points. Public pages are statically generated;
     `src/styles/tokens.css` (`--color-bg`, `--color-surface`,
     `--color-fg`, `--color-muted-*`, `--color-border`, `--color-accent`,
     `--color-accent-fg`, `--color-heart`, `--color-heart-soft`,
-    `--color-focus`, `--color-qr-bg`) plus `--text-*`, `--space-*`,
+    `--color-focus`, `--color-qr-bg`, `--color-bg-glow`) plus `--text-*`, `--space-*`,
     `--radius*`, `--shadow-soft`, `--measure`, `--ease`. Light on
     `:root`, dark on `[data-theme="dark"]`. Components reference
     tokens, never raw hues (a QA test greps for this).
-  - **Visual language (PRD-32): warm editorial, paper + ink.** Serif
+  - **Visual language (PRD-32/33): warm editorial, paper + ink.** Light
+    theme = sand paper + peach glow. Dark theme = "ember" (deep
+    terracotta, not grey/black; owner 2026-09-29). Any token change
+    must keep text >= 4.5:1 in both themes. Serif
     display + serif italic for heart comments. Sans for UI chrome. Pill
     buttons (`.quiet`, `.small`, `.link-button`, `.button` for anchors).
     `.card` surfaces. Custom SVG hearts (`HeartIcon`), never emoji. No
@@ -82,7 +85,8 @@ the client/server entry points. Public pages are statically generated;
   `privateMode()`.
 - **Balance (`src/lib/balance.ts`)**: pure, computed, never stored
   (§13b). Only the viewer's own balance is ever rendered.
-- **Dashboard (`components/Dashboard.tsx`)**: composes the composer,
+- **Dashboard (`components/Dashboard.tsx`)**: composes `PairBadge`
+  (who you're paired with + edit own name), the composer,
   feed, balance, privacy toggle and restore-key flow. `routes/app.tsx`
   only gates (session → profile → relationship).
 
