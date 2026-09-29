@@ -224,6 +224,10 @@ files add operational contracts; they do not replace `DESIGN.md`.
 - Do not request out-of-workspace or wide access without explaining why;
   scope commands to the workspace.
 - Record things learned on the go in the DOX docs (this framework).
+- **Write files in small chunks.** The opencode write tool can fail on
+  big files. Prefer targeted edits or appends; split large new files.
+- **Don't `pkill -f vinxi` from the same shell command** as other work:
+  the pattern matches the shell's own command line and kills it.
 
 ## Verification
 

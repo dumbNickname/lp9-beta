@@ -38,6 +38,13 @@ Thinking so far, to pick up when Phase 6 resumes:
 ## Product / UX
 
 ### Seen while testing (2026-09-29)
+- **Worlds redesign follow-ups (PRD-49):** the tab icons are text glyphs
+  (♥ ✦ ❀); swap for custom SVGs with the brand. Maybe a swipe gesture
+  between worlds on mobile. The "Give" world could show "you noticed N
+  things this week" (local only, no comparison), a scoreboard-risk
+  review first.
+- **Balance pill animation** when hearts arrive (count-up + tiny pop)
+  on the next load after a new note.
 - The **recovery-password overlay after pairing** is heavy (long warning
   and 2 fields right at the happiest moment). Maybe show it after the
   first note is sent, or as a small banner "Protect your notes".

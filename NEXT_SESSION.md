@@ -43,7 +43,12 @@
    -> plan -> delivered), and a 2nd pair via "Add someone".
 2. QA pass on the dev-done PRDs (28–34, 36–40, 42, 43), then mark them
    merged.
-3. Polish round done (PRD-44..47: confirm sheet, device settings,
+3. **App shell redesigned (PRD-49):** app bar (home, pair switcher,
+   balance pill), 3 worlds Give / My wishes / For partner, ticket
+   coupons, desktop 2 columns. The live E2E scripts in
+   `/tmp/opencode/pw/*.mjs` may be gone next session; the AGENTS.md
+   gotchas describe how to recreate them.
+   Polish round done (PRD-44..48: confirm sheet, device settings,
    new-since-last-visit + waiting badge, pairing/onboarding look). More
    polish candidates from testing are in `IDEAS.md` → "Seen while
    testing"; pick with the owner.
