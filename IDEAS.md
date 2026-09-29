@@ -6,13 +6,14 @@
 
 ## Owner actions
 
-- Re-check the dark "ember" palette (PRD-33) on a phone.
+- Re-check the dark "ember" palette and the app shell on a phone.
+- Finish push setup (`docs/push-setup.md`).
 - Supabase free tier pauses after about a week idle. Consider a weekly
   keep-alive ping (GH Actions cron hitting `/auth/v1/health`) during beta.
 - Branch protection on `master` is still unset.
 - Pick the final app name (blocks Phase 9).
 
-## Parked: email + account linking (owner 2026-09-29: "park for now")
+## Parked: email + account linking
 
 Thinking so far, to pick up when Phase 6 resumes:
 - **Anonymous users have no email.** Email notifications (§8) require
@@ -35,10 +36,13 @@ Thinking so far, to pick up when Phase 6 resumes:
 - **Multi-device** also depends on linking (§10); the key comes via
   recovery password (already built).
 
-## Discussed 2026-09-29 (owner questions)
+## Discussed with owner
 
 ### Notifications about new hearts?
-- **Recommendation: yes, but gentle and later.** DESIGN §8 already
+- **Built as web push: PRD-53** (owner setup in `docs/push-setup.md`).
+  Open follow-ups: per-event toggles in Settings (`user_settings` §13a),
+  quiet hours, and a daily digest mode instead of per-event coupon pushes.
+- Original reasoning: **yes, but gentle.** DESIGN §8 already
   planned a throttled daily email (max 1/day, content-free: "Ben
   appreciated you", no count, no preview). Email is parked (needs
   account linking).
@@ -54,7 +58,7 @@ Thinking so far, to pick up when Phase 6 resumes:
 
 ### "Watch rings" gadget around the balance
 - Owner idea: a smartwatch-style ring/bars around the heart number.
-- **Owner clarification 2026-09-29: not for comparison — just fun data
+- **Owner clarification: not for comparison — just fun data
   visualisation.** So no goals/pressure needed; rings can simply show
   e.g. hearts given this week, progress to the next wish, plans coming
   up.
@@ -76,23 +80,10 @@ Thinking so far, to pick up when Phase 6 resumes:
 - Needs a scoreboard-risk decision in DESIGN before building (§5b).
 
 ### Install as an app (PWA)
-- **Recommended next polish PRD.** Add `manifest.webmanifest`
-  (name=APP_NAME, `start_url` = `<base>app`, `scope` = `<base>`,
-  `display: standalone`, `theme_color`/`background_color` = paper/ember),
-  icons (192/512 + maskable; heart mark placeholder until branding),
-  `<meta name="theme-color">` per theme (light #f4ebe0, dark #3a1f19)
-  so the browser chrome matches, `apple-mobile-web-app-capable` +
-  status-bar style + apple-touch-icon for iOS.
-- A minimal service worker (cache the app shell for offline launch) is
-  needed for Chrome's install prompt; keep data network-only.
-- GH Pages sub-path: the manifest + SW must live under `/lp9-beta/`
-  with the scope set; the SW must not cache Supabase requests.
-- A small "Add to home screen" hint in Settings (iOS has no prompt).
-- Note DESIGN §8a said "no PWA install flow in MVP"; owner now asks
-  for it -> record the change in DESIGN when building.
+- Done: PRD-52. Open follow-ups: real brand icon once named; a subtle
+  "install" hint on the home page for mobile visitors.
 
-
-### Seen while testing (2026-09-29)
+### Seen while testing
 - **Worlds redesign follow-ups (PRD-49):** the tab icons are text glyphs
   (♥ ✦ ❀); swap for custom SVGs with the brand. Maybe a swipe gesture
   between worlds on mobile. The "Give" world could show "you noticed N
@@ -110,12 +101,6 @@ Thinking so far, to pick up when Phase 6 resumes:
   silently.
 - **Hash tab + new pair**: after pairing a 2nd person the app keeps the
   `#coupons` tab. Consider jumping to Notes for a new pair.
-- **"Welcome back, Anna."** duplicates the pair badge name; drop the
-  eyebrow or make it time-of-day ("Good evening").
-- **Claim when 0 affordable**: show "N more hearts" on the cheapest
-  approved coupon (gentle, not a progress bar) — discuss scoreboard risk.
-- **Partner's coupon list** can grow long; group "Ready" vs "Waiting for
-  you" with small headings.
 - **Composer**: after sending, the Undo affordance is on the note in the
   feed below; maybe a toast "Sent · Undo" right under the button.
 - **Empty "Coming up"** takes space for new couples; hide until the
@@ -127,12 +112,8 @@ Thinking so far, to pick up when Phase 6 resumes:
   send hearts back ("How was it?") — closes the loop without scoring.
 - **Coupon "claimed N times"** stays hidden (no scoreboard); maybe show
   "last enjoyed 3 weeks ago" instead.
-- **Claim confirm**: replace `window.confirm` with an in-app sheet.
-
 - **Private nickname for partner** (only I see it, e.g. "Bear"), stored
-  per relationship on my side. Asked owner 2026-09-29; unconfirmed.
-- **Relationship switcher** once multi-pair UI unlocks (§4).
-
+  per relationship on my side. Asked owner; unconfirmed.
 - **Heart comment prompts per archetype**: rotate prompts tuned to
   getting_to_know / established_couple / close_friends.
 - **"Read" moment**: the first time the receiver opens a new note, give
@@ -145,13 +126,8 @@ Thinking so far, to pick up when Phase 6 resumes:
 - **Older notes pagination** (feed caps at 50).
 - **Quick-pick phrases** ("Thank you for...", "I loved when you...") as
   chips that prefill the comment.
-- **Relationship settings page** `/app/settings`: change recovery
-  password, reset, theme, locale, email toggles (Phase 6 / 8).
 - **Unpair / archive relationship** server-side (only local reset exists).
 - **Haptics** (`navigator.vibrate(10)`) on heart select, on Android only.
-- **PWA manifest + icons** for add-to-home-screen (no push; §8a still
-  holds).
-
 ## Design
 
 - Real brand face after naming: self-host a variable serif (Newsreader /
@@ -159,16 +135,22 @@ Thinking so far, to pick up when Phase 6 resumes:
   (Iowan / Palatino / Georgia).
 - Subtle paper grain texture on `--color-bg` (SVG noise, very low
   opacity, respects reduced-motion/data-saver).
-- Pairing screens still use the older generic layout; give them the
-  card treatment and an illustration of "two phones".
+- Pairing screens have cards now (PRD-47); still missing an
+  illustration of "two phones".
+- Replace text-glyph icons (♥ ✦ ❀ ◔ … ➜ ✓) with one small SVG icon set
+  (`REVIEW.md` UX #3).
+- **Delight moments** (no gamification pressure): a soft heart burst when
+  a note is sent; an "unfold" animation the first time a new note is
+  read; a warm full-card moment on "Delivered" ("How was it?" -> send
+  hearts back); the balance pill counts up when new hearts arrived.
 - Style the privacy / terms pages (Phase 8 content).
 - OG image + favicon (heart mark) once named.
 
 ## Tech debt
 
-- `PairFlow.tsx` is 430 lines; split invite/join/confirm views.
-- Store boilerplate (focus refresh) is duplicated across profile /
-  relationship / points; extract a `useFocusRefresh(fn)` helper.
+(See `REVIEW.md` for the ranked list; items below are not duplicated
+there.)
+
 - CI: add a Playwright smoke against the built site (no DB) to catch
   blank-page regressions.
 - Edit/undo window expiry isn't live-tested (needs time travel). Add a

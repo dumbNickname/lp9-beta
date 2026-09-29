@@ -45,7 +45,7 @@ the client/server entry points. Public pages are statically generated;
     tokens, never raw hues (a QA test greps for this).
   - **Visual language (PRD-32/33): warm editorial, paper + ink.** Light
     theme = sand paper + peach glow. Dark theme = "ember" (deep
-    terracotta, not grey/black; owner 2026-09-29). Any token change
+    terracotta, not grey/black; owner decision). Any token change
     must keep text >= 4.5:1 in both themes. Serif
     display + serif italic for heart comments. Sans for UI chrome. Pill
     buttons (`.quiet`, `.small`, `.link-button`, `.button` for anchors).
@@ -132,13 +132,27 @@ the client/server entry points. Public pages are statically generated;
 ## Work Guidance
 
 - No scoreboards: never render sums, counts, partner balance, or
-  given-vs-received comparisons (§5b, owner 2026-09-29).
+  given-vs-received comparisons (§5b, owner decision). Fun, non-comparing
+  data visualisation (e.g. the "watch rings" idea) is OK.
+- **Copy tone:** warm, short, no jargon, honest about anonymity and
+  encryption (§3). Never show raw timestamps by default; put them behind
+  a "Details" toggle.
+- **CSS:** `global.css` is append-grown. Before adding a selector, grep
+  for an existing one and edit it instead (duplicates exist, see
+  `REVIEW.md` #13). New world-aware styles use `--w` / `--w-soft`.
+- **Mobile first, then check 360px + 1280px** for overflow (`min-inline-
+  size: 0`, `minmax(0, 1fr)` in grids) and fixed/sticky layering.
+- **Desktop may pre-open forms** (e.g. "Add a wish") to use the space;
+  mobile keeps them collapsed.
 
 ## Verification
 
 - `pnpm typecheck && pnpm lint && pnpm test` for this tree.
 - Route components have smoke tests in `tests/unit/`; theme pure
   functions are unit-tested there too.
+- UI changes: also build locally (`BASE_PATH=/lp9-beta/`) and run a
+  Playwright DOM check (root AGENTS.md "Local E2E" recipe), then re-run
+  against the live site after deploy.
 
 ## Child DOX Index
 

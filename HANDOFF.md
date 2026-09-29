@@ -1,13 +1,11 @@
 # Handoff — Couples Gamification App
 
-> **Status as of 2026-06-01:** implementation has started. The Phase 0
-> tasks below have been **decomposed into PRDs under `prds/`** and
-> their canonical status lives in `PROGRESS.md`. The phased structure
-> here remains the strategic roadmap; specific task wording (e.g.
-> "two repos", "two Supabase projects", or any external project
-> references) has been **superseded by `DESIGN.md` §16e and §16f**
-> (single-repo + Supabase branching model). Where this file disagrees
-> with `DESIGN.md` §16, `DESIGN.md` wins.
+> **Status:** historical strategic roadmap. Phases 0–5 are built;
+> canonical status is `PROGRESS.md`, orientation is `NEXT_SESSION.md`.
+> Task wording here is superseded wherever `DESIGN.md` (incl. its dated
+> amendments, e.g. PWA + web push now in, email parked) or `PROGRESS.md`
+> say otherwise. Where this file disagrees with `DESIGN.md`, `DESIGN.md`
+> wins.
 
 This document hands off the design phase to the next session. The next
 session's job is **either**:

@@ -93,8 +93,8 @@ placeholder. See `DESIGN.md` §14i.
 ## Source-of-truth docs
 
 - `DESIGN.md` — every locked design decision (the *why*). Authoritative.
-- `HANDOFF.md` — phased roadmap (Phase 0–10). Strategic; where it
-  disagrees with `DESIGN.md` §16, `DESIGN.md` wins.
+- `HANDOFF.md` — historical phased roadmap (Phase 0–10). Where it
+  disagrees with `DESIGN.md` or `PROGRESS.md`, those win.
 - `PROGRESS.md` — single source of truth for PRD status.
 - `NEXT_SESSION.md` — orientation for resuming work.
 - `prds/PRD-NN-*.md` — one tiny PRD per behavior; the executable unit.
@@ -132,7 +132,23 @@ files add operational contracts; they do not replace `DESIGN.md`.
   pre-commit hook blocks leaks. Only `VITE_`-prefixed public values ship
   in the browser bundle. See `DESIGN.md` §16g.
 - **Schema changes only via `supabase/migrations/`** — never click-ops.
-- **No emojis in code/files** unless the user asks.
+- **No emojis in code/files** unless the user asks. (Coupon template
+  emoji in `src/data/coupon-templates.ts` are product content, allowed.)
+- **Solo-owner practice (current):** the owner works alone, so small
+  PRDs are committed straight to `master` and pushed (CI gates deploy).
+  Switch to branches + PRs once branch protection is on.
+- **Verify on the live site, not just unit tests.** After each deploy,
+  run a Playwright E2E with two (or three) anon browser contexts
+  against the deployed URL. It caught real bugs unit tests missed
+  (hydration nav state, `<base href>` hash URLs, z-index, overflow).
+- **Owner reviews by looking at the UI; the agent can't view images.**
+  Assert layout via DOM/computed styles (bounding boxes, contrast
+  maths, `elementFromPoint` for layering) and tell the owner what to
+  eyeball.
+- **Record owner decisions where they belong:** product rules as dated
+  amendments in `DESIGN.md` (strike old text); autonomous choices in
+  `no-human-decisions.md`; ideas in `IDEAS.md`; review findings in
+  `REVIEW.md`. Keep other docs free of dates and history.
 
 ## Environment gotchas (learned; keep current)
 
@@ -171,8 +187,7 @@ files add operational contracts; they do not replace `DESIGN.md`.
   lazy init (getter/proxy). `supabase.ts` uses this pattern.
 - **Git remote is `beta`, not `origin`.** Push with `git push beta master`.
 - **Gitleaks trips on `sb_publishable_*` test strings:** use low-entropy
-  fakes like `fake-key` in test stubs, not `sb_publishable_test123`. branch, work, merge to master, push.
-  Don't fuss over perfect history.
+  fakes like `fake-key` in test stubs, not `sb_publishable_test123`.
 - **High-entropy test fixtures (e.g. base64 AES keys) trip
   `generic-api-key`:** tests deliberately need high entropy (see
   `tests/AGENTS.md`), so mark intentional fixtures with a trailing
@@ -186,7 +201,7 @@ files add operational contracts; they do not replace `DESIGN.md`.
 - **PostgREST serializes `bytea` as `\x`-prefixed hex** (Postgres default
   `bytea_output = hex`). Convert with the `bytesToBytea`/`byteaToBytes`
   helpers in `src/lib/data/relationship.ts`; pass the same `\x` hex text
-  as RPC `bytea` args. Verified against live DB 2026-09-29 (write via
+  as RPC `bytea` args. Verified against the live DB (write via
   `set_recovery_password`, read back identical `\x` hex).
 - **Supabase free tier pauses after ~1 week idle.** Symptom: project
   host fails DNS (`ENOTFOUND`). After owner restores: ~3 min of 502s,
@@ -214,6 +229,32 @@ files add operational contracts; they do not replace `DESIGN.md`.
   place), then run the build detached (`setsid nohup ... &`) with a log
   and an `RC $?` marker line to poll for. Verify fresh output by
   grepping the bundle for your new code.
+
+- **Subagents (task tool) time out on big scopes** ("Gateway
+  Time-out"). Give each one a narrow, ~10-minute task (one area, few
+  files); run several small ones instead of one broad review.
+- **Solid hydration quirk:** Solid skips attribute writes until the
+  first delegated event marks hydration done, so reactive attributes
+  on SSR'd nodes (e.g. router `<A>` `aria-current`) can go stale on the
+  first client navigation. Write such attributes in an effect
+  (`SiteNav.tsx`).
+- **Postgres grants EXECUTE on new functions to PUBLIC.** Every helper
+  function not meant as an API must get `revoke execute ... from
+  public, anon, authenticated` in the same migration. RLS policies with
+  no column limits (e.g. `for update using (member)`) allow editing
+  every column; prefer no write policies + SECURITY DEFINER RPCs.
+- **Supabase GitHub integration deploys Edge Functions** declared as
+  `[functions.<name>]` in `supabase/config.toml` (with "Deploy to
+  production" on); only migrations are applied otherwise. Function
+  secrets are set in the dashboard, never in the repo.
+- **Portal-rendered UI (sheets, dialogs) lives outside the
+  testing-library container:** query with `screen`, not the
+  render-scoped helpers.
+- **`public/` is copied as-is to the site root under BASE_PATH**
+  (manifest, icons, `sw.js`). Use relative URLs in the manifest so the
+  GH Pages sub-path works.
+- **Rewriting pushed history:** only with the owner's explicit OK, and
+  with `git push --force-with-lease=master:<expected-sha>`.
 
 ## User preferences (durable)
 

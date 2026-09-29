@@ -15,9 +15,16 @@ workflow connecting this repo to the Supabase project.
 
 - **Schema changes only via `supabase/migrations/NNNN_slug.sql`.** Never
   click-ops in the dashboard (`DESIGN.md` §16e).
-- **Scaffold** with `supabase migration new <slug>`; commit on a feature
-  branch; the Supabase GitHub integration applies it to an auto-created
-  preview branch on PR, then to production on merge to `master`.
+- **Scaffold** with `supabase migration new <slug>` (or hand-name
+  `NNNN_slug.sql` in order). The Supabase GitHub integration applies new
+  migrations to production on push to `master` (solo-owner practice) or
+  to a preview branch on PR.
+- **Every new function:** `security definer` + `set search_path = ''`
+  for RPCs; `revoke execute ... from public, anon, authenticated` for
+  helpers (Postgres grants PUBLIC by default). **No write RLS
+  policies**; writes go through RPCs (see PRD-54 for why).
+- **Verify live** after the migration applies: a throwaway two-client
+  smoke script (root AGENTS.md "Live smoke test").
 - **Do NOT run `supabase db push` or `supabase link`** locally — the
   branch-driven flow owns all DB changes.
 - **No PAT, no DB password** needed for the branch-driven flow. The only

@@ -1,10 +1,11 @@
-# REVIEW.md — review findings (2026-09-29)
+# REVIEW.md — open review findings
 
-> Orchestrator's own review; the independent subagent reviews timed out
-> (gateway) twice. Findings verified live where marked. Nothing is fixed
-> yet — owner asked for findings first. Promote to PRDs to fix.
+> **Status:** the orchestrator's own review. The independent reviews
+> (technical + UX subagents) did NOT complete (gateway time-outs); re-run
+> them in small scopes (see `NEXT_SESSION.md`). Nothing below is fixed
+> yet. Promote items to PRDs to fix; strike them here when done.
 
-## Technical — security (verified live 2026-09-29)
+## Technical — security (verified live)
 
 1. **HIGH — any member can UPDATE any column of their relationship
    row directly** (`0002` policy "members update relationship", no
@@ -17,7 +18,14 @@
      coupons, claims, and the partner's profile.
    Fix: drop the UPDATE policy entirely (writes via `set_recovery_
    password` RPC already exist); add explicit RPCs for archive/unpair
-   later. Note: `set_recovery_password` lets either member overwrite
+   later.
+   **Probe to re-check** (throwaway Node script with `@supabase/supabase-js`
+   + `.env`, run from the repo root, delete after): sign in two anon
+   clients A/B, `create_pair_invite` (A) + `redeem_pair_code` (B), then as
+   B `from("relationships").update({ status: "archived" }).eq("id", rel)
+   .select("id")` and `update({ member_a: <outsider id> })`. Fixed = 0
+   rows / RLS error. Also call helper functions as an outsider (e.g.
+   `rpc("gen_pair_code")`) — fixed = permission denied. Note: `set_recovery_password` lets either member overwrite
    the shared blob; that's acceptable (same key), but log/confirm in UI.
 2. **MEDIUM — helper functions callable by anon/any user** (Postgres
    grants EXECUTE to PUBLIC by default): `gen_pair_code`,
@@ -98,8 +106,7 @@
 - Strict TS, 0-warning lint, ~400 unit tests, CI gates build.
 - Consistent DOX docs; decisions logged with dates.
 
-## UX / UI (orchestrator's own review; the independent UX agent timed
-## out — re-run next session, see NEXT_SESSION)
+## UX / UI (orchestrator's own review; independent UX review pending)
 
 Top findings:
 1. **HIGH — first-run is long before the first heart:** home -> app ->

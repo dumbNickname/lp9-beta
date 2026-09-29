@@ -11,7 +11,7 @@
 
 ## Phase 4 — Wishlists (PRD-35..39)
 
-Owner-ratified 2026-09-29: receiver adds, giver approves; price 1–50;
+Owner-ratified: receiver adds, giver approves; price 1–50;
 drafts editable/deletable by the receiver; giver may gently decline
 ("not for me"); templates via an empty-wishlist picker. Recorded in
 `DESIGN.md` §6b/§6e/§13a.
@@ -35,7 +35,7 @@ drafts editable/deletable by the receiver; giver may gently decline
 
 ## Phase 3 — Hearts (PRD-27..32)
 
-Owner-ratified 2026-09-29 (not autonomous, recorded for context):
+Owner-ratified (not autonomous, recorded for context):
 backdate window 30 days / no future; one timeline received + given;
 per-entry heart amounts shown, no totals; no key on device -> block
 comment, allow hearts-only + restore prompt; visual direction warm

@@ -108,7 +108,7 @@ its own end-to-end PRD per `DESIGN.md` §16a.
 | 40 | Highlight coupons I can afford                        | `prds/PRD-40-affordable-highlight.md`          | dev-done |
 | 43 | Multiple relationships: switcher + `?rel=`            | `prds/PRD-43-relationship-switcher.md`         | dev-done |
 
-### Polish — anonymous mode (owner 2026-09-29: park email, polish first)
+### Polish — anonymous mode (email parked, polish first)
 
 | #  | Title                                                 | PRD                                            | Status |
 |----|-------------------------------------------------------|------------------------------------------------|--------|
@@ -123,6 +123,12 @@ its own end-to-end PRD per `DESIGN.md` §16a.
 | 52 | Installable PWA + browser colour                      | `prds/PRD-52-pwa-install.md`                   | dev-done |
 | 53 | Web push notifications (opt-in, content-free)         | `prds/PRD-53-web-push.md`                      | dev-done (owner setup pending) |
 
+### Security (from `REVIEW.md`)
+
+| #  | Title                                                 | PRD                                            | Status |
+|----|-------------------------------------------------------|------------------------------------------------|--------|
+| 54 | Lock relationship writes + helper grants (HIGH)       | `prds/PRD-54-lock-relationship-writes.md`      | todo   |
+
 ### Phase 5 — Coupon claim/escrow flow
 
 | #  | Title                                                 | PRD | Status |
@@ -132,7 +138,7 @@ its own end-to-end PRD per `DESIGN.md` §16a.
 
 ### Phase 6 — Email notifications
 
-**Parked** by owner 2026-09-29. Thinking recorded in `IDEAS.md`
+**Parked** by owner. Thinking recorded in `IDEAS.md`
 ("Parked: email + account linking").
 
 | #  | Title                                                 | PRD | Status |

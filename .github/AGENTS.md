@@ -48,6 +48,9 @@ Owns `.github/`. Currently one workflow: `workflows/deploy.yml`.
     for prerender).
   - `VITE_SUPABASE_ANON_KEY` — publishable/anon key (public-safe, needed
     at build time for prerender).
+  - `VITE_VAPID_PUBLIC_KEY` — web push public key (public-safe; PRD-53,
+    see `docs/push-setup.md`). Without it Settings says notifications
+    aren't set up.
 
 ## Child DOX Index
 
