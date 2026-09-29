@@ -9,6 +9,7 @@ export default tseslint.config(
       ".output/**",
       ".vinxi/**",
       "dist/**",
+      "supabase/functions/**",
       ".git/**",
     ],
   },

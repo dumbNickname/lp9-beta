@@ -382,6 +382,14 @@ inspector_port = 8083
 # The Deno major version to use.
 deno_version = 2
 
+# Edge Function for web push (PRD-53). Declared here so the Supabase
+# GitHub integration deploys it on merge to master. Called by DB triggers
+# with a shared secret header, so gateway JWT verification is off.
+[functions.notify]
+enabled = true
+verify_jwt = false
+entrypoint = "./functions/notify/index.ts"
+
 # [edge_runtime.secrets]
 # secret_key = "env(SECRET_VALUE)"
 

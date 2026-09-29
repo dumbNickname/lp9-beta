@@ -105,6 +105,7 @@ placeholder. See `DESIGN.md` §14i.
 - `REVIEW.md` — latest technical + UX review findings (ranked). Fix via
   PRDs; strike items when done.
 - `LICENSE` (AGPL-3.0-or-later), `TRADEMARK.md` — legal.
+- `docs/push-setup.md` — owner's one-time push notification setup.
 
 These predate DOX and remain authoritative for their content. AGENTS.md
 files add operational contracts; they do not replace `DESIGN.md`.

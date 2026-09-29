@@ -27,6 +27,14 @@ workflow connecting this repo to the Supabase project.
   (`DESIGN.md` §12d).
 - `config.toml` must contain no secrets; `seed.sql` populates preview
   branch DBs.
+- **Edge Functions** live in `supabase/functions/<name>/index.ts` (Deno)
+  and must be declared under `[functions.<name>]` in `config.toml` so the
+  GitHub integration deploys them. Secrets go in Dashboard → Edge
+  Functions → Secrets, never in the repo. Excluded from repo tsc/eslint.
+- **pg_net + Vault** (0009): DB triggers call Edge Functions through
+  `push_event()`, which reads URL + shared secret from `vault` and must
+  never raise (notifications must not break user actions). Owner setup:
+  `docs/push-setup.md`.
 
 ## Work Guidance
 
