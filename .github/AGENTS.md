@@ -14,7 +14,8 @@ Owns `.github/`. Currently one workflow: `workflows/deploy.yml`.
 - **`deploy.yml`** runs on push and PR to `master`, jobs in order:
   1. `gitleaks` — CI secret scan (mirrors the pre-commit hook),
      `GITLEAKS_CONFIG=.gitleaks.toml`.
-  2. `build` — `pnpm install --frozen-lockfile` → `pnpm build` (with
+  2. `build` — `pnpm install --frozen-lockfile` → `pnpm typecheck` →
+     `pnpm lint` → `pnpm test` (tests must not need `.env`) → `pnpm build` (with
      `BASE_PATH` env) → `scripts/post-build.sh` (SPA 404 fallback) →
      upload-pages-artifact.
   3. `deploy` — `actions/deploy-pages`, **push-to-master only** (skipped

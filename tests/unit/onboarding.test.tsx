@@ -1,7 +1,9 @@
 import { fireEvent, render } from "@solidjs/testing-library";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-const saveProfile = vi.fn((_arg: unknown) => Promise.resolve());
+const saveProfile = vi.fn<(arg: unknown) => Promise<void>>(() =>
+  Promise.resolve(),
+);
 const refreshProfile = vi.fn(() => Promise.resolve());
 
 vi.mock("~/lib/stores/profile", () => ({

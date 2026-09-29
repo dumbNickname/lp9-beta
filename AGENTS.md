@@ -181,8 +181,19 @@ files add operational contracts; they do not replace `DESIGN.md`.
 - **PostgREST serializes `bytea` as `\x`-prefixed hex** (Postgres default
   `bytea_output = hex`). Convert with the `bytesToBytea`/`byteaToBytes`
   helpers in `src/lib/data/relationship.ts`; pass the same `\x` hex text
-  as RPC `bytea` args. NOTE: unverified against live DB — QA must confirm
-  bytea round-trips on the preview branch (see PRD-22 Dev notes).
+  as RPC `bytea` args. Verified against live DB 2026-09-29 (write via
+  `set_recovery_password`, read back identical `\x` hex).
+- **Supabase free tier pauses after ~1 week idle.** Symptom: project
+  host fails DNS (`ENOTFOUND`). After owner restores: ~3 min of 502s,
+  then PostgREST schema cache may briefly report "Could not find the
+  table/function" — wait and retry before concluding migrations are
+  missing.
+- **Live smoke test:** a throwaway Node script using
+  `@supabase/supabase-js` + `.env` values with two anon clients can
+  exercise RPCs end-to-end (pair, recovery). Keep scripts out of the repo
+  (`/tmp/opencode/`) or delete after; they create real anon users.
+- **Run pnpm via nvm:** `source ~/.nvm/nvm.sh` first in each shell
+  (system node is 22.8, too old; nvm default is 24).
 
 ## User preferences (durable)
 
