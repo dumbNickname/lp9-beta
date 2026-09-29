@@ -37,6 +37,28 @@ Thinking so far, to pick up when Phase 6 resumes:
 
 ## Product / UX
 
+### Seen while testing (2026-09-29)
+- The **recovery-password overlay after pairing** is heavy (long warning
+  and 2 fields right at the happiest moment). Maybe show it after the
+  first note is sent, or as a small banner "Protect your notes".
+- **Onboarding archetype question** ("What describes you best?") comes
+  before pairing, but the archetype belongs to the relationship. Better
+  asked by the inviter when creating the invite (it's the default
+  template set). When a user adds a 2nd pair the old hint is reused
+  silently.
+- **Hash tab + new pair**: after pairing a 2nd person the app keeps the
+  `#coupons` tab. Consider jumping to Notes for a new pair.
+- **"Welcome back, Anna."** duplicates the pair badge name; drop the
+  eyebrow or make it time-of-day ("Good evening").
+- **Claim when 0 affordable**: show "N more hearts" on the cheapest
+  approved coupon (gentle, not a progress bar) — discuss scoreboard risk.
+- **Partner's coupon list** can grow long; group "Ready" vs "Waiting for
+  you" with small headings.
+- **Composer**: after sending, the Undo affordance is on the note in the
+  feed below; maybe a toast "Sent · Undo" right under the button.
+- **Empty "Coming up"** takes space for new couples; hide until the
+  first accepted claim.
+
 - **Coming up -> .ics export** ("add to my calendar") for accepted
   claims with a date.
 - **Delivered moment**: after "Mark delivered", prompt the claimer to

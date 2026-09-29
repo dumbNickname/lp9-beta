@@ -43,12 +43,16 @@
    -> plan -> delivered), and a 2nd pair via "Add someone".
 2. QA pass on the dev-done PRDs (28–34, 36–40, 42, 43), then mark them
    merged.
-3. Phase 6 (email notifications) needs owner input: Supabase SMTP only
+3. Polish round done (PRD-44..47: confirm sheet, device settings,
+   new-since-last-visit + waiting badge, pairing/onboarding look). More
+   polish candidates from testing are in `IDEAS.md` → "Seen while
+   testing"; pick with the owner.
+4. **Parked by owner:** Phase 6 (email notifications) needs owner input: Supabase SMTP only
    works for auth emails, so transactional mail probably needs an Edge
    Function + provider (Resend). Anonymous users have no email at all,
    so email needs Google linking first (Phase 1 left linking undone).
    Grill before decomposing.
-4. Backlog and polish are in `IDEAS.md`.
+5. Backlog and polish are in `IDEAS.md`.
 
 ## Deployment URLs
 
