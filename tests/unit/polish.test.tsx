@@ -86,7 +86,6 @@ describe("DeviceSettings", () => {
         <ConfirmHost />
       </>
     ));
-    fireEvent.click(getByRole("button", { name: /settings & this device/i }));
     expect(await findByText(/Not set/)).toBeInTheDocument();
     expect(getByRole("button", { name: "Set" })).toBeInTheDocument();
     fireEvent.click(getByRole("button", { name: "Reset device" }));
@@ -98,8 +97,7 @@ describe("DeviceSettings", () => {
     getKey.mockResolvedValue(null);
     getRelationshipWrap.mockResolvedValue({ wrapped_key_blob: new Uint8Array() });
     const DeviceSettings = (await import("~/components/DeviceSettings")).default;
-    const { getByRole, findByRole, findByText } = render(() => <DeviceSettings relationshipId="r1" />);
-    fireEvent.click(getByRole("button", { name: /settings & this device/i }));
+    const { findByRole, findByText } = render(() => <DeviceSettings relationshipId="r1" />);
     expect(await findByText(/Set — you can unlock/)).toBeInTheDocument();
     expect(await findByRole("button", { name: "Unlock notes" })).toBeInTheDocument();
   });

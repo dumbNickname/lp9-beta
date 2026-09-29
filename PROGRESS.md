@@ -119,6 +119,7 @@ its own end-to-end PRD per `DESIGN.md` §16a.
 | 48 | Fix: nav double-current + input overflow on mobile    | `prds/PRD-48-nav-current-and-input-overflow.md` | dev-done |
 | 49 | App shell redesign: app bar, 3 worlds, ticket coupons | `prds/PRD-49-app-shell-worlds.md`              | dev-done |
 | 50 | Layering, alignment, calendar whose-wish, claim chips | `prds/PRD-50-layout-polish.md`                 | dev-done |
+| 51 | Settings as its own page (`#settings`)                | `prds/PRD-51-settings-page.md`                 | dev-done |
 
 ### Phase 5 — Coupon claim/escrow flow
 

@@ -28,7 +28,12 @@ export default function ThemeToggle() {
     sync(stored);
 
     // In "system" mode, follow OS preference changes live.
-    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    let mq: MediaQueryList;
+    try {
+      mq = window.matchMedia("(prefers-color-scheme: dark)");
+    } catch {
+      return;
+    }
     const onChange = () => {
       if (choice() === "system") sync("system");
     };

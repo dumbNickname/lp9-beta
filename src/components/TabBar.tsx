@@ -3,6 +3,11 @@ import { For, Show } from "solid-js";
 export type Tab = "give" | "mine" | "theirs";
 const TABS: Tab[] = ["give", "mine", "theirs"];
 
+// `#settings` is a separate page inside the dashboard (PRD-51).
+export function readSettings(): boolean {
+  return typeof window !== "undefined" && window.location.hash === "#settings";
+}
+
 // Hash sync (D-39.1, PRD-49). Legacy `#coupons` opens My wishes.
 export function readTab(): Tab {
   if (typeof window === "undefined") return "give";
@@ -14,7 +19,7 @@ export function readTab(): Tab {
 
 // Absolute URL: a bare "#x" would resolve against <base href> and drop
 // /app (see src/AGENTS.md gotcha).
-export function writeTab(t: Tab): void {
+export function writeTab(t: Tab | "settings"): void {
   try {
     const path = location.pathname + location.search;
     history.replaceState(null, "", t === "give" ? path : `${path}#${t}`);

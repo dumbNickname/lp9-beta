@@ -108,7 +108,8 @@ the client/server entry points. Public pages are statically generated;
   link, pair switcher, balance pill, ⋯ menu) + `TabBar` with three
   **worlds**: Give (composer + notes), My wishes (`MyWishes`), For
   partner (`ForPartner`). Hash-synced (`#mine`, `#theirs`; legacy
-  `#coupons`). World colours: `--world-*` tokens, set per world via
+  `#coupons`), plus `#settings` = `SettingsPage` (You / Pairs / This
+  device / About), opened from the ⋯ menu. World colours: `--world-*` tokens, set per world via
   `--w`/`--w-soft` on `.world--*`; sections use `Section.tsx` (sticky
   tinted header). The site header is hidden on `/app`. `routes/app.tsx`
   only gates (session → profile → relationship).

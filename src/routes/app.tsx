@@ -62,8 +62,6 @@ export default function AppShell() {
     setRecoveryDone(rel ? wasRecoveryPrompted(rel.id) : true);
   });
 
-  const [settingsOpen, setSettingsOpen] = createSignal(0);
-
   const dismissRecovery = (relId: string) => {
     markRecoveryPrompted(relId);
     setRecoveryDone(true);
@@ -104,7 +102,6 @@ export default function AppShell() {
                       relationship={rel}
                       userId={user()!.id}
                       displayName={profile()!.display_name!}
-                      onOpenSettings={() => setSettingsOpen((n) => n + 1)}
                     />
                   )}
                 </Show>
@@ -113,9 +110,14 @@ export default function AppShell() {
           </Show>
         </Show>
       </Show>
-      <footer class="app-reset">
-        <DeviceSettings relationshipId={relationship()?.id ?? null} openSignal={settingsOpen()} />
-      </footer>
+      <Show when={!relationship()}>
+        <footer class="app-reset">
+          <details class="app-reset-details">
+            <summary>This device</summary>
+            <DeviceSettings relationshipId={null} />
+          </details>
+        </footer>
+      </Show>
       <ConfirmHost />
     </main>
   );

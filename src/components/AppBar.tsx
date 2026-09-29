@@ -2,7 +2,6 @@ import { createSignal, For, onCleanup, onMount, Show } from "solid-js";
 import HeartIcon from "~/components/HeartIcon";
 import { initial, type PairOption } from "~/components/PairBadge";
 import PrivacyToggle from "~/components/PrivacyToggle";
-import ThemeToggle from "~/components/ThemeToggle";
 
 interface Props {
   myName: string;
@@ -171,10 +170,6 @@ export default function AppBar(props: Props) {
             <span>Private mode</span>
             <PrivacyToggle />
           </div>
-          <div class="popover-row">
-            <span>Theme</span>
-            <ThemeToggle />
-          </div>
           <button
             type="button"
             class="pair-menu-item"
@@ -193,7 +188,7 @@ export default function AppBar(props: Props) {
               props.onOpenSettings();
             }}
           >
-            Settings &amp; this device
+            Settings
           </button>
           <a href={HOME} class="pair-menu-item">
             Home, privacy &amp; terms

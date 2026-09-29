@@ -1,4 +1,4 @@
-import { createEffect, createResource, createSignal, on, Show } from "solid-js";
+import { createResource, createSignal, Show } from "solid-js";
 import { confirmSheet } from "~/components/ConfirmSheet";
 import RecoveryPassword from "~/components/RecoveryPassword";
 import { getKey } from "~/lib/crypto/keystore";
@@ -8,8 +8,6 @@ import { resetAccount } from "~/lib/session";
 interface Props {
   relationshipId: string | null;
   onKeyRestored?: () => void;
-  // Bumped by the app bar "Settings" item to open + scroll to the panel.
-  openSignal?: number;
 }
 
 type Panel = null | "change" | "restore";
@@ -17,24 +15,12 @@ type Panel = null | "change" | "restore";
 // "This device" settings for anonymous mode (PRD-45): recovery password
 // status + change/restore, honest data note, and the reset escape hatch.
 export default function DeviceSettings(props: Props) {
-  const [open, setOpen] = createSignal(false);
   const [panel, setPanel] = createSignal<Panel>(null);
   const [resetting, setResetting] = createSignal(false);
   const [saved, setSaved] = createSignal("");
-  let rootEl: HTMLElement | undefined;
-  createEffect(
-    on(
-      () => props.openSignal,
-      (v) => {
-        if (!v) return;
-        setOpen(true);
-        queueMicrotask(() => rootEl?.scrollIntoView?.({ behavior: "smooth", block: "start" }));
-      },
-    ),
-  );
 
   const [status, { refetch }] = createResource(
-    () => (open() && props.relationshipId ? props.relationshipId : null),
+    () => props.relationshipId,
     async (relId) => {
       const [key, wrap] = await Promise.all([
         getKey(relId).catch(() => null),
@@ -66,20 +52,9 @@ export default function DeviceSettings(props: Props) {
   };
 
   return (
-    <section class="settings" aria-label="This device" ref={rootEl}>
-      <button
-        type="button"
-        class="link-button settings-toggle"
-        aria-expanded={open()}
-        aria-controls="settings-panel"
-        onClick={() => setOpen((v) => !v)}
-      >
-        {open() ? "Hide settings" : "Settings & this device"}
-      </button>
-
-      <Show when={open()}>
-        <div id="settings-panel" class="card settings-panel">
-          <h2 class="templates-title">This device</h2>
+    <section class="settings" aria-labelledby="device-title">
+        <div class="card settings-panel">
+          <h2 id="device-title" class="templates-title">This device</h2>
           <p class="settings-note">
             You're using the app without an account. Your hearts and coupons are
             stored on our server, but only this browser can get to them — clearing
@@ -145,7 +120,6 @@ export default function DeviceSettings(props: Props) {
             </button>
           </div>
         </div>
-      </Show>
     </section>
   );
 }

@@ -117,3 +117,29 @@ describe("Dashboard worlds (PRD-49)", () => {
     expect(getByRole("tab", { name: /give/i })).toHaveAttribute("aria-selected", "true");
   });
 });
+
+describe("Settings page (PRD-51)", () => {
+  it("opens from the ⋯ menu as its own view and Back returns to the tab", async () => {
+    history.replaceState(null, "", "/app#mine");
+    const Dashboard = (await import("~/components/Dashboard")).default;
+    const { getByRole, queryByRole, findByRole } = render(() => (
+      <Dashboard relationship={rel} userId="me" displayName="Anna" />
+    ));
+    fireEvent.click(getByRole("button", { name: "More" }));
+    fireEvent.click(getByRole("button", { name: "Settings" }));
+    expect(await findByRole("heading", { level: 1, name: "Settings" })).toBeInTheDocument();
+    expect(location.hash).toBe("#settings");
+    expect(queryByRole("tabpanel")).toBeNull();
+    expect(getByRole("heading", { name: "This device" })).toBeInTheDocument();
+    fireEvent.click(getByRole("button", { name: /back/i }));
+    expect(location.hash).toBe("#mine");
+    expect(getByRole("tab", { name: /my wishes/i })).toHaveAttribute("aria-selected", "true");
+  });
+
+  it("#settings in URL opens the settings page directly", async () => {
+    history.replaceState(null, "", "/app#settings");
+    const Dashboard = (await import("~/components/Dashboard")).default;
+    const { findByRole } = render(() => <Dashboard relationship={rel} userId="me" displayName="Anna" />);
+    expect(await findByRole("heading", { level: 1, name: "Settings" })).toBeInTheDocument();
+  });
+});

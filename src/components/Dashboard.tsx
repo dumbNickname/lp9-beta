@@ -7,7 +7,8 @@ import MyWishes from "~/components/MyWishes";
 import PairBadge from "~/components/PairBadge";
 import PrivacyToggle from "~/components/PrivacyToggle";
 import RecoveryPassword from "~/components/RecoveryPassword";
-import TabBar, { type Tab, readTab, writeTab } from "~/components/TabBar";
+import SettingsPage from "~/components/SettingsPage";
+import TabBar, { type Tab, readSettings, readTab, writeTab } from "~/components/TabBar";
 import { getDisplayName } from "~/lib/data/profile";
 import type { Relationship } from "~/lib/data/types";
 import {
@@ -29,7 +30,6 @@ interface Props {
   relationship: Relationship;
   userId: string;
   displayName: string;
-  onOpenSettings?: () => void;
 }
 
 export default function Dashboard(props: Props) {
@@ -103,6 +103,7 @@ export default function Dashboard(props: Props) {
   // consumed by PairFlow before the dashboard ever mounts.
   const [tab, setTab] = createSignal<Tab>(readTab());
   const selectTab = (t: Tab) => {
+    setSettings(false);
     setTab(t);
     writeTab(t);
     if (t !== "give") {
@@ -112,8 +113,21 @@ export default function Dashboard(props: Props) {
     if (typeof window !== "undefined") window.scrollTo?.({ top: 0 });
   };
   const [editingName, setEditingName] = createSignal(false);
+  const [settings, setSettings] = createSignal(readSettings());
+  const openSettings = () => {
+    setSettings(true);
+    writeTab("settings");
+    if (typeof window !== "undefined") window.scrollTo?.({ top: 0 });
+  };
+  const closeSettings = () => {
+    setSettings(false);
+    writeTab(tab());
+  };
   onMount(() => {
-    const onHash = () => setTab(readTab());
+    const onHash = () => {
+      setSettings(readSettings());
+      if (!readSettings()) setTab(readTab());
+    };
     const onFocus = () => {
       if (document.visibilityState !== "visible") return;
       void refreshClaims(props.relationship.id);
@@ -145,13 +159,21 @@ export default function Dashboard(props: Props) {
         onSwitch={(id) => selectRelationship(id)}
         onNewPair={() => setAddingPartner(true)}
         onEditName={() => setEditingName(true)}
-        onOpenSettings={() => {
-          props.onOpenSettings?.();
-        }}
+        onOpenSettings={openSettings}
       />
 
+      <Show when={settings()}>
+        <SettingsPage
+          myName={props.displayName}
+          partnerName={partnerNameRes.latest ?? null}
+          relationshipId={props.relationship.id}
+          onBack={closeSettings}
+          onNewPair={() => setAddingPartner(true)}
+        />
+      </Show>
+
       <TabBar
-        tab={tab()}
+        tab={settings() ? ("none" as Tab) : tab()}
         onSelect={selectTab}
         partnerName={partnerName()}
         mineBadge={myWaiting()}
@@ -185,7 +207,7 @@ export default function Dashboard(props: Props) {
         </div>
       </Show>
 
-      <Show when={tab() === "give"}>
+      <Show when={!settings() && tab() === "give"}>
         <div id="panel-give" role="tabpanel" aria-labelledby="tab-give" class="world world--give">
           <div class="world-main">
             <p class="eyebrow greeting">
@@ -213,7 +235,7 @@ export default function Dashboard(props: Props) {
         </div>
       </Show>
 
-      <Show when={tab() === "mine"}>
+      <Show when={!settings() && tab() === "mine"}>
         <div id="panel-mine" role="tabpanel" aria-labelledby="tab-mine">
           <MyWishes
             relationship={props.relationship}
@@ -224,7 +246,7 @@ export default function Dashboard(props: Props) {
         </div>
       </Show>
 
-      <Show when={tab() === "theirs"}>
+      <Show when={!settings() && tab() === "theirs"}>
         <div id="panel-theirs" role="tabpanel" aria-labelledby="tab-theirs">
           <ForPartner
             relationship={props.relationship}
