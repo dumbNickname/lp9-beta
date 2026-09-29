@@ -114,12 +114,23 @@ the partner missed it (because they didn't have their phone, etc.).
   two-step. If users complain, introduce an "immediate" coupon flag that
   collapses the two steps into one tap.
 
-#### 5f. Open / deferred
-- Whether deliverer or earner can cancel an *accepted-but-not-yet-delivered*
-  claim, and what happens to points.
-- What happens if a coupon definition is edited or deleted while a claim
-  against it is pending.
-- Schema for coupon templates per relationship type (still on the queue).
+#### 5f. ~~Open / deferred~~ Resolved 2026-09-29 (owner)
+- **Withdraw:** the claimer may withdraw a *pending* claim (full refund,
+  status `withdrawn`).
+- **Cancel accepted:** either partner may cancel an *accepted, not yet
+  delivered* claim (full refund, status `cancelled`, optional note).
+- **Coupon changes during a claim:** approved coupons are immutable
+  (§6e); retiring one cancels its open claims with a full refund
+  (`cancelled`, note "coupon retired").
+- **One open claim per coupon:** at most one `pending`/`accepted` claim per
+  coupon; claim again after delivery.
+- **"Propose later" simplified:** the deliverer accepts with an optional
+  date + short note ("Saturday morning?"); no propose/confirm loop.
+  Planning details happen in person. Accepted claims with a date show in a
+  **"Coming up" 14-day calendar preview** for both partners.
+- **14-day auto-refund:** a lazy sweep RPC (`sweep_expired_claims`) runs
+  whenever either partner loads claims; no cron infra. Same outcome.
+- Templates schema: resolved as a hardcoded TS file (§6c, PRD-37).
 
 ### Not yet discussed
 ### 6. Coupons — definition, agreement, and templates
@@ -701,8 +712,12 @@ suggest the app is about optimizing, comparing, or earning.
 - `price_at_claim` int (frozen so retiring/renaming a coupon doesn't
   change history)
 - `status` text — `'pending'` | `'accepted'` | `'declined'` |
-  `'delivered'` | `'auto_refunded'`
-- `scheduled_for` timestamptz nullable
+  `'delivered'` | `'auto_refunded'` | `'withdrawn'` | `'cancelled'`
+  (last two added 2026-09-29, §5f)
+- `scheduled_date` date + `accept_note` text (replaces `scheduled_for`
+  timestamptz, 2026-09-29 — a date + free note fits "Saturday morning?")
+- `cancelled_by` uuid, `cancel_note` text, `cancelled_at`, `withdrawn_at`
+- ~~`scheduled_for` timestamptz nullable~~ (see `scheduled_date` above)
 - `decline_reason` text nullable
 - `claimed_at`, `accepted_at`, `declined_at`, `delivered_at`,
   `nudged_at` timestamptz (last four nullable)
@@ -786,15 +801,20 @@ inserts/updates for state-changing actions.
 - `approve_coupon(coupon_id)` — only by giver.
 - `retire_coupon(coupon_id)` — only by giver; refunds pending claims.
 - `claim_coupon(coupon_id)` — escrow, validates spendable balance.
-- `accept_claim(claim_id, scheduled_for?)` — deliverer only.
+- `accept_claim(claim_id, scheduled_date?, note?)` — deliverer only (§5f).
 - `decline_claim(claim_id, reason)` — deliverer only; refunds.
 - `deliver_claim(claim_id)` — deliverer only; finalizes spend.
 - `nudge_claim(claim_id)` — claimer only; rate-limited (>= 24h between
   nudges, only after 7 days from claim).
+- `withdraw_claim(claim_id)` — claimer, pending only; refunds (§5f).
+- `cancel_claim(claim_id, note?)` — either member, accepted only;
+  refunds (§5f).
+- `sweep_expired_claims(rel_id)` — lazy 14-day auto-refund (§5f).
 - `set_recovery_password(rel_id, wrapped_blob, salt, iterations, algo)` — first set + change.
 
 A scheduled job (Supabase Edge Function or pg_cron) runs daily to:
-- Auto-refund claims older than 14 days (`auto_refunded`).
+- ~~Auto-refund claims older than 14 days (`auto_refunded`).~~ Replaced
+  2026-09-29 by the lazy `sweep_expired_claims` RPC (§5f).
 - Send the throttled hearts email per Q8.
 
 #### 13e. Indexes (sketch)

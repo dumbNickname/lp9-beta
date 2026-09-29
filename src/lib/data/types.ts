@@ -94,3 +94,36 @@ export interface CouponInput {
   emoji?: string | null;
   price: number;
 }
+
+export type ClaimStatus =
+  | "pending"
+  | "accepted"
+  | "declined"
+  | "delivered"
+  | "auto_refunded"
+  | "withdrawn"
+  | "cancelled";
+
+// Escrow claim (DESIGN.md §5e/§5f, §13a). price_at_claim is frozen.
+export interface Claim {
+  id: string;
+  coupon_id: string;
+  relationship_id: string;
+  claimer_id: string;
+  deliverer_id: string;
+  price_at_claim: number;
+  status: ClaimStatus;
+  scheduled_date: string | null;
+  accept_note: string | null;
+  decline_reason: string | null;
+  cancel_note: string | null;
+  cancelled_by: string | null;
+  claimed_at: string;
+  accepted_at: string | null;
+  declined_at: string | null;
+  delivered_at: string | null;
+  withdrawn_at: string | null;
+  cancelled_at: string | null;
+  auto_refunded_at: string | null;
+  nudged_at: string | null;
+}
