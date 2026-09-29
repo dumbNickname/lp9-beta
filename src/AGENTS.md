@@ -70,6 +70,10 @@ the client/server entry points. Public pages are statically generated;
   so relative URLs in `history.replaceState/pushState` (e.g. `"#x"`)
   resolve to the site root and drop `/app`. Always pass
   `location.pathname + location.search + hash`.
+- **PWA (PRD-52)**: static files in `public/` (copied to the site root
+  under BASE_PATH): `manifest.webmanifest` (relative URLs), `icons/`,
+  `sw.js` (never caches cross-origin; bump `CACHE` name when changing
+  caching). theme-color follows the theme via `lib/theme.ts`.
 - Path alias `~/*` → `src/*`.
 
 - **Data layer (`src/lib/data/`)**: all Supabase calls live here.

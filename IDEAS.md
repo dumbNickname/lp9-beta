@@ -54,6 +54,10 @@ Thinking so far, to pick up when Phase 6 resumes:
 
 ### "Watch rings" gadget around the balance
 - Owner idea: a smartwatch-style ring/bars around the heart number.
+- **Owner clarification 2026-09-29: not for comparison — just fun data
+  visualisation.** So no goals/pressure needed; rings can simply show
+  e.g. hearts given this week, progress to the next wish, plans coming
+  up.
 - **Take:** good for attractiveness, but must stay non-competitive
   (never partner vs partner, never totals). Candidate rings, all
   self-referential and gentle:

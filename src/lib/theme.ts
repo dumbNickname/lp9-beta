@@ -53,8 +53,29 @@ export function systemPrefersDark(): boolean {
   }
 }
 
+// Browser chrome colour per theme (PRD-52): matches --color-bg.
+export const THEME_COLORS: Record<EffectiveTheme, string> = {
+  light: "#f4ebe0",
+  dark: "#3a1f19",
+};
+
+function setThemeColorMeta(theme: EffectiveTheme): void {
+  try {
+    let meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]:not([media])');
+    if (!meta) {
+      meta = document.createElement("meta");
+      meta.name = "theme-color";
+      document.head.appendChild(meta);
+    }
+    meta.content = THEME_COLORS[theme];
+  } catch {
+    // no DOM
+  }
+}
+
 export function applyEffectiveTheme(theme: EffectiveTheme): void {
   document.documentElement.dataset.theme = theme;
+  setThemeColorMeta(theme);
 }
 
 // Inline script injected into <head> before paint to set the correct
@@ -69,6 +90,10 @@ export const THEME_INIT_SCRIPT = `
       (c === "system" &&
         window.matchMedia("(prefers-color-scheme: dark)").matches);
     document.documentElement.dataset.theme = dark ? "dark" : "light";
+    var m = document.createElement("meta");
+    m.name = "theme-color";
+    m.content = dark ? ${JSON.stringify("#3a1f19")} : ${JSON.stringify("#f4ebe0")};
+    document.head.appendChild(m);
   } catch (e) {
     document.documentElement.dataset.theme = "light";
   }

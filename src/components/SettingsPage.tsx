@@ -1,4 +1,5 @@
 import DeviceSettings from "~/components/DeviceSettings";
+import InstallApp from "~/components/InstallApp";
 import PairBadge from "~/components/PairBadge";
 import PrivacyToggle from "~/components/PrivacyToggle";
 import ThemeToggle from "~/components/ThemeToggle";
@@ -42,6 +43,7 @@ export default function SettingsPage(props: Props) {
           </div>
           <ThemeToggle />
         </div>
+        <InstallApp />
       </section>
 
       <section class="card settings-panel" aria-labelledby="pairs-title">

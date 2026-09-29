@@ -15,6 +15,19 @@ export default tseslint.config(
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
+    files: ["public/sw.js"],
+    languageOptions: {
+      sourceType: "script",
+      globals: {
+        self: "readonly",
+        caches: "readonly",
+        fetch: "readonly",
+        URL: "readonly",
+        Promise: "readonly",
+      },
+    },
+  },
+  {
     files: ["**/*.{ts,tsx}"],
     ...solid,
     languageOptions: {

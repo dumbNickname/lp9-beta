@@ -224,8 +224,11 @@ the partner missed it (because they didn't have their phone, etc.).
 
 #### 8a. Channels in MVP
 - **Decision:** In-app feed + **transactional email** (Supabase built-in
-  SMTP). **No web push, no PWA install flow** in MVP — defer until users
-  request.
+  SMTP). ~~**No web push, no PWA install flow** in MVP — defer until users
+  request.~~ **Amended 2026-09-29 (owner):** installable PWA (PRD-52) and
+  opt-in **web push** (PRD-53) are in; email stays parked. Push follows
+  §8b rules: content-free text, max 1 hearts push per day per receiver,
+  coupon-flow events immediate, user-toggleable.
 - Rationale: keeps tech setup minimal; web push (especially iOS PWA
   requirement) is a rabbit hole for a side project.
 
