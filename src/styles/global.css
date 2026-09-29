@@ -177,6 +177,26 @@ textarea {
   line-height: 1.5;
 }
 
+/* Never let a control overflow its card (PRD-48). iOS Safari gives date
+   inputs an intrinsic min-width and centres the value; reset both. */
+input,
+select,
+textarea {
+  max-inline-size: 100%;
+  min-inline-size: 0;
+}
+
+input[type="date"] {
+  -webkit-appearance: none;
+  appearance: none;
+  min-block-size: 2.5rem;
+  text-align: start;
+}
+
+input[type="date"]::-webkit-date-and-time-value {
+  text-align: start;
+}
+
 input:hover,
 select:hover,
 textarea:hover {
@@ -479,7 +499,7 @@ button.small,
 }
 
 .composer-when label {
-  max-inline-size: 14rem;
+  max-inline-size: 16rem;
 }
 
 .composer-actions {
@@ -957,7 +977,7 @@ button.small,
 
 .coupon-main {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   gap: var(--space-3);
   align-items: start;
 }
@@ -1077,7 +1097,7 @@ button.small,
 
 .coupon-form-row {
   display: grid;
-  grid-template-columns: 4.5rem 1fr;
+  grid-template-columns: 4.5rem minmax(0, 1fr);
   gap: var(--space-3);
 }
 
@@ -1166,7 +1186,7 @@ button.small,
 
 .template-item {
   display: grid;
-  grid-template-columns: auto auto 1fr auto;
+  grid-template-columns: auto auto minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--space-3);
   margin: 0;
@@ -1258,7 +1278,7 @@ button.small,
 
 .claim-main {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   gap: var(--space-3);
   align-items: start;
 }
@@ -1362,7 +1382,7 @@ button.small,
 
 .plan {
   display: grid;
-  grid-template-columns: 6.5rem auto 1fr auto;
+  grid-template-columns: 6.5rem auto minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--space-2);
   font-size: var(--text-sm);

@@ -206,8 +206,11 @@ files add operational contracts; they do not replace `DESIGN.md`.
   anon partners. The agent model cannot view images, so assert via the
   DOM / computed styles.
 - **`pnpm build` can exceed the 5-min tool timeout** when a stale vinxi
-  process lingers. Kill stray `vinxi` processes first, and run the build
-  detached with the log in `/tmp/opencode/build.log`.
+  process lingers. Kill stray `vinxi` processes first, `rm -rf .output`
+  (otherwise a failed or killed build silently leaves the OLD bundle in
+  place), then run the build detached (`setsid nohup ... &`) with a log
+  and an `RC $?` marker line to poll for. Verify fresh output by
+  grepping the bundle for your new code.
 
 ## User preferences (durable)
 

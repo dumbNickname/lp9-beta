@@ -28,4 +28,22 @@ describe("SiteNav", () => {
       "/lp9-beta/app",
     );
   });
+
+  it("isCurrent: end-exact for home, prefix for others, trailing slash tolerant", async () => {
+    const { isCurrent } = await import("~/components/SiteNav");
+    expect(isCurrent("/lp9-beta/", "/lp9-beta", true)).toBe(true);
+    expect(isCurrent("/lp9-beta/app/", "/lp9-beta", true)).toBe(false);
+    expect(isCurrent("/lp9-beta/app/", "/lp9-beta/app")).toBe(true);
+    expect(isCurrent("/lp9-beta", "/lp9-beta/app")).toBe(false);
+    expect(isCurrent("/lp9-beta/application", "/lp9-beta/app")).toBe(false);
+  });
+
+  it("only the current page link has aria-current", () => {
+    const { getByRole } = renderNav();
+    const current = ["Home", "App", "Privacy", "Terms"].filter(
+      (name) => getByRole("link", { name }).getAttribute("aria-current") === "page",
+    );
+    expect(current).toEqual(["Home"]);
+  });
 });
+

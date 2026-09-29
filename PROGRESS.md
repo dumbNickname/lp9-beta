@@ -116,6 +116,7 @@ its own end-to-end PRD per `DESIGN.md` §16a.
 | 45 | "Settings & this device" panel                        | `prds/PRD-45-device-settings.md`               | dev-done |
 | 46 | "New since last visit" + waiting badge                | `prds/PRD-46-new-since-last-visit.md`          | dev-done |
 | 47 | Pairing + onboarding visual polish                    | `prds/PRD-47-pairing-onboarding-polish.md`     | dev-done |
+| 48 | Fix: nav double-current + input overflow on mobile    | `prds/PRD-48-nav-current-and-input-overflow.md` | dev-done |
 
 ### Phase 5 — Coupon claim/escrow flow
 
