@@ -58,20 +58,31 @@ const rel = {
   paired_at: "",
 };
 
-describe("Dashboard tabs", () => {
-  it("defaults to Notes, switches to Coupons and syncs hash", async () => {
+describe("Dashboard worlds (PRD-49)", () => {
+  it("defaults to Give, switches worlds and syncs hash", async () => {
     const Dashboard = (await import("~/components/Dashboard")).default;
-    const { getByRole, findByText, queryByRole } = render(() => (
+    const { getByRole, queryByRole, findByText, findByRole } = render(() => (
       <Dashboard relationship={rel} userId="me" displayName="Anna" />
     ));
-    expect(getByRole("tab", { name: "Notes" })).toHaveAttribute("aria-selected", "true");
+    expect(getByRole("tab", { name: /give/i })).toHaveAttribute("aria-selected", "true");
     expect(getByRole("heading", { name: /appreciate/i })).toBeInTheDocument();
-    expect(await findByText(/7/)).toBeInTheDocument();
-    fireEvent.click(getByRole("tab", { name: "Coupons" }));
-    expect(location.hash).toBe("#coupons");
+    expect(await findByText("7")).toBeInTheDocument();
+    fireEvent.click(getByRole("tab", { name: /my wishes/i }));
+    expect(location.hash).toBe("#mine");
     expect(queryByRole("heading", { name: /appreciate/i })).toBeNull();
-    expect(getByRole("heading", { name: "I'd love" })).toBeInTheDocument();
     expect(getByRole("heading", { name: /need ideas/i })).toBeInTheDocument();
+    fireEvent.click(await findByRole("tab", { name: /for bob/i }));
+    expect(location.hash).toBe("#theirs");
+    expect(getByRole("heading", { name: /bob's wishes/i })).toBeInTheDocument();
+  });
+
+  it("balance pill explains itself", async () => {
+    const Dashboard = (await import("~/components/Dashboard")).default;
+    const { getByRole, findByRole } = render(() => (
+      <Dashboard relationship={rel} userId="me" displayName="Anna" />
+    ));
+    fireEvent.click(getByRole("button", { name: /hearts to spend/i }));
+    expect(await findByRole("note")).toHaveTextContent(/ready to spend/i);
   });
 
   it("keeps the /app path when switching tabs under a <base href> (GH Pages)", async () => {
@@ -82,10 +93,10 @@ describe("Dashboard tabs", () => {
     try {
       const Dashboard = (await import("~/components/Dashboard")).default;
       const { getByRole } = render(() => <Dashboard relationship={rel} userId="me" displayName="Anna" />);
-      fireEvent.click(getByRole("tab", { name: "Coupons" }));
+      fireEvent.click(getByRole("tab", { name: /my wishes/i }));
       expect(location.pathname).toBe("/lp9-beta/app");
-      expect(location.hash).toBe("#coupons");
-      fireEvent.click(getByRole("tab", { name: "Notes" }));
+      expect(location.hash).toBe("#mine");
+      fireEvent.click(getByRole("tab", { name: /give/i }));
       expect(location.pathname).toBe("/lp9-beta/app");
       expect(location.hash).toBe("");
     } finally {
@@ -93,13 +104,16 @@ describe("Dashboard tabs", () => {
     }
   });
 
-  it("opens on Coupons when hash is #coupons; arrow keys switch", async () => {
+  it("legacy #coupons opens My wishes; arrow keys cycle", async () => {
     history.replaceState(null, "", "#coupons");
     const Dashboard = (await import("~/components/Dashboard")).default;
-    const { getByRole } = render(() => <Dashboard relationship={rel} userId="me" displayName="Anna" />);
-    const coupons = getByRole("tab", { name: "Coupons" });
-    expect(coupons).toHaveAttribute("aria-selected", "true");
-    fireEvent.keyDown(coupons, { key: "ArrowLeft" });
-    expect(getByRole("tab", { name: "Notes" })).toHaveAttribute("aria-selected", "true");
+    const { getByRole, findByRole } = render(() => <Dashboard relationship={rel} userId="me" displayName="Anna" />);
+    await findByRole("tab", { name: /for bob/i });
+    const mine = getByRole("tab", { name: /my wishes/i });
+    expect(mine).toHaveAttribute("aria-selected", "true");
+    fireEvent.keyDown(mine, { key: "ArrowRight" });
+    expect(getByRole("tab", { name: /for bob/i })).toHaveAttribute("aria-selected", "true");
+    fireEvent.keyDown(getByRole("tab", { name: /for bob/i }), { key: "ArrowRight" });
+    expect(getByRole("tab", { name: /give/i })).toHaveAttribute("aria-selected", "true");
   });
 });

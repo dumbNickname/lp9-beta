@@ -81,7 +81,7 @@ describe("PRD-21 QA: /app gate — all four states", () => {
     const { queryByRole, queryByText } = render(() => <AppShell />);
     // PairFlow heading must NOT appear.
     expect(queryByRole("heading", { name: /pair with your partner/i })).toBeNull();
-    expect(queryByText(/welcome back/i)).toBeNull();
+    expect(queryByText(/(good (morning|afternoon|evening)|hello), /i)).toBeNull();
   });
 
   it("profile with name but no relationship -> PairFlow", async () => {
@@ -98,7 +98,7 @@ describe("PRD-21 QA: /app gate — all four states", () => {
     relationshipValue = { id: "r1", status: "active" };
     const AppShell = (await import("~/routes/app")).default;
     const { findByText } = render(() => <AppShell />);
-    expect(await findByText(/welcome back, alice/i)).toBeInTheDocument();
+    expect(await findByText(/(good (morning|afternoon|evening)|hello), alice/i)).toBeInTheDocument();
   });
 
   it("relationship still loading -> Loading, not a premature PairFlow flash", async () => {

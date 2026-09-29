@@ -92,7 +92,7 @@ describe("CouponCard", () => {
         onRetire={onRetire}
       />
     ));
-    expect(getByText("Ready")).toBeInTheDocument();
+    expect(getByText("Agreed")).toBeInTheDocument();
     expect(queryByRole("button", { name: "Edit" })).toBeNull();
     expect(queryByRole("button", { name: "Delete" })).toBeNull();
     fireEvent.click(getByRole("button", { name: "Retire" }));

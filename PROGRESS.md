@@ -117,6 +117,7 @@ its own end-to-end PRD per `DESIGN.md` §16a.
 | 46 | "New since last visit" + waiting badge                | `prds/PRD-46-new-since-last-visit.md`          | dev-done |
 | 47 | Pairing + onboarding visual polish                    | `prds/PRD-47-pairing-onboarding-polish.md`     | dev-done |
 | 48 | Fix: nav double-current + input overflow on mobile    | `prds/PRD-48-nav-current-and-input-overflow.md` | dev-done |
+| 49 | App shell redesign: app bar, 3 worlds, ticket coupons | `prds/PRD-49-app-shell-worlds.md`              | dev-done |
 
 ### Phase 5 — Coupon claim/escrow flow
 

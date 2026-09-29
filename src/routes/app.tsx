@@ -62,6 +62,8 @@ export default function AppShell() {
     setRecoveryDone(rel ? wasRecoveryPrompted(rel.id) : true);
   });
 
+  const [settingsOpen, setSettingsOpen] = createSignal(0);
+
   const dismissRecovery = (relId: string) => {
     markRecoveryPrompted(relId);
     setRecoveryDone(true);
@@ -79,7 +81,7 @@ export default function AppShell() {
                 <>
                   <Show when={relationship()}>
                     <div class="adding-partner-bar">
-                      <p class="eyebrow">Pairing with someone new</p>
+                      <p class="eyebrow">New pair — a separate notebook</p>
                       <button type="button" class="quiet small" onClick={() => setAddingPartner(false)}>
                         Back to my pair
                       </button>
@@ -102,6 +104,7 @@ export default function AppShell() {
                       relationship={rel}
                       userId={user()!.id}
                       displayName={profile()!.display_name!}
+                      onOpenSettings={() => setSettingsOpen((n) => n + 1)}
                     />
                   )}
                 </Show>
@@ -111,7 +114,7 @@ export default function AppShell() {
         </Show>
       </Show>
       <footer class="app-reset">
-        <DeviceSettings relationshipId={relationship()?.id ?? null} />
+        <DeviceSettings relationshipId={relationship()?.id ?? null} openSignal={settingsOpen()} />
       </footer>
       <ConfirmHost />
     </main>

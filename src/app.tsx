@@ -1,6 +1,6 @@
-import { Router } from "@solidjs/router";
+import { Router, useLocation } from "@solidjs/router";
 import { FileRoutes } from "@solidjs/start/router";
-import { Suspense } from "solid-js";
+import { Show, Suspense } from "solid-js";
 import SessionProvider from "~/components/SessionProvider";
 import SiteNav from "~/components/SiteNav";
 import ThemeToggle from "~/components/ThemeToggle";
@@ -16,16 +16,28 @@ const routerBase = (import.meta.env.SERVER_BASE_URL || "/").replace(
   "",
 );
 
+// The marketing header (site nav + theme) is for public pages only; /app
+// has its own compact AppBar (PRD-49).
+function SiteHeader() {
+  const location = useLocation();
+  const inApp = () => /\/app(\/|$)/.test(location.pathname);
+  return (
+    <Show when={!inApp()}>
+      <header class="app-header">
+        <SiteNav />
+        <ThemeToggle />
+      </header>
+    </Show>
+  );
+}
+
 export default function App() {
   return (
     <Router
       base={routerBase}
       root={(props) => (
         <SessionProvider>
-          <header class="app-header">
-            <SiteNav />
-            <ThemeToggle />
-          </header>
+          <SiteHeader />
           <Suspense>{props.children}</Suspense>
         </SessionProvider>
       )}

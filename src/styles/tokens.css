@@ -23,6 +23,14 @@
   --color-heart: #b03f58;
   --color-heart-soft: #f5d9dc;
   --color-focus: #96482e;
+  /* App "worlds" (PRD-49): Give = rose, My wishes = amber, For partner =
+     sage. Each has a text-safe ink + a soft tint. */
+  --world-give: #b03f58;
+  --world-give-soft: #f5d9dc;
+  --world-mine: #8a5300;
+  --world-mine-soft: #f6e3bf;
+  --world-theirs: #3d6a4c;
+  --world-theirs-soft: #d9eadc;
   /* QR codes need a true light quiet zone to scan, in both themes. */
   --color-qr-bg: #ffffff;
 
@@ -69,6 +77,12 @@
   --color-heart: #ff9aac;
   --color-heart-soft: #6b3036;
   --color-focus: #f2a07b;
+  --world-give: #ff9aac;
+  --world-give-soft: #6b3036;
+  --world-mine: #f2c46b;
+  --world-mine-soft: #5b4120;
+  --world-theirs: #a6d9b4;
+  --world-theirs-soft: #2f4a38;
 
   --shadow-soft: 0 1px 2px rgb(0 0 0 / 25%), 0 12px 32px -14px rgb(20 5 0 / 60%);
 }

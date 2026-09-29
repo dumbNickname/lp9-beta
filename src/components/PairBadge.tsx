@@ -22,12 +22,17 @@ interface Props {
   currentId?: string;
   onSwitch?: (id: string) => void;
   onAddPartner?: () => void;
+  // PRD-49: open straight into the name editor; called on save/cancel.
+  startEditing?: boolean;
+  onDone?: () => void;
 }
 
 // "Who am I paired with" at a glance + edit own display name (PRD-34).
 export default function PairBadge(props: Props) {
-  const [editing, setEditing] = createSignal(false);
-  const [draft, setDraft] = createSignal("");
+  // eslint-disable-next-line solid/reactivity -- initial mode only
+  const [editing, setEditing] = createSignal(!!props.startEditing);
+  // eslint-disable-next-line solid/reactivity -- initial value only
+  const [draft, setDraft] = createSignal(props.startEditing ? props.myName : "");
   const [busy, setBusy] = createSignal(false);
   const [error, setError] = createSignal("");
   const [menuOpen, setMenuOpen] = createSignal(false);
@@ -56,6 +61,7 @@ export default function PairBadge(props: Props) {
     try {
       await saveProfile({ display_name: name });
       setEditing(false);
+      props.onDone?.();
     } catch {
       setError("Couldn't save. Please try again.");
     } finally {
@@ -96,7 +102,7 @@ export default function PairBadge(props: Props) {
                   aria-controls="pair-menu"
                   onClick={() => setMenuOpen((v) => !v)}
                 >
-                  {(props.pairs?.length ?? 0) > 1 ? "Switch" : "Add someone"}
+                  Switch / new pair
                 </button>
               </Show>
             </p>
@@ -133,7 +139,7 @@ export default function PairBadge(props: Props) {
                         props.onAddPartner?.();
                       }}
                     >
-                      + Pair with someone new
+                      + New pair (a separate notebook)
                     </button>
                   </li>
                 </Show>
@@ -164,7 +170,10 @@ export default function PairBadge(props: Props) {
             <button
               type="button"
               class="quiet small"
-              onClick={() => setEditing(false)}
+              onClick={() => {
+                setEditing(false);
+                props.onDone?.();
+              }}
               disabled={busy()}
             >
               Cancel

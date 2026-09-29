@@ -39,7 +39,7 @@ the client/server entry points. Public pages are statically generated;
     `src/styles/tokens.css` (`--color-bg`, `--color-surface`,
     `--color-fg`, `--color-muted-*`, `--color-border`, `--color-accent`,
     `--color-accent-fg`, `--color-heart`, `--color-heart-soft`,
-    `--color-focus`, `--color-qr-bg`, `--color-bg-glow`) plus `--text-*`, `--space-*`,
+    `--color-focus`, `--color-qr-bg`, `--color-bg-glow`, `--world-*`) plus `--text-*`, `--space-*`,
     `--radius*`, `--shadow-soft`, `--measure`, `--ease`. Light on
     `:root`, dark on `[data-theme="dark"]`. Components reference
     tokens, never raw hues (a QA test greps for this).
@@ -104,12 +104,14 @@ the client/server entry points. Public pages are statically generated;
   (`refreshClaims` runs the lazy 14-day sweep first), `ClaimRow`,
   `ComingUp`. Balance = received − open − delivered claims, mirroring
   SQL `spendable_hearts`.
-- **Dashboard (`components/Dashboard.tsx`)**: `PairBadge` (who you're
-  paired with + edit own name), balance, privacy toggle, and **tabs**
-  Notes / Coupons synced to `location.hash` (`#coupons`; D-39.1, no
-  sub-routes). Notes = composer + feed + restore-key flow; Coupons =
-  `CouponsView`. `routes/app.tsx` only gates (session → profile →
-  relationship).
+- **Dashboard (`components/Dashboard.tsx`, PRD-49)**: `AppBar` (home
+  link, pair switcher, balance pill, ⋯ menu) + `TabBar` with three
+  **worlds**: Give (composer + notes), My wishes (`MyWishes`), For
+  partner (`ForPartner`). Hash-synced (`#mine`, `#theirs`; legacy
+  `#coupons`). World colours: `--world-*` tokens, set per world via
+  `--w`/`--w-soft` on `.world--*`; sections use `Section.tsx` (sticky
+  tinted header). The site header is hidden on `/app`. `routes/app.tsx`
+  only gates (session → profile → relationship).
 
 - **Confirms**: use `confirmSheet()` from `components/ConfirmSheet.tsx`,
   never `window.confirm` (host is mounted in `routes/app.tsx`).

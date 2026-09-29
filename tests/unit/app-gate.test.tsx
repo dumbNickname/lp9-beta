@@ -60,6 +60,6 @@ describe("AppShell gate — relationship", () => {
     relationshipValue = { id: "r1", status: "active" };
     const AppShell = (await import("~/routes/app")).default;
     const { findByText } = render(() => <AppShell />);
-    expect(await findByText(/welcome back, alice/i)).toBeInTheDocument();
+    expect(await findByText(/(good (morning|afternoon|evening)|hello), alice/i)).toBeInTheDocument();
   });
 });

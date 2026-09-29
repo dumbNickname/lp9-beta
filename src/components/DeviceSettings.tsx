@@ -1,4 +1,4 @@
-import { createResource, createSignal, Show } from "solid-js";
+import { createEffect, createResource, createSignal, on, Show } from "solid-js";
 import { confirmSheet } from "~/components/ConfirmSheet";
 import RecoveryPassword from "~/components/RecoveryPassword";
 import { getKey } from "~/lib/crypto/keystore";
@@ -8,6 +8,8 @@ import { resetAccount } from "~/lib/session";
 interface Props {
   relationshipId: string | null;
   onKeyRestored?: () => void;
+  // Bumped by the app bar "Settings" item to open + scroll to the panel.
+  openSignal?: number;
 }
 
 type Panel = null | "change" | "restore";
@@ -19,6 +21,17 @@ export default function DeviceSettings(props: Props) {
   const [panel, setPanel] = createSignal<Panel>(null);
   const [resetting, setResetting] = createSignal(false);
   const [saved, setSaved] = createSignal("");
+  let rootEl: HTMLElement | undefined;
+  createEffect(
+    on(
+      () => props.openSignal,
+      (v) => {
+        if (!v) return;
+        setOpen(true);
+        queueMicrotask(() => rootEl?.scrollIntoView?.({ behavior: "smooth", block: "start" }));
+      },
+    ),
+  );
 
   const [status, { refetch }] = createResource(
     () => (open() && props.relationshipId ? props.relationshipId : null),
@@ -53,7 +66,7 @@ export default function DeviceSettings(props: Props) {
   };
 
   return (
-    <section class="settings" aria-label="This device">
+    <section class="settings" aria-label="This device" ref={rootEl}>
       <button
         type="button"
         class="link-button settings-toggle"

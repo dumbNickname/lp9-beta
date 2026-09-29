@@ -76,7 +76,7 @@ describe("PRD-22 QA: recovery overlay shows once (D-22.3)", () => {
     const { findByTestId, getByText } = render(() => <AppShell />);
     expect(await findByTestId("recovery-overlay")).toBeInTheDocument();
     // Dashboard is NOT blocked -- it renders alongside the overlay.
-    expect(getByText(/welcome back, alice/i)).toBeInTheDocument();
+    expect(getByText(/(good (morning|afternoon|evening)|hello), alice/i)).toBeInTheDocument();
   });
 
   it("skipping marks localStorage recovery_prompted:<relId> and hides the overlay", async () => {
@@ -107,7 +107,7 @@ describe("PRD-22 QA: recovery overlay shows once (D-22.3)", () => {
     const AppShell = (await import("~/routes/app")).default;
     const { queryByTestId, findByText } = render(() => <AppShell />);
     // Dashboard renders...
-    expect(await findByText(/welcome back, alice/i)).toBeInTheDocument();
+    expect(await findByText(/(good (morning|afternoon|evening)|hello), alice/i)).toBeInTheDocument();
     // ...but the overlay must be absent.
     expect(queryByTestId("recovery-overlay")).toBeNull();
   });

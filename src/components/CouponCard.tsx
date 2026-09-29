@@ -21,6 +21,8 @@ interface Props extends CouponActions {
   partnerName: string;
   // PRD-40: my approved coupon whose price fits my spendable balance.
   affordable?: boolean;
+  // Hearts still missing for an approved coupon ("3 more"), 0 if affordable.
+  short?: number;
   // An open (pending/accepted) claim exists for this coupon.
   claimed?: boolean;
 }
@@ -31,7 +33,7 @@ function statusLabel(c: Coupon, mine: boolean, partner: string, claimed: boolean
     case "draft":
       return mine ? `Waiting for ${partner}` : "Waiting for you";
     case "approved":
-      return "Ready";
+      return "Agreed";
     case "declined":
       return mine ? `Not for ${partner}` : "You passed";
     case "retired":
@@ -86,7 +88,7 @@ export default function CouponCard(props: Props) {
 
   return (
     <li
-      class="coupon"
+      class="coupon ticket"
       classList={{
         [`coupon--${props.coupon.status}`]: true,
         "coupon--hidden": hidden(),
@@ -120,9 +122,12 @@ export default function CouponCard(props: Props) {
               <p class="coupon-bounds">"{props.coupon.decline_note}"</p>
             </Show>
           </div>
-          <span class="coupon-price" aria-label={`${props.coupon.price} hearts`}>
-            {props.coupon.price}
+          <span class="coupon-price ticket-stub" aria-label={`${props.coupon.price} hearts`}>
+            <span class="ticket-stub-num">{props.coupon.price}</span>
             <HeartIcon filled />
+            <Show when={(props.short ?? 0) > 0 && !props.claimed}>
+              <span class="ticket-short">{props.short} more</span>
+            </Show>
           </span>
         </div>
 
