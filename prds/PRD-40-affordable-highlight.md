@@ -14,3 +14,12 @@ Out: progress bars (anti-pattern, PRD-32).
 ## Verification
 Balance 8: my approved 8-heart coupon highlighted, a 10-heart one not;
 drafts/partner coupons never highlighted.
+
+---
+
+## Dev notes
+- `CouponCard` props: `affordable`, `claimed`. Affordable = rose border +
+  soft ring + "You have enough" chip, and it enables the "Claim" button.
+  Computed in `CouponsView` as `approved && price <= spendable`.
+- Balance = received − (pending + accepted + delivered claims), which
+  matches the server's `spendable_hearts`.

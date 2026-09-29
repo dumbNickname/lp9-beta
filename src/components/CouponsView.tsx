@@ -1,4 +1,6 @@
 import { createEffect, createSignal, For, Show } from "solid-js";
+import { ClaimList } from "~/components/ClaimRow";
+import ComingUp from "~/components/ComingUp";
 import CouponCard from "~/components/CouponCard";
 import CouponForm from "~/components/CouponForm";
 import TemplatePicker from "~/components/TemplatePicker";
@@ -16,11 +18,13 @@ import {
   removeCoupon,
   retire,
 } from "~/lib/stores/coupons";
+import { claim, claims, isOpen, openClaimFor, refreshClaims } from "~/lib/stores/claims";
 
 interface Props {
   relationship: Relationship;
   userId: string;
   partnerName: string;
+  balance: number;
 }
 
 const ORDER: Record<Coupon["status"], number> = { draft: 0, approved: 1, declined: 2, retired: 3 };
@@ -32,9 +36,20 @@ export default function CouponsView(props: Props) {
   const [showIdeas, setShowIdeas] = createSignal(false);
   const [showRetired, setShowRetired] = createSignal(false);
 
+  const [showHistory, setShowHistory] = createSignal(false);
+
   createEffect(() => {
     void refreshCoupons(props.relationship.id);
+    void refreshClaims(props.relationship.id);
   });
+
+  const couponMap = () => new Map(coupons().map((c) => [c.id, c]));
+  const needsMe = () =>
+    claims().filter(
+      (c) => c.deliverer_id === props.userId && (c.status === "pending" || c.status === "accepted"),
+    );
+  const myOpen = () => claims().filter((c) => c.claimer_id === props.userId && isOpen(c));
+  const history = () => claims().filter((c) => !isOpen(c)).slice(0, 20);
 
   const visible = (c: Coupon) => showRetired() || c.status !== "retired";
   const mine = () => coupons().filter((c) => c.receiver_id === props.userId).sort(byStatus);
@@ -47,6 +62,9 @@ export default function CouponsView(props: Props) {
   const myKeys = () => new Set(mine().map((c) => c.template_key).filter((k): k is string => !!k));
   const mineActive = () => mine().filter((c) => c.status !== "retired");
 
+  const claimIt = async (id: string) => {
+    await claim(id);
+  };
   const createWish = async (input: CouponInput) => {
     await addCoupon(props.relationship.id, input);
     setAdding(false);
@@ -71,6 +89,37 @@ export default function CouponsView(props: Props) {
       <Show when={couponsError()}>
         <p class="error" role="alert">Couldn't load coupons. Try refreshing.</p>
       </Show>
+
+      <Show when={needsMe().length > 0}>
+        <section class="coupon-section" aria-labelledby="needs-title">
+          <h2 id="needs-title" class="feed-title">For you to give</h2>
+          <ClaimList
+            claims={needsMe()}
+            coupons={couponMap()}
+            userId={props.userId}
+            partnerName={props.partnerName}
+          />
+        </section>
+      </Show>
+
+      <Show when={myOpen().length > 0}>
+        <section class="coupon-section" aria-labelledby="myclaims-title">
+          <h2 id="myclaims-title" class="feed-title">Your claims</h2>
+          <ClaimList
+            claims={myOpen()}
+            coupons={couponMap()}
+            userId={props.userId}
+            partnerName={props.partnerName}
+          />
+        </section>
+      </Show>
+
+      <ComingUp
+        claims={claims()}
+        coupons={couponMap()}
+        userId={props.userId}
+        partnerName={props.partnerName}
+      />
 
       <section class="coupon-section" aria-labelledby="theirs-title">
         <div class="feed-head">
@@ -97,6 +146,7 @@ export default function CouponsView(props: Props) {
                   coupon={c}
                   mine={false}
                   partnerName={props.partnerName}
+                  claimed={!!openClaimFor(c.id)}
                   onApprove={() => approve(c.id)}
                   onDecline={(note) => decline(c.id, note)}
                   onRetire={() => retire(c.id)}
@@ -156,6 +206,9 @@ export default function CouponsView(props: Props) {
                   coupon={c}
                   mine
                   partnerName={props.partnerName}
+                  affordable={c.status === "approved" && c.price <= props.balance}
+                  claimed={!!openClaimFor(c.id)}
+                  onClaim={() => claimIt(c.id)}
                   onEdit={() => setEditingId(c.id)}
                   onDelete={() => removeCoupon(c.id)}
                   onRetire={() => retire(c.id)}
@@ -171,6 +224,11 @@ export default function CouponsView(props: Props) {
               Need ideas?
             </button>
           </Show>
+          <Show when={history().length > 0}>
+            <button type="button" class="link-button" onClick={() => setShowHistory((v) => !v)}>
+              {showHistory() ? "Hide history" : "History"}
+            </button>
+          </Show>
           <Show when={hasRetired()}>
             <button type="button" class="link-button" onClick={() => setShowRetired((v) => !v)}>
               {showRetired() ? "Hide retired" : "Show retired"}
@@ -179,12 +237,26 @@ export default function CouponsView(props: Props) {
           <button
             type="button"
             class="link-button"
-            onClick={() => void refreshCoupons(props.relationship.id)}
+            onClick={() => {
+              void refreshCoupons(props.relationship.id);
+              void refreshClaims(props.relationship.id);
+            }}
             disabled={couponsLoading()}
           >
             {couponsLoading() ? "Refreshing..." : "Refresh"}
           </button>
         </div>
+        <Show when={showHistory()}>
+          <section class="coupon-section history" aria-labelledby="history-title">
+            <h3 id="history-title" class="templates-title">History</h3>
+            <ClaimList
+              claims={history()}
+              coupons={couponMap()}
+              userId={props.userId}
+              partnerName={props.partnerName}
+            />
+          </section>
+        </Show>
       </section>
     </div>
   );

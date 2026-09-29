@@ -54,3 +54,23 @@ open claim per coupon, each transition actor-restricted, invalid
 transitions rejected, retire refunds, sweep refunds a backdated claim
 (test via `claimed_at` can't be forged -> verify the function body
 through SQL-text QA + returns 0 live), outsider blocked.
+
+---
+
+## Dev notes
+
+- Migration `0008_coupon_claims.sql`. The internal helpers
+  `spendable_hearts`, `load_claim_for_update` and `check_claim_note`
+  have EXECUTE revoked from API roles (the first two).
+- Race safety: `pg_advisory_xact_lock(hashtextextended(rel||claimer))`
+  before the balance check, plus the partial unique index on open
+  claims per coupon.
+- `accept_claim` date window: `current_date - 1` .. `+365` (the -1
+  tolerates timezones).
+- **Live smoke 2026-09-29: 30/30 pass**, including the parallel
+  double-claim race (exactly one wins), every actor restriction,
+  deliver-before-accept rejected, cancel/decline/withdraw/retire
+  refunds, delivered = spent, outsider blocked, internal helpers not
+  callable.
+- Not live-tested: nudge after 7d and the sweep after 14d (needs time
+  travel); logic is in SQL.

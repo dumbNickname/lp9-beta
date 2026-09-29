@@ -11,15 +11,21 @@ export interface CouponActions {
   onApprove?: () => Promise<void>;
   onDecline?: (note: string | null) => Promise<void>;
   onRetire?: () => Promise<void>;
+  onClaim?: () => Promise<void>;
 }
 
 interface Props extends CouponActions {
   coupon: Coupon;
   mine: boolean;
   partnerName: string;
+  // PRD-40: my approved coupon whose price fits my spendable balance.
+  affordable?: boolean;
+  // An open (pending/accepted) claim exists for this coupon.
+  claimed?: boolean;
 }
 
-function statusLabel(c: Coupon, mine: boolean, partner: string): string {
+function statusLabel(c: Coupon, mine: boolean, partner: string, claimed: boolean): string {
+  if (claimed && c.status === "approved") return "Claimed";
   switch (c.status) {
     case "draft":
       return mine ? `Waiting for ${partner}` : "Waiting for you";
@@ -40,17 +46,26 @@ export default function CouponCard(props: Props) {
 
   const hidden = () => privateMode() && isCouponPrivate(props.coupon.id);
 
-  const run = async (action: "delete" | "approve" | "decline" | "retire") => {
+  const run = async (action: "delete" | "approve" | "decline" | "retire" | "claim") => {
     if (action === "retire" && !window.confirm("Retire this coupon? It can't be claimed any more.")) {
       return;
     }
     if (action === "delete" && !window.confirm("Delete this coupon?")) return;
+    if (
+      action === "claim" &&
+      !window.confirm(
+        `Claim "${props.coupon.title}" for ${props.coupon.price} hearts? They're set aside until ${props.partnerName} delivers, and returned if it doesn't happen.`,
+      )
+    ) {
+      return;
+    }
     setBusy(true);
     setError("");
     try {
       if (action === "delete") await props.onDelete?.();
       if (action === "approve") await props.onApprove?.();
       if (action === "retire") await props.onRetire?.();
+      if (action === "claim") await props.onClaim?.();
       if (action === "decline") {
         await props.onDecline?.(note().trim() || null);
         setDeclining(false);
@@ -68,6 +83,7 @@ export default function CouponCard(props: Props) {
       classList={{
         [`coupon--${props.coupon.status}`]: true,
         "coupon--hidden": hidden(),
+        "coupon--affordable": !!props.affordable && !props.claimed && !hidden(),
       }}
     >
       <Show
@@ -104,10 +120,24 @@ export default function CouponCard(props: Props) {
         </div>
 
         <div class="coupon-foot">
-          <span class="chip" classList={{ [`chip--${props.coupon.status}`]: true }}>
-            {statusLabel(props.coupon, props.mine, props.partnerName)}
+          <span
+            class="chip"
+            classList={{
+              [`chip--${props.coupon.status}`]: true,
+              "chip--claimed": !!props.claimed,
+              "chip--affordable": !!props.affordable && !props.claimed,
+            }}
+          >
+            {props.affordable && !props.claimed
+              ? "You have enough"
+              : statusLabel(props.coupon, props.mine, props.partnerName, !!props.claimed)}
           </span>
           <span class="coupon-actions">
+            <Show when={props.onClaim && props.affordable && !props.claimed}>
+              <button type="button" class="small" onClick={() => void run("claim")} disabled={busy()}>
+                Claim
+              </button>
+            </Show>
             <Show when={props.onApprove && props.coupon.status === "draft"}>
               <button type="button" class="small" onClick={() => void run("approve")} disabled={busy()}>
                 Yes, I'm in

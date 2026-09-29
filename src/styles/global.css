@@ -1204,3 +1204,186 @@ button.small,
   font-weight: 600;
   color: var(--color-heart);
 }
+
+/* --- Affordable + claims (PRD-40, PRD-42) ------------------------------ */
+
+.coupon--affordable {
+  border-color: var(--color-heart);
+  box-shadow:
+    0 0 0 3px var(--color-heart-soft),
+    var(--shadow-soft);
+}
+
+.chip--affordable {
+  background-color: var(--color-heart);
+  color: var(--color-accent-fg);
+}
+
+.chip--claimed {
+  background-color: var(--color-accent);
+  color: var(--color-accent-fg);
+}
+
+.claim-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-3);
+}
+
+.claim {
+  background-color: var(--color-surface);
+  border: var(--border-thin);
+  border-inline-start: 3px solid var(--color-accent);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-4);
+  box-shadow: var(--shadow-soft);
+  animation: fade-up 320ms var(--ease) both;
+}
+
+.claim--pending {
+  border-inline-start-style: dashed;
+}
+
+.claim--delivered,
+.claim--declined,
+.claim--withdrawn,
+.claim--cancelled,
+.claim--auto_refunded {
+  border-inline-start-color: var(--color-border);
+  box-shadow: none;
+  opacity: 0.8;
+}
+
+.claim-main {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: var(--space-3);
+  align-items: start;
+}
+
+.claim-title {
+  margin: 0;
+  color: var(--color-fg);
+  font-size: var(--text-md);
+}
+
+.claim-title strong {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: var(--text-lg);
+}
+
+.claim-status {
+  margin: var(--space-1) 0 0;
+  font-size: var(--text-sm);
+}
+
+.claim-note {
+  margin: var(--space-1) 0 0;
+  font-family: var(--font-display);
+  font-style: italic;
+  color: var(--color-fg);
+}
+
+.claim-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-block-start: var(--space-3);
+  font-size: var(--text-sm);
+}
+
+.claim-form {
+  margin-block-start: var(--space-3);
+}
+
+/* --- Coming up (PRD-42) ------------------------------------------------ */
+
+.coming-up {
+  margin-block-end: var(--space-6);
+}
+
+.cal-strip {
+  list-style: none;
+  margin: 0 0 var(--space-3);
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: var(--space-1);
+}
+
+.cal-day {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  padding-block: var(--space-2);
+  border-radius: var(--radius);
+  background-color: var(--color-bg);
+  font-size: var(--text-xs);
+  color: var(--color-muted-fg);
+}
+
+.cal-day.is-today {
+  outline: 1.5px solid var(--color-accent);
+  color: var(--color-fg);
+}
+
+.cal-num {
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  color: var(--color-fg);
+}
+
+.cal-dot {
+  inline-size: 6px;
+  block-size: 6px;
+  border-radius: 50%;
+  background-color: transparent;
+}
+
+.cal-day.has-plan {
+  background-color: var(--color-heart-soft);
+}
+
+.cal-day.has-plan .cal-dot {
+  background-color: var(--color-heart);
+}
+
+.plan-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.plan {
+  display: grid;
+  grid-template-columns: 6.5rem auto 1fr auto;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+}
+
+.plan-date {
+  font-weight: 600;
+  color: var(--color-accent);
+}
+
+.plan-title {
+  color: var(--color-fg);
+  overflow-wrap: anywhere;
+}
+
+.plan-who {
+  font-size: var(--text-xs);
+  color: var(--color-muted-fg);
+}
+
+.plan--undated .plan-date {
+  color: var(--color-muted-fg);
+  font-weight: 500;
+}

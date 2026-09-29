@@ -10,6 +10,7 @@ import {
 } from "~/lib/data/points";
 import type { HeartAmount, Point } from "~/lib/data/types";
 import { computeSpendable } from "~/lib/balance";
+import { myClaims } from "~/lib/stores/claims";
 
 export interface FeedItem extends Point {
   // Decrypted text; null when there is no comment or it is locked.
@@ -84,8 +85,17 @@ export async function undoHearts(relId: string, userId: string, pointId: string)
   await refreshPoints(relId, userId);
 }
 
-export function mySpendable(): number {
-  return computeSpendable(receivedAmounts());
+// Received hearts minus my escrowed + spent claims (§13b). Mirrors the
+// server's spendable_hearts(); the server remains the authority on claim.
+export function mySpendable(userId: string): number {
+  return computeSpendable(receivedAmounts(), myClaims(userId));
+}
+
+export function resetPoints(): void {
+  current = null;
+  setFeed([]);
+  setReceivedAmounts([]);
+  setHasCommentKey(null);
 }
 
 export function usePointsFocusRefresh(): void {

@@ -8,6 +8,7 @@ import RecoveryPassword from "~/components/RecoveryPassword";
 import { getDisplayName } from "~/lib/data/profile";
 import type { Relationship } from "~/lib/data/types";
 import { refreshCurrentCoupons } from "~/lib/stores/coupons";
+import { myEscrow, refreshClaims } from "~/lib/stores/claims";
 import {
   hasCommentKey,
   mySpendable,
@@ -45,10 +46,12 @@ export default function Dashboard(props: Props) {
 
   createEffect(() => {
     void refreshPoints(props.relationship.id, props.userId);
+    void refreshClaims(props.relationship.id);
   });
   usePointsFocusRefresh();
 
-  const balance = () => mySpendable();
+  const balance = () => mySpendable(props.userId);
+  const escrow = () => myEscrow(props.userId);
 
   // Tabs synced to location.hash (D-39.1). `#pair=` deep links are consumed
   // by PairFlow before the dashboard ever mounts.
@@ -70,7 +73,9 @@ export default function Dashboard(props: Props) {
   onMount(() => {
     const onHash = () => setTab(readTab());
     const onFocus = () => {
-      if (document.visibilityState === "visible" && tab() === "coupons") refreshCurrentCoupons();
+      if (document.visibilityState !== "visible") return;
+      void refreshClaims(props.relationship.id);
+      if (tab() === "coupons") refreshCurrentCoupons();
     };
     window.addEventListener("hashchange", onHash);
     document.addEventListener("visibilitychange", onFocus);
@@ -97,10 +102,17 @@ export default function Dashboard(props: Props) {
           <p class="balance" aria-live="polite">
             <Show
               when={balance() > 0}
-              fallback={<>No hearts to spend yet — they'll gather here.</>}
+              fallback={
+                <Show when={escrow() > 0} fallback={<>No hearts to spend yet — they'll gather here.</>}>
+                  All your hearts are set aside for a claim.
+                </Show>
+              }
             >
               You have <strong>{balance()}</strong> {balance() === 1 ? "heart" : "hearts"} to
               spend.
+            </Show>
+            <Show when={escrow() > 0}>
+              <span class="balance-sub">{escrow()} set aside for claims</span>
             </Show>
           </p>
         </div>
@@ -177,6 +189,7 @@ export default function Dashboard(props: Props) {
             relationship={props.relationship}
             userId={props.userId}
             partnerName={partnerName()}
+            balance={balance()}
           />
         </div>
       </Show>

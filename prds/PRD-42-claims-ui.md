@@ -28,3 +28,23 @@ refund. The claimer can withdraw while pending, and nudge after 7 days.
 Live 2-partner E2E: give hearts -> approve coupon -> claim -> balance
 drops -> partner accepts with date -> shows in Coming up on both ->
 delivered -> history. Decline refunds. Withdraw refunds.
+
+---
+
+## Dev notes
+- `ClaimRow.tsx` (+ `ClaimList`, `claimStatusText`): deliverer "Yes,
+  let's plan it" (optional date + note) / "Not right now" (reason);
+  accepted -> "Mark delivered"; either side Cancel. Claimer Withdraw,
+  and "Send a gentle reminder" after 7 days (client check; server
+  enforces).
+- `ComingUp.tsx`: 14-day, 7-column strip with dot days + a plan list;
+  undated accepted = "Some day soon"; beyond 14 days = "Later".
+- The Coupons tab order is: "For you to give" (claims awaiting me),
+  "Your claims", Coming up, then the wish lists. History toggle (last
+  20 closed claims).
+- Claim confirm uses `window.confirm` with the price + "returned if it
+  doesn't happen" copy.
+- Balance line shows "N set aside for claims" when escrow > 0.
+- `src/lib/stores/claims.ts`: `refreshClaims` sweeps first (§5f lazy
+  refund), then lists.
+- Tests: `tests/unit/claims-ui.test.tsx`, `tests/unit/claims-data.test.ts`.

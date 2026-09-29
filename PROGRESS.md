@@ -105,15 +105,15 @@ its own end-to-end PRD per `DESIGN.md` §16a.
 | 36 | Wishlist UI (mine + partner's, approve/decline)       | `prds/PRD-36-wishlist-ui.md`                   | dev-done |
 | 37 | Starter coupon templates                              | `prds/PRD-37-starter-templates.md`             | dev-done |
 | 38 | Per-coupon private flag (device-local)                | `prds/PRD-38-coupon-private-flag.md`           | dev-done |
-| 40 | Highlight coupons I can afford                        | `prds/PRD-40-affordable-highlight.md`          | todo   |
+| 40 | Highlight coupons I can afford                        | `prds/PRD-40-affordable-highlight.md`          | dev-done |
 | 43 | Multiple relationships: switcher + `?rel=`            | `prds/PRD-43-relationship-switcher.md`         | todo   |
 
 ### Phase 5 — Coupon claim/escrow flow
 
 | #  | Title                                                 | PRD | Status |
 |----|-------------------------------------------------------|-----|--------|
-| 41 | `coupon_claims` table + RLS + escrow RPCs             | `prds/PRD-41-claims-table-rpcs.md`             | dev-done |
-| 42 | Claims UI: claim, respond, deliver, coming up, history | `prds/PRD-42-claims-ui.md`                    | todo   |
+| 41 | `coupon_claims` table + RLS + escrow RPCs             | `prds/PRD-41-claims-table-rpcs.md`             | merged |
+| 42 | Claims UI: claim, respond, deliver, coming up, history | `prds/PRD-42-claims-ui.md`                    | dev-done |
 
 ### Phase 6 — Email notifications
 

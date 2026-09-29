@@ -1,6 +1,6 @@
 // Spendable balance (DESIGN.md §13b): computed, never stored.
 export interface ClaimLike {
-  status: "pending" | "accepted" | "declined" | "delivered" | "auto_refunded";
+  status: string;
   price_at_claim: number;
 }
 
