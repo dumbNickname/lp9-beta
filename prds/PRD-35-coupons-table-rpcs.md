@@ -54,3 +54,18 @@ blocked.
 ## Open questions
 
 None (D-35.1 in `no-human-decisions.md`).
+
+---
+
+## Dev notes
+
+- Migration `0007_coupons.sql`. Helpers: `coupon_opt` (trim/empty to
+  null), `check_coupon_fields`, and `load_coupon_for_update` (definer,
+  EXECUTE revoked from API roles).
+- Live smoke 2026-09-29, **21/21 pass**: submit/normalise, price/title
+  bounds, outsider blocked + sees nothing, receiver-only edit/delete,
+  giver-only approve/decline, approved immutable, decline note visible,
+  delete declined, retire, direct insert blocked, internal helper not
+  callable.
+- The retire refund for pending claims is a TODO for Phase 5
+  (`retire_coupon` must be amended when `coupon_claims` exists).

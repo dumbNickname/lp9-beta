@@ -60,6 +60,7 @@ export async function resetAccount(): Promise<void> {
         k &&
         (k === "pair_invite_pending" ||
           k === "archetype_hint" ||
+          k === "private_coupons" ||
           k.startsWith("recovery_prompted:"))
       ) {
         localStorage.removeItem(k);

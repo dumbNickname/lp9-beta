@@ -16,3 +16,13 @@ dependency + the pnpm release-age policy; same behaviour). The
 "Mark private"/"Unmark" action is on each card. Placeholder: "Hidden
 coupon — turn off private mode to view". The partner is unaffected.
 The privacy toggle also shows on the Coupons tab.
+
+---
+
+## Dev notes
+
+- `src/lib/privateCoupons.ts` (signal + `localStorage["private_coupons"]`,
+  defensive). "Reset account" clears it (`session.ts`).
+- The card shows "Mark private"/"Unmark private"; the placeholder has an
+  "Unmark" shortcut. The global privacy toggle in the dashboard head
+  covers both tabs.

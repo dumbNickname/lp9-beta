@@ -17,3 +17,14 @@ boundaries hint. Tone gentle, nothing spicy, culturally broad. Adds via
 `submit_coupon` with `template_key`. Duplicates (same `template_key`
 already in my list) are hidden.
 **Out:** i18n (Phase 7; keep strings in one file).
+
+---
+
+## Dev notes
+
+- `src/data/coupon-templates.ts`: 8 per archetype. Emoji are content
+  (the §6d `emoji` field), not decoration. Prices 3–40.
+- `TemplatePicker.tsx` shows when "I'd love" has no active coupons, or
+  via "Need ideas?". Archetype tabs are preselected from the
+  relationship; keys already in my list are hidden. Adds sequentially
+  via `submit_coupon` with `template_key`.

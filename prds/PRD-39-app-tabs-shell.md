@@ -15,3 +15,14 @@ because GH Pages serves `/app` only (D-39.1). No new prerender routes;
 the `#pair=` deep link must keep working (pair handling runs before tabs
 exist). Keyboard + `aria-selected` tabs pattern. Balance shows on both
 tabs.
+
+---
+
+## Dev notes
+
+- Tabs live in `Dashboard.tsx` (pill segmented tablist under the
+  balance, not a bottom bar; simpler, and it reads well on mobile).
+  `#coupons` is set via `history.replaceState`; Notes clears the hash.
+  `hashchange` is listened to. Arrow keys switch tabs.
+- Coupons refresh on tab focus while on the Coupons tab.
+- Tests: `tests/unit/dashboard-tabs.test.tsx`.

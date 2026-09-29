@@ -83,12 +83,19 @@ the client/server entry points. Public pages are statically generated;
 - **Privacy mode (`src/lib/privacy.ts`)**: in-memory signal, ON at
   every load (§15c). Any component showing comment text must check
   `privateMode()`.
+- **Coupons**: `lib/data/coupons.ts` (RPC wrappers, `PRICE_MIN/MAX`),
+  `lib/stores/coupons.ts` (mutate-then-refetch), `components/Coupon*`
+  + `TemplatePicker`. Templates live in `src/data/coupon-templates.ts`
+  (single file for Phase 7 i18n). Private coupon flags:
+  `lib/privateCoupons.ts` (device-local localStorage, §15b).
 - **Balance (`src/lib/balance.ts`)**: pure, computed, never stored
   (§13b). Only the viewer's own balance is ever rendered.
-- **Dashboard (`components/Dashboard.tsx`)**: composes `PairBadge`
-  (who you're paired with + edit own name), the composer,
-  feed, balance, privacy toggle and restore-key flow. `routes/app.tsx`
-  only gates (session → profile → relationship).
+- **Dashboard (`components/Dashboard.tsx`)**: `PairBadge` (who you're
+  paired with + edit own name), balance, privacy toggle, and **tabs**
+  Notes / Coupons synced to `location.hash` (`#coupons`; D-39.1, no
+  sub-routes). Notes = composer + feed + restore-key flow; Coupons =
+  `CouponsView`. `routes/app.tsx` only gates (session → profile →
+  relationship).
 
 ## Work Guidance
 

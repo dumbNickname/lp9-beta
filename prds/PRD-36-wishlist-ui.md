@@ -35,3 +35,21 @@ approve / gently decline drafts, see approved).
 Owner-level: Alice adds a draft -> Bob sees it waiting -> Bob approves ->
 Alice sees it Ready. Bob declines another -> Alice sees "Not for Bob" +
 note.
+
+---
+
+## Dev notes
+
+- `CouponsView.tsx` has two sections: "{partner} would love" (their
+  list; approve / "Not for me" with optional note / retire) and "I'd
+  love" (mine; add/edit/delete drafts, retire approved). Declined
+  coupons are hidden from the giver's view. A "Show retired" toggle is
+  offered.
+- `CouponForm.tsx`: emoji, title, price stepper (clamped 1–50), and the
+  description + boundaries textareas with the §6b guidance copy. Says
+  the price freezes after the yes.
+- `CouponCard.tsx`: status chips ("Waiting for Bob" / "Waiting for you"
+  / "Ready" / "Not for Bob" / "Retired"). Retire and delete confirm via
+  `window.confirm`.
+- Store `src/lib/stores/coupons.ts`: every mutation re-fetches.
+- Tests: `tests/unit/coupons-ui.test.tsx`, `tests/unit/coupons-data.test.ts`.

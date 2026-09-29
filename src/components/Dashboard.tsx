@@ -1,4 +1,5 @@
 import { createEffect, createResource, createSignal, onCleanup, onMount, Show } from "solid-js";
+import CouponsView from "~/components/CouponsView";
 import HeartComposer from "~/components/HeartComposer";
 import HeartsFeed from "~/components/HeartsFeed";
 import PairBadge from "~/components/PairBadge";
@@ -6,6 +7,7 @@ import PrivacyToggle from "~/components/PrivacyToggle";
 import RecoveryPassword from "~/components/RecoveryPassword";
 import { getDisplayName } from "~/lib/data/profile";
 import type { Relationship } from "~/lib/data/types";
+import { refreshCurrentCoupons } from "~/lib/stores/coupons";
 import {
   hasCommentKey,
   mySpendable,
@@ -48,6 +50,41 @@ export default function Dashboard(props: Props) {
 
   const balance = () => mySpendable();
 
+  // Tabs synced to location.hash (D-39.1). `#pair=` deep links are consumed
+  // by PairFlow before the dashboard ever mounts.
+  type Tab = "notes" | "coupons";
+  const readTab = (): Tab =>
+    typeof window !== "undefined" && window.location.hash === "#coupons" ? "coupons" : "notes";
+  const [tab, setTab] = createSignal<Tab>(readTab());
+  const selectTab = (t: Tab) => {
+    setTab(t);
+    try {
+      history.replaceState(null, "", t === "notes" ? location.pathname + location.search : "#coupons");
+    } catch {
+      // history unavailable (tests/SSR)
+    }
+  };
+  onMount(() => {
+    const onHash = () => setTab(readTab());
+    const onFocus = () => {
+      if (document.visibilityState === "visible" && tab() === "coupons") refreshCurrentCoupons();
+    };
+    window.addEventListener("hashchange", onHash);
+    document.addEventListener("visibilitychange", onFocus);
+    onCleanup(() => {
+      window.removeEventListener("hashchange", onHash);
+      document.removeEventListener("visibilitychange", onFocus);
+    });
+  });
+  const onTabKey = (e: KeyboardEvent) => {
+    if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+      e.preventDefault();
+      const next: Tab = tab() === "notes" ? "coupons" : "notes";
+      selectTab(next);
+      document.getElementById(`tab-${next}`)?.focus();
+    }
+  };
+
   return (
     <div class="dashboard">
       <PairBadge myName={props.displayName} partnerName={partnerNameRes.latest ?? null} />
@@ -60,7 +97,7 @@ export default function Dashboard(props: Props) {
               fallback={<>No hearts to spend yet — they'll gather here.</>}
             >
               You have <strong>{balance()}</strong> {balance() === 1 ? "heart" : "hearts"} to
-              spend. <span class="balance-sub">Coupons are coming soon.</span>
+              spend.
             </Show>
           </p>
         </div>
@@ -83,20 +120,63 @@ export default function Dashboard(props: Props) {
         </div>
       </Show>
 
-      <HeartComposer
-        relationshipId={props.relationship.id}
-        userId={props.userId}
-        partnerName={partnerName()}
-        hasKey={hasCommentKey() !== false}
-        onRestoreKey={() => setRestoring(true)}
-      />
+      <div class="tabs" role="tablist" aria-label="Sections">
+        <button
+          id="tab-notes"
+          type="button"
+          role="tab"
+          class="tab"
+          aria-selected={tab() === "notes"}
+          aria-controls="panel-notes"
+          tabIndex={tab() === "notes" ? 0 : -1}
+          onClick={() => selectTab("notes")}
+          onKeyDown={onTabKey}
+        >
+          Notes
+        </button>
+        <button
+          id="tab-coupons"
+          type="button"
+          role="tab"
+          class="tab"
+          aria-selected={tab() === "coupons"}
+          aria-controls="panel-coupons"
+          tabIndex={tab() === "coupons" ? 0 : -1}
+          onClick={() => selectTab("coupons")}
+          onKeyDown={onTabKey}
+        >
+          Coupons
+        </button>
+      </div>
 
-      <HeartsFeed
-        relationshipId={props.relationship.id}
-        userId={props.userId}
-        partnerName={partnerName()}
-        onRestoreKey={() => setRestoring(true)}
-      />
+      <Show when={tab() === "notes"}>
+        <div id="panel-notes" role="tabpanel" aria-labelledby="tab-notes">
+          <HeartComposer
+            relationshipId={props.relationship.id}
+            userId={props.userId}
+            partnerName={partnerName()}
+            hasKey={hasCommentKey() !== false}
+            onRestoreKey={() => setRestoring(true)}
+          />
+
+          <HeartsFeed
+            relationshipId={props.relationship.id}
+            userId={props.userId}
+            partnerName={partnerName()}
+            onRestoreKey={() => setRestoring(true)}
+          />
+        </div>
+      </Show>
+
+      <Show when={tab() === "coupons"}>
+        <div id="panel-coupons" role="tabpanel" aria-labelledby="tab-coupons">
+          <CouponsView
+            relationship={props.relationship}
+            userId={props.userId}
+            partnerName={partnerName()}
+          />
+        </div>
+      </Show>
     </div>
   );
 }
