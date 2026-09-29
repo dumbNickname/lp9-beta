@@ -66,6 +66,10 @@ the client/server entry points. Public pages are statically generated;
   in sync. Wired into the app via `SessionProvider` component.
 - **Storage access is defensive:** wrap `localStorage`/`matchMedia` in
   try/catch (private-mode / SSR). See `src/lib/theme.ts` for the pattern.
+- **`<base href>` gotcha:** `entry-server.tsx` sets `<base href=BASE_PATH>`,
+  so relative URLs in `history.replaceState/pushState` (e.g. `"#x"`)
+  resolve to the site root and drop `/app`. Always pass
+  `location.pathname + location.search + hash`.
 - Path alias `~/*` → `src/*`.
 
 - **Data layer (`src/lib/data/`)**: all Supabase calls live here.

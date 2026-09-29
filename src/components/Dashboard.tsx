@@ -59,7 +59,10 @@ export default function Dashboard(props: Props) {
   const selectTab = (t: Tab) => {
     setTab(t);
     try {
-      history.replaceState(null, "", t === "notes" ? location.pathname + location.search : "#coupons");
+      // Absolute path: a bare "#coupons" would resolve against <base href>
+      // (the site root) and drop /app from the URL.
+      const path = location.pathname + location.search;
+      history.replaceState(null, "", t === "notes" ? path : `${path}#coupons`);
     } catch {
       // history unavailable (tests/SSR)
     }

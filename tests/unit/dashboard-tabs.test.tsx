@@ -63,6 +63,25 @@ describe("Dashboard tabs", () => {
     expect(getByRole("heading", { name: /need ideas/i })).toBeInTheDocument();
   });
 
+  it("keeps the /app path when switching tabs under a <base href> (GH Pages)", async () => {
+    history.replaceState(null, "", "/lp9-beta/app");
+    const base = document.createElement("base");
+    base.href = "/lp9-beta/";
+    document.head.appendChild(base);
+    try {
+      const Dashboard = (await import("~/components/Dashboard")).default;
+      const { getByRole } = render(() => <Dashboard relationship={rel} userId="me" displayName="Anna" />);
+      fireEvent.click(getByRole("tab", { name: "Coupons" }));
+      expect(location.pathname).toBe("/lp9-beta/app");
+      expect(location.hash).toBe("#coupons");
+      fireEvent.click(getByRole("tab", { name: "Notes" }));
+      expect(location.pathname).toBe("/lp9-beta/app");
+      expect(location.hash).toBe("");
+    } finally {
+      base.remove();
+    }
+  });
+
   it("opens on Coupons when hash is #coupons; arrow keys switch", async () => {
     history.replaceState(null, "", "#coupons");
     const Dashboard = (await import("~/components/Dashboard")).default;
