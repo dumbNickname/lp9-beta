@@ -7,12 +7,18 @@ import PrivacyToggle from "~/components/PrivacyToggle";
 import RecoveryPassword from "~/components/RecoveryPassword";
 import { getDisplayName } from "~/lib/data/profile";
 import type { Relationship } from "~/lib/data/types";
-import { refreshCurrentCoupons } from "~/lib/stores/coupons";
-import { myEscrow, refreshClaims } from "~/lib/stores/claims";
+import {
+  relationships,
+  selectRelationship,
+  setAddingPartner,
+} from "~/lib/stores/relationship";
+import { refreshCurrentCoupons, resetCoupons } from "~/lib/stores/coupons";
+import { myEscrow, refreshClaims, resetClaims } from "~/lib/stores/claims";
 import {
   hasCommentKey,
   mySpendable,
   refreshPoints,
+  resetPoints,
   usePointsFocusRefresh,
 } from "~/lib/stores/points";
 
@@ -34,6 +40,28 @@ export default function Dashboard(props: Props) {
     ({ id }) => getDisplayName(id).catch(() => null),
   );
   const partnerName = () => partnerNameRes.latest || "your partner";
+
+  // Names for every pair on this account (switcher, PRD-43).
+  const [pairNames] = createResource(
+    () => ({
+      pairs: relationships().map((r) => ({
+        id: r.id,
+        other: r.member_a === props.userId ? r.member_b : r.member_a,
+      })),
+      tick: partnerTick(),
+    }),
+    async ({ pairs }) => {
+      const entries = await Promise.all(
+        pairs.map(async (p) => {
+          const n = await getDisplayName(p.other).catch(() => null);
+          return [p.id, n || "Someone"] as const;
+        }),
+      );
+      return new Map(entries);
+    },
+  );
+  const pairs = () =>
+    relationships().map((r) => ({ id: r.id, partnerName: pairNames.latest?.get(r.id) ?? "…" }));
   onMount(() => {
     const onFocus = () => {
       if (document.visibilityState === "visible") setPartnerTick((t) => t + 1);
@@ -43,6 +71,12 @@ export default function Dashboard(props: Props) {
   });
 
   const [restoring, setRestoring] = createSignal(false);
+
+  // Mounted fresh per relationship (keyed in routes/app.tsx): clear the
+  // previous pair's module-level store data before fetching (PRD-43).
+  resetPoints();
+  resetCoupons();
+  resetClaims();
 
   createEffect(() => {
     void refreshPoints(props.relationship.id, props.userId);
@@ -95,7 +129,14 @@ export default function Dashboard(props: Props) {
 
   return (
     <div class="dashboard">
-      <PairBadge myName={props.displayName} partnerName={partnerNameRes.latest ?? null} />
+      <PairBadge
+        myName={props.displayName}
+        partnerName={partnerNameRes.latest ?? null}
+        pairs={pairs()}
+        currentId={props.relationship.id}
+        onSwitch={(id) => selectRelationship(id)}
+        onAddPartner={() => setAddingPartner(true)}
+      />
       <div class="dashboard-head">
         <div>
           <p class="eyebrow">Welcome back, {props.displayName}.</p>

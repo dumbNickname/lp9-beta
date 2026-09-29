@@ -59,6 +59,8 @@ vi.mock("~/lib/crypto/aes", async () => {
 const mockRefreshRelationship = vi.fn(async () => undefined);
 vi.mock("~/lib/stores/relationship", () => ({
   refreshRelationship: mockRefreshRelationship,
+  onNewRelationship: () => mockRefreshRelationship(),
+  relationships: () => [],
 }));
 
 vi.mock("qrcode", () => ({ default: { toCanvas: vi.fn(() => Promise.resolve()) } }));

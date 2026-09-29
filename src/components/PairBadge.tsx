@@ -1,4 +1,4 @@
-import { createSignal, Show } from "solid-js";
+import { createSignal, For, Show } from "solid-js";
 import HeartIcon from "~/components/HeartIcon";
 import { saveProfile } from "~/lib/stores/profile";
 
@@ -9,9 +9,19 @@ export function initial(name: string): string {
   return ch ? ch.toLocaleUpperCase() : "?";
 }
 
+export interface PairOption {
+  id: string;
+  partnerName: string;
+}
+
 interface Props {
   myName: string;
   partnerName: string | null;
+  // PRD-43: other pairs on this account + actions.
+  pairs?: PairOption[];
+  currentId?: string;
+  onSwitch?: (id: string) => void;
+  onAddPartner?: () => void;
 }
 
 // "Who am I paired with" at a glance + edit own display name (PRD-34).
@@ -20,6 +30,7 @@ export default function PairBadge(props: Props) {
   const [draft, setDraft] = createSignal("");
   const [busy, setBusy] = createSignal(false);
   const [error, setError] = createSignal("");
+  const [menuOpen, setMenuOpen] = createSignal(false);
 
   const partner = () => props.partnerName || "your partner";
 
@@ -70,11 +81,64 @@ export default function PairBadge(props: Props) {
               {props.myName} <span class="amp">&amp;</span> {partner()}
             </p>
             <p class="pair-sub">
-              Paired.{" "}
+              <Show when={(props.pairs?.length ?? 0) > 1} fallback={<>Paired. </>}>
+                {props.pairs!.length} pairs.{" "}
+              </Show>
               <button type="button" class="link-button" onClick={start}>
                 Edit my name
               </button>
+              <Show when={props.onSwitch || props.onAddPartner}>
+                {" · "}
+                <button
+                  type="button"
+                  class="link-button"
+                  aria-expanded={menuOpen()}
+                  aria-controls="pair-menu"
+                  onClick={() => setMenuOpen((v) => !v)}
+                >
+                  {(props.pairs?.length ?? 0) > 1 ? "Switch" : "Add someone"}
+                </button>
+              </Show>
             </p>
+            <Show when={menuOpen()}>
+              <ul id="pair-menu" class="pair-menu">
+                <For each={props.pairs ?? []}>
+                  {(p) => (
+                    <li>
+                      <button
+                        type="button"
+                        class="pair-menu-item"
+                        aria-current={p.id === props.currentId ? "true" : undefined}
+                        onClick={() => {
+                          setMenuOpen(false);
+                          props.onSwitch?.(p.id);
+                        }}
+                      >
+                        <span class="avatar avatar--partner avatar--sm">{initial(p.partnerName)}</span>
+                        {p.partnerName}
+                        <Show when={p.id === props.currentId}>
+                          <span class="note-badge">current</span>
+                        </Show>
+                      </button>
+                    </li>
+                  )}
+                </For>
+                <Show when={props.onAddPartner}>
+                  <li>
+                    <button
+                      type="button"
+                      class="pair-menu-item pair-menu-add"
+                      onClick={() => {
+                        setMenuOpen(false);
+                        props.onAddPartner?.();
+                      }}
+                    >
+                      + Pair with someone new
+                    </button>
+                  </li>
+                </Show>
+              </ul>
+            </Show>
           </div>
         }
       >

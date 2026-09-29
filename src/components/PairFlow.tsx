@@ -17,7 +17,7 @@ import {
   revokePairInvite,
 } from "~/lib/data/relationship";
 import { normalizeScannedInput, parseInviteUrl, parseInvitePayload } from "~/lib/pairing/qr";
-import { refreshRelationship } from "~/lib/stores/relationship";
+import { onNewRelationship, relationships } from "~/lib/stores/relationship";
 import type { Archetype, PairInvitePeek } from "~/lib/data/types";
 
 const POLL_MS = 3000;
@@ -121,6 +121,8 @@ export default function PairFlow() {
   const [confirm, setConfirm] = createSignal<ConfirmState | null>(null);
 
   let pollTimer: ReturnType<typeof setInterval> | undefined;
+  // Relationships that existed when the flow opened (PRD-43).
+  const knownIds = new Set(relationships().map((r) => r.id));
 
   const stopPolling = () => {
     if (pollTimer !== undefined) {
@@ -141,7 +143,7 @@ export default function PairFlow() {
       await deleteKey(tempKeyId(code));
     }
     clearPendingInvite();
-    await refreshRelationship();
+    await onNewRelationship(relationshipId);
   };
 
 
@@ -149,8 +151,10 @@ export default function PairFlow() {
     stopPolling();
     pollTimer = setInterval(() => {
       void (async () => {
+        // Newest active relationship; ignore ones that existed before this
+        // invite so an already-paired user can pair again (PRD-43).
         const rel = await getMyActiveRelationship();
-        if (rel) await onPaired(rel.id, code);
+        if (rel && !knownIds.has(rel.id)) await onPaired(rel.id, code);
       })();
     }, POLL_MS);
   };
@@ -243,7 +247,7 @@ export default function PairFlow() {
       const relationshipId = await redeemPairCode(current.code);
       const key = await importKeyRaw(base64ToBytes(current.keyBase64));
       await putKey(relationshipId, key);
-      await refreshRelationship();
+      await onNewRelationship(relationshipId);
       // Gate re-renders into the dashboard on the active relationship.
     } catch (err) {
       // Stay on the confirm view with a Back option; no key was stored.

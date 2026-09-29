@@ -20,7 +20,8 @@ export async function refreshCoupons(relId: string): Promise<void> {
   currentRel = relId;
   setCouponsLoading(true);
   try {
-    setCoupons(await listCoupons(relId));
+    const rows = await listCoupons(relId);
+    if (currentRel === relId) setCoupons(rows);
     setCouponsError(false);
   } catch {
     setCouponsError(true);
@@ -42,6 +43,11 @@ export const removeCoupon = (id: string) => after(deleteCoupon(id));
 export const approve = (id: string) => after(approveCoupon(id));
 export const decline = (id: string, note: string | null) => after(declineCoupon(id, note));
 export const retire = (id: string) => after(retireCoupon(id));
+
+export function resetCoupons(): void {
+  currentRel = null;
+  setCoupons([]);
+}
 
 export function refreshCurrentCoupons(): void {
   if (currentRel) void refreshCoupons(currentRel);

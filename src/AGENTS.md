@@ -78,7 +78,7 @@ the client/server entry points. Public pages are statically generated;
   RPCs and `friendlyPointsError`.
 - **Stores (`src/lib/stores/`)**: module-level signals + `refresh*()` +
   `use*FocusRefresh()` (§9a/§9c). `points.ts` decrypts into
-  `FeedItem`s, exposes `mySpendable()`, and `hasCommentKey()`
+  `FeedItem`s, exposes `mySpendable(userId)`, and `hasCommentKey()`
   (tri-state: `null` = unchecked).
 - **Comments E2E (`src/lib/crypto/comments.ts`)**: `encryptComment`
   throws without a key, so it can never send plaintext.
@@ -94,6 +94,16 @@ the client/server entry points. Public pages are statically generated;
   `lib/privateCoupons.ts` (device-local localStorage, §15b).
 - **Balance (`src/lib/balance.ts`)**: pure, computed, never stored
   (§13b). Only the viewer's own balance is ever rendered.
+- **Relationships (PRD-43)**: `lib/stores/relationship.ts` holds all
+  active pairs + the selected one (`?rel=` > localStorage
+  `active_relationship` > newest). `routes/app.tsx` remounts Dashboard
+  keyed by relationship; per-pair stores (points/coupons/claims) expose
+  `reset*()` and ignore stale responses. Any new per-pair store must do
+  the same.
+- **Claims (PRD-41/42)**: `lib/data/claims.ts`, `lib/stores/claims.ts`
+  (`refreshClaims` runs the lazy 14-day sweep first), `ClaimRow`,
+  `ComingUp`. Balance = received − open − delivered claims, mirroring
+  SQL `spendable_hearts`.
 - **Dashboard (`components/Dashboard.tsx`)**: `PairBadge` (who you're
   paired with + edit own name), balance, privacy toggle, and **tabs**
   Notes / Coupons synced to `location.hash` (`#coupons`; D-39.1, no

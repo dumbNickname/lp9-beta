@@ -17,6 +17,16 @@ vi.mock("~/lib/stores/points", () => ({
   giveHearts: vi.fn(),
   editHeartComment: vi.fn(),
   undoHearts: vi.fn(),
+  resetPoints: vi.fn(),
+}));
+vi.mock("~/lib/stores/claims", () => ({
+  claims: () => [],
+  myEscrow: () => 0,
+  refreshClaims: vi.fn(),
+  resetClaims: vi.fn(),
+  claim: vi.fn(),
+  isOpen: () => false,
+  openClaimFor: () => undefined,
 }));
 vi.mock("~/lib/stores/coupons", () => ({
   coupons: () => [],
@@ -30,6 +40,7 @@ vi.mock("~/lib/stores/coupons", () => ({
   approve: vi.fn(),
   decline: vi.fn(),
   retire: vi.fn(),
+  resetCoupons: vi.fn(),
 }));
 
 afterEach(() => {

@@ -106,7 +106,7 @@ its own end-to-end PRD per `DESIGN.md` §16a.
 | 37 | Starter coupon templates                              | `prds/PRD-37-starter-templates.md`             | dev-done |
 | 38 | Per-coupon private flag (device-local)                | `prds/PRD-38-coupon-private-flag.md`           | dev-done |
 | 40 | Highlight coupons I can afford                        | `prds/PRD-40-affordable-highlight.md`          | dev-done |
-| 43 | Multiple relationships: switcher + `?rel=`            | `prds/PRD-43-relationship-switcher.md`         | todo   |
+| 43 | Multiple relationships: switcher + `?rel=`            | `prds/PRD-43-relationship-switcher.md`         | dev-done |
 
 ### Phase 5 — Coupon claim/escrow flow
 

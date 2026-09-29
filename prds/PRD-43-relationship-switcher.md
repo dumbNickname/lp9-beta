@@ -24,3 +24,24 @@ URL selects one (bookmarkable).
 User with two pairs: switch -> notes/coupons/balance change; reload
 keeps the selection; `?rel=` opens that pair; an unknown `?rel=` is
 ignored; pairing a third person while paired works.
+
+---
+
+## Dev notes
+- `src/lib/stores/relationship.ts` rewritten: `relationships()` (active
+  only), `relationship()` = selected, `pickRelationship(rels, url,
+  remembered)` (pure, tested), `selectRelationship`,
+  `onNewRelationship`, `addingPartner` signal. `?rel=` is only written
+  when >1 pair (clean URL for single-pair users); absolute replaceState.
+- `routes/app.tsx`: `<Show when={relationship()} keyed>` remounts the
+  Dashboard per pair; Dashboard resets the points/coupons/claims stores
+  on mount, and the stores drop stale responses after a switch. "Adding"
+  mode renders PairFlow with a "Back to my pair" bar.
+- PairFlow: inviter poll ignores relationships known when the flow
+  opened (`knownIds`); both success paths call `onNewRelationship(id)`
+  (selects the new pair).
+- PairBadge: "Switch" / "Add someone" menu with partner names (fetched
+  per pair).
+- Reset account clears `active_relationship`.
+- Existing PairFlow tests' store mocks gained `onNewRelationship` +
+  `relationships` (test-only).

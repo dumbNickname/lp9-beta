@@ -1387,3 +1387,57 @@ button.small,
   color: var(--color-muted-fg);
   font-weight: 500;
 }
+
+/* --- Pair switcher (PRD-43) ------------------------------------------- */
+
+.pair-menu {
+  list-style: none;
+  margin: var(--space-2) 0 0;
+  padding: var(--space-1);
+  display: grid;
+  gap: 2px;
+  background-color: var(--color-surface);
+  border: var(--border-thin);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-soft);
+  min-inline-size: 14rem;
+}
+
+.pair-menu-item {
+  inline-size: 100%;
+  justify-content: flex-start;
+  gap: var(--space-2);
+  min-block-size: 2.5rem;
+  padding-inline: var(--space-2);
+  color: var(--color-fg);
+  background-color: transparent;
+  border-color: transparent;
+  border-radius: calc(var(--radius) - 2px);
+  font-weight: 500;
+}
+
+.pair-menu-item:hover,
+.pair-menu-item[aria-current="true"] {
+  background-color: var(--color-muted-bg);
+  opacity: 1;
+}
+
+.pair-menu-add {
+  color: var(--color-accent);
+}
+
+.avatar--sm {
+  inline-size: 1.75rem;
+  block-size: 1.75rem;
+  font-size: var(--text-sm);
+  margin-inline-start: 0;
+  border-width: 0;
+}
+
+.adding-partner-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+  margin-block-end: var(--space-4);
+}

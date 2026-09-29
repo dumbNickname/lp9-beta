@@ -27,7 +27,8 @@ export async function getMyRelationships(): Promise<Relationship[]> {
   return (data ?? []) as Relationship[];
 }
 
-// Convenience helper for the store: the first active relationship, if any.
+// Newest active relationship, if any (list is ordered created_at desc).
+// Used by PairFlow's inviter poll to spot a freshly-created pair.
 export async function getMyActiveRelationship(): Promise<Relationship | null> {
   const rels = await getMyRelationships();
   return rels.find((r) => r.status === "active") ?? null;

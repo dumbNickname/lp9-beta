@@ -8,9 +8,11 @@ import {
   useProfileFocusRefresh,
 } from "~/lib/stores/profile";
 import {
+  addingPartner,
   relationship,
   relationshipLoading,
   refreshRelationship,
+  setAddingPartner,
   useRelationshipFocusRefresh,
 } from "~/lib/stores/relationship";
 import Onboarding from "~/components/Onboarding";
@@ -85,7 +87,19 @@ export default function AppShell() {
         <Show when={!profileLoading()} fallback={<p>Loading...</p>}>
           <Show when={profile()?.display_name} fallback={<Onboarding />}>
             <Show when={!relationshipLoading()} fallback={<p>Loading...</p>}>
-              <Show when={relationship()} fallback={<PairFlow />}>
+              <Show when={relationship() && !addingPartner()} fallback={
+                <>
+                  <Show when={relationship()}>
+                    <div class="adding-partner-bar">
+                      <p class="eyebrow">Pairing with someone new</p>
+                      <button type="button" class="quiet small" onClick={() => setAddingPartner(false)}>
+                        Back to my pair
+                      </button>
+                    </div>
+                  </Show>
+                  <PairFlow />
+                </>
+              }>
                 <Show when={!recoveryDone()}>
                   <RecoveryPassword
                     mode="set"
@@ -94,11 +108,15 @@ export default function AppShell() {
                     onSkip={() => dismissRecovery(relationship()!.id)}
                   />
                 </Show>
-                <Dashboard
-                  relationship={relationship()!}
-                  userId={user()!.id}
-                  displayName={profile()!.display_name!}
-                />
+                <Show when={relationship()} keyed>
+                  {(rel) => (
+                    <Dashboard
+                      relationship={rel}
+                      userId={user()!.id}
+                      displayName={profile()!.display_name!}
+                    />
+                  )}
+                </Show>
               </Show>
             </Show>
           </Show>

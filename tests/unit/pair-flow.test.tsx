@@ -44,6 +44,8 @@ const mockRefreshRelationship = vi.fn();
 
 vi.mock("~/lib/stores/relationship", () => ({
   refreshRelationship: mockRefreshRelationship,
+  onNewRelationship: () => mockRefreshRelationship(),
+  relationships: () => [],
 }));
 
 // qrcode touches a real canvas 2d context jsdom lacks — mock it out.

@@ -39,6 +39,11 @@ vi.mock("~/lib/stores/relationship", () => ({
   relationshipLoading: () => relationshipLoadingValue,
   refreshRelationship: vi.fn(),
   useRelationshipFocusRefresh: vi.fn(),
+  addingPartner: () => false,
+  setAddingPartner: vi.fn(),
+  relationships: () => [],
+  selectRelationship: vi.fn(),
+  onNewRelationship: vi.fn(),
 }));
 
 // Onboarding + PairFlow both pull in modules jsdom struggles with; stub the

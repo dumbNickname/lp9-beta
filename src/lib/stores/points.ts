@@ -46,7 +46,10 @@ export async function refreshPoints(relId: string, userId: string): Promise<void
       listPoints(relId),
       listReceivedAmounts(relId, userId),
     ]);
-    setFeed(await Promise.all(rows.map((p) => toFeedItem(p, key))));
+    const items = await Promise.all(rows.map((p) => toFeedItem(p, key)));
+    // Drop stale responses after a relationship switch (PRD-43).
+    if (current?.relId !== relId) return;
+    setFeed(items);
     setReceivedAmounts(amounts);
     setPointsError(false);
   } catch {

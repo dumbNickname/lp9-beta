@@ -1,25 +1,105 @@
 import { createSignal, onCleanup, onMount } from "solid-js";
-import { getMyActiveRelationship } from "~/lib/data/relationship";
+import { getMyRelationships } from "~/lib/data/relationship";
 import type { Relationship } from "~/lib/data/types";
 
-const [relationship, setRelationship] = createSignal<Relationship | null>(null);
+// All active relationships + the selected one (PRD-43, DESIGN §4).
+// Selection priority: `?rel=<id>` (if mine) > remembered on this device >
+// newest.
+export const ACTIVE_REL_KEY = "active_relationship";
+
+const [relationships, setRelationships] = createSignal<Relationship[]>([]);
+const [selectedId, setSelectedId] = createSignal<string | null>(null);
 const [relationshipLoading, setRelationshipLoading] = createSignal(false);
+// True while an already-paired user is pairing with someone new.
+const [addingPartner, setAddingPartner] = createSignal(false);
 
 let lastFetchTime = 0;
 const THROTTLE_MS = 2000;
 
-export async function refreshRelationship(): Promise<void> {
+function readUrlRel(): string | null {
+  try {
+    return new URLSearchParams(window.location.search).get("rel");
+  } catch {
+    return null;
+  }
+}
+
+function readRemembered(): string | null {
+  try {
+    return localStorage.getItem(ACTIVE_REL_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function remember(id: string): void {
+  try {
+    localStorage.setItem(ACTIVE_REL_KEY, id);
+  } catch {
+    // storage unavailable
+  }
+}
+
+// Reflect the selection in `?rel=` with an absolute URL (see the
+// `<base href>` gotcha in src/AGENTS.md). Only when >1 relationship, so
+// single-pair users keep a clean URL.
+function writeUrlRel(id: string | null): void {
+  try {
+    const url = new URL(window.location.href);
+    if (id) url.searchParams.set("rel", id);
+    else url.searchParams.delete("rel");
+    history.replaceState(null, "", url.pathname + url.search + url.hash);
+  } catch {
+    // history unavailable
+  }
+}
+
+export function pickRelationship(
+  rels: Relationship[],
+  urlId: string | null,
+  rememberedId: string | null,
+): Relationship | null {
+  const has = (id: string | null) => (id ? rels.find((r) => r.id === id) : undefined);
+  return has(urlId) ?? has(rememberedId) ?? rels[0] ?? null;
+}
+
+export const relationship = (): Relationship | null =>
+  relationships().find((r) => r.id === selectedId()) ?? null;
+
+export async function refreshRelationship(force = false): Promise<void> {
   const now = Date.now();
-  if (now - lastFetchTime < THROTTLE_MS) return;
+  if (!force && now - lastFetchTime < THROTTLE_MS) return;
   lastFetchTime = now;
 
   setRelationshipLoading(true);
   try {
-    const r = await getMyActiveRelationship();
-    setRelationship(r);
+    const rels = (await getMyRelationships()).filter((r) => r.status === "active");
+    setRelationships(rels);
+    const current = selectedId();
+    const keep = current && rels.some((r) => r.id === current) ? current : null;
+    const picked = keep
+      ? rels.find((r) => r.id === keep)!
+      : pickRelationship(rels, readUrlRel(), readRemembered());
+    setSelectedId(picked?.id ?? null);
+    if (picked) remember(picked.id);
+    if (rels.length > 1 && picked) writeUrlRel(picked.id);
   } finally {
     setRelationshipLoading(false);
   }
+}
+
+export function selectRelationship(id: string): void {
+  if (!relationships().some((r) => r.id === id)) return;
+  setSelectedId(id);
+  setAddingPartner(false);
+  remember(id);
+  writeUrlRel(relationships().length > 1 ? id : null);
+}
+
+// Called by PairFlow on success: select the new pair and leave add mode.
+export async function onNewRelationship(id: string): Promise<void> {
+  await refreshRelationship(true);
+  selectRelationship(id);
 }
 
 export function useRelationshipFocusRefresh(): void {
@@ -38,4 +118,9 @@ export function useRelationshipFocusRefresh(): void {
   });
 }
 
-export { relationship, relationshipLoading };
+export {
+  relationships,
+  relationshipLoading,
+  addingPartner,
+  setAddingPartner,
+};

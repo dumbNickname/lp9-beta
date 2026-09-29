@@ -34,6 +34,11 @@ vi.mock("~/lib/stores/relationship", () => ({
   relationshipLoading: () => false,
   refreshRelationship: vi.fn(),
   useRelationshipFocusRefresh: vi.fn(),
+  addingPartner: () => false,
+  setAddingPartner: vi.fn(),
+  relationships: () => [],
+  selectRelationship: vi.fn(),
+  onNewRelationship: vi.fn(),
 }));
 
 // RecoveryPassword pulls crypto/data modules; stub it to a thin shim that
