@@ -2108,7 +2108,6 @@ a.pair-menu-item {
 /* --- Ticket-stub coupons ---------------------------------------------- */
 
 .ticket {
-  --notch: 0.7rem;
   position: relative;
   padding: 0;
   overflow: hidden;
@@ -2143,25 +2142,6 @@ a.pair-menu-item {
   color: var(--color-heart);
 }
 
-.ticket-stub::before,
-.ticket-stub::after {
-  content: "";
-  position: absolute;
-  inset-inline-start: calc(var(--notch) * -1 - 1px);
-  inline-size: calc(var(--notch) * 2);
-  block-size: calc(var(--notch) * 2);
-  border-radius: 50%;
-  background-color: var(--color-bg);
-}
-
-.ticket-stub::before {
-  inset-block-start: calc(var(--notch) * -1);
-}
-
-.ticket-stub::after {
-  inset-block-end: calc(var(--notch) * -1);
-}
-
 .ticket-stub-num {
   font-family: var(--font-display);
   font-size: 1.75rem;
@@ -2169,12 +2149,10 @@ a.pair-menu-item {
   line-height: 1;
 }
 
-.ticket-short {
-  font-family: var(--font-body);
-  font-size: 0.7rem;
-  font-weight: 600;
+.coupon-short {
+  font-size: var(--text-xs);
   color: var(--color-muted-fg);
-  white-space: nowrap;
+  font-style: italic;
 }
 
 .ticket .coupon-foot {
@@ -2468,4 +2446,11 @@ a.pair-menu-item {
 
 .app-reset-details[open] summary {
   margin-block-end: var(--space-3);
+}
+
+.coupon-state {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
 }

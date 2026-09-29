@@ -162,4 +162,15 @@ describe("CouponCard affordable + claim", () => {
     expect(queryByRole("button", { name: "Claim" })).toBeNull();
     expect(getByText("Claimed")).toBeInTheDocument();
   });
+
+  it("saving up: shows 'N more hearts to go' next to the chip, not in the stub", async () => {
+    const CouponCard = (await import("~/components/CouponCard")).default;
+    const c = { ...coupon, status: "approved", price: 20 } as Coupon;
+    const { container, getByText } = render(() => (
+      <CouponCard coupon={c} mine partnerName="Bob" short={5} />
+    ));
+    expect(getByText("5 more hearts to go")).toBeInTheDocument();
+    expect(container.querySelector(".ticket-stub")!.textContent).toBe("20");
+  });
 });
+

@@ -30,3 +30,11 @@ Owner feedback 2026-09-29 on PRD-49.
 ## Verification
 Local prod build, 14/15 checks pass; the remaining one is a test
 artifact (no Agreed chip on that screen); covered by the unit test.
+
+## Follow-up (owner 2026-09-29): ticket circles + "5 more"
+- The notch circles (`.ticket-stub::before/::after`, painted with the
+  page bg) looked like stray dots mid-card on mobile, because the stub
+  ends above the actions row, not at the card edge. Removed; the
+  perforation is just the dashed divider.
+- "5 more" under the price was unclear. It's moved next to the status
+  chip as "Agreed · 5 more hearts to go"; the stub shows only the price.

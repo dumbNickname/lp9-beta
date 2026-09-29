@@ -125,13 +125,11 @@ export default function CouponCard(props: Props) {
           <span class="coupon-price ticket-stub" aria-label={`${props.coupon.price} hearts`}>
             <span class="ticket-stub-num">{props.coupon.price}</span>
             <HeartIcon filled />
-            <Show when={(props.short ?? 0) > 0 && !props.claimed}>
-              <span class="ticket-short">{props.short} more</span>
-            </Show>
           </span>
         </div>
 
         <div class="coupon-foot">
+          <span class="coupon-state">
           <span
             class="chip"
             classList={{
@@ -143,6 +141,12 @@ export default function CouponCard(props: Props) {
             {props.affordable && !props.claimed
               ? "You have enough"
               : statusLabel(props.coupon, props.mine, props.partnerName, !!props.claimed)}
+          </span>
+          <Show when={(props.short ?? 0) > 0 && !props.claimed}>
+            <span class="coupon-short">
+              {props.short} more {props.short === 1 ? "heart" : "hearts"} to go
+            </span>
+          </Show>
           </span>
           <span class="coupon-actions">
             <Show when={props.onClaim && props.affordable && !props.claimed}>
