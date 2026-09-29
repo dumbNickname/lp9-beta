@@ -63,3 +63,34 @@ export interface EncryptedComment {
   ciphertext: Uint8Array;
   iv: Uint8Array;
 }
+
+export type CouponStatus = "draft" | "approved" | "declined" | "retired";
+
+// A wishlist item (DESIGN.md §6d, §13a). Receiver = who enjoys it,
+// giver = partner who delivers it. Plaintext by design (§12a).
+export interface Coupon {
+  id: string;
+  relationship_id: string;
+  receiver_id: string;
+  giver_id: string;
+  title: string;
+  description: string | null;
+  boundaries_note: string | null;
+  emoji: string | null;
+  price: number;
+  status: CouponStatus;
+  decline_note: string | null;
+  template_key: string | null;
+  created_at: string;
+  approved_at: string | null;
+  declined_at: string | null;
+  retired_at: string | null;
+}
+
+export interface CouponInput {
+  title: string;
+  description?: string | null;
+  boundaries_note?: string | null;
+  emoji?: string | null;
+  price: number;
+}

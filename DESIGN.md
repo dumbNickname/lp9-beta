@@ -146,6 +146,12 @@ the partner missed it (because they didn't have their phone, etc.).
 - **Retiring:** the deliverer can mark an approved coupon as `retired` at
   any time. Pending claims against a retired coupon are **refunded** to the
   earner (kinder; simpler).
+- **Added 2026-09-29 (owner):** the giver may gently **decline** a draft
+  ("Not for me", optional note), which sets status `declined`. The receiver
+  sees it and can delete it. Only the receiver adds to their own list; the
+  giver never adds to the partner's list.
+- **Added 2026-09-29 (owner):** the receiver may **edit or delete drafts**.
+  Once approved, a coupon can only be retired.
 
 #### 6c. Archetype templates (onboarding helpers)
 - **Decision:** Hardcode template suggestions for **three archetypes**:
@@ -175,7 +181,8 @@ the partner missed it (because they didn't have their phone, etc.).
 - `boundaries_note` (optional, see 6b)
 - `price` (points; immutable, see 6e)
 - `emoji` / icon (optional, visual flavor)
-- `status`: `draft` | `approved` | `retired`
+- `status`: `draft` | `approved` | `declined` | `retired` (`declined`
+  added 2026-09-29)
 - `created_at`
 - `approved_at` (nullable)
 - `retired_at` (nullable)
@@ -184,7 +191,9 @@ the partner missed it (because they didn't have their phone, etc.).
   already self-regulate.
 
 #### 6e. Price is immutable
-- **Decision:** Once a coupon is created, **its price cannot change**.
+- **Decision:** Once a coupon is ~~created~~ **approved** (amended
+  2026-09-29: drafts are editable, see 6b), **its price cannot change**.
+- **Price range (2026-09-29, owner):** 1–50 hearts.
 - To change a price, the user **retires the existing coupon and creates a
   new one**, which goes through the partner-approval flow again.
 - Pending claims against the old (retired) coupon are refunded per 6b.
@@ -676,10 +685,12 @@ suggest the app is about optimizing, comparing, or earning.
 - `description` text nullable
 - `boundaries_note` text nullable (Q6b)
 - `emoji` text nullable
-- `price` int CHECK (`price > 0`) — **immutable** (Q6e)
-- `status` text — `'draft'` | `'approved'` | `'retired'`
+- `price` int CHECK (`price BETWEEN 1 AND 50`) — **immutable once
+  approved** (Q6e, amended 2026-09-29)
+- `status` text — `'draft'` | `'approved'` | `'declined'` | `'retired'`
+- `decline_note` text nullable (giver's gentle "not for me" note)
 - `template_key` text nullable (which archetype template it came from)
-- `created_at`, `approved_at`, `retired_at` timestamptz
+- `created_at`, `approved_at`, `declined_at`, `retired_at` timestamptz
 
 **`coupon_claims`** — escrow flow (Q5e).
 - `id` uuid PK

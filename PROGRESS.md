@@ -100,7 +100,11 @@ its own end-to-end PRD per `DESIGN.md` §16a.
 
 | #  | Title                                                 | PRD | Status |
 |----|-------------------------------------------------------|-----|--------|
-| —  | (Phase 4 PRDs not yet decomposed)                     | —   | todo   |
+| 39 | App tabs (Notes / Coupons) shell                      | `prds/PRD-39-app-tabs-shell.md`                | todo   |
+| 35 | `coupons` table + RLS + RPCs + data layer             | `prds/PRD-35-coupons-table-rpcs.md`            | dev-done |
+| 36 | Wishlist UI (mine + partner's, approve/decline)       | `prds/PRD-36-wishlist-ui.md`                   | todo   |
+| 37 | Starter coupon templates                              | `prds/PRD-37-starter-templates.md`             | todo   |
+| 38 | Per-coupon private flag (device-local)                | `prds/PRD-38-coupon-private-flag.md`           | todo   |
 
 ### Phase 5 — Coupon claim/escrow flow
 

@@ -9,6 +9,30 @@
 > ratified or changed, move the rationale into `DESIGN.md`/the PRD and
 > trim the entry here.
 
+## Phase 4 — Wishlists (PRD-35..39)
+
+Owner-ratified 2026-09-29: receiver adds, giver approves; price 1–50;
+drafts editable/deletable by the receiver; giver may gently decline
+("not for me"); templates via an empty-wishlist picker. Recorded in
+`DESIGN.md` §6b/§6e/§13a.
+
+### D-35.1 Either member may retire an approved coupon
+- **Why:** §6b says the deliverer retires. But the receiver may also
+  stop wanting something, and retiring only refunds, so there's no harm
+  in letting both.
+- **Alternative:** giver-only per §6b literal.
+
+### D-38.1 No `@solid-primitives/storage` for private flags
+- **Why:** a plain signal + try/catch localStorage behaves the same;
+  avoids a dependency + the pnpm minimumReleaseAge friction. §15b named
+  the lib but the behaviour is what matters.
+
+### D-39.1 Tabs via `location.hash`, not sub-routes
+- **Why:** GH Pages only prerenders `/app`. Sub-routes rely on the
+  404.html fallback (which serves with HTTP 404). A hash keeps one
+  clean 200 page and back-button support.
+- **Alternative:** `/app/coupons` route + prerender entry.
+
 ## Phase 3 — Hearts (PRD-27..32)
 
 Owner-ratified 2026-09-29 (not autonomous, recorded for context):
