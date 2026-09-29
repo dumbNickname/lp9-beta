@@ -32,3 +32,14 @@ export async function updateMyProfile(patch: ProfileUpdate): Promise<Profile> {
   if (error) throw error;
   return data as Profile;
 }
+
+// A relationship co-member's display name (RLS co-member policy, §13c).
+export async function getDisplayName(userId: string): Promise<string | null> {
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("display_name")
+    .eq("id", userId)
+    .maybeSingle();
+  if (error) throw error;
+  return (data?.display_name as string | null | undefined) ?? null;
+}

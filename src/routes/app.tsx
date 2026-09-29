@@ -16,6 +16,7 @@ import {
 import Onboarding from "~/components/Onboarding";
 import PairFlow from "~/components/PairFlow";
 import RecoveryPassword from "~/components/RecoveryPassword";
+import Dashboard from "~/components/Dashboard";
 
 // One-time "set recovery password" prompt, tracked per relationship in
 // localStorage so it shows once and survives reloads (D-22.3).
@@ -78,8 +79,8 @@ export default function AppShell() {
   };
 
   return (
-    <main>
-      <h1>{APP_NAME}</h1>
+    <main class="app-main">
+      <h1 class="visually-hidden">{APP_NAME}</h1>
       <Show when={!sessionLoading() && user()} fallback={<p>Loading...</p>}>
         <Show when={!profileLoading()} fallback={<p>Loading...</p>}>
           <Show when={profile()?.display_name} fallback={<Onboarding />}>
@@ -93,7 +94,11 @@ export default function AppShell() {
                     onSkip={() => dismissRecovery(relationship()!.id)}
                   />
                 </Show>
-                <p>Welcome back, {profile()!.display_name}!</p>
+                <Dashboard
+                  relationship={relationship()!}
+                  userId={user()!.id}
+                  displayName={profile()!.display_name!}
+                />
               </Show>
             </Show>
           </Show>

@@ -57,3 +57,18 @@ None.
 ## Open questions
 
 None.
+
+---
+
+## Dev notes
+
+- `HeartsFeed.tsx` + `HeartNote.tsx`; store `src/lib/stores/points.ts`
+  holds `feed()` (decrypted `FeedItem`s) and `refreshPoints`.
+- Received notes: solid card with a rose edge. Given notes: dashed,
+  muted.
+- Undo/Edit windows are checked on the client with a 15s tick; the
+  server stays authoritative (RPC errors are mapped by
+  `friendlyPointsError`).
+- Edit is hidden while private mode is on (so it can't reveal the
+  comment text).
+- A "noted <day>" badge shows when `event_date` < local created day.

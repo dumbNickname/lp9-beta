@@ -100,6 +100,8 @@ placeholder. See `DESIGN.md` §14i.
 - `prds/PRD-NN-*.md` — one tiny PRD per behavior; the executable unit.
 - `no-human-decisions.md` — review queue of decisions agents made
   autonomously (momentum mode) that a human may want to revisit.
+- `IDEAS.md` — backlog of ideas, tech debt and owner actions. Not
+  decisions; promote an item to a PRD before building it.
 - `LICENSE` (AGPL-3.0-or-later), `TRADEMARK.md` — legal.
 
 These predate DOX and remain authoritative for their content. AGENTS.md
@@ -194,6 +196,18 @@ files add operational contracts; they do not replace `DESIGN.md`.
   (`/tmp/opencode/`) or delete after; they create real anon users.
 - **Run pnpm via nvm:** `source ~/.nvm/nvm.sh` first in each shell
   (system node is 22.8, too old; nvm default is 24).
+- **Local E2E in a browser:** don't use `vinxi dev` (Vite re-optimizes
+  deps mid-run and reloads the page). Instead run `BASE_PATH=/lp9-beta/
+  pnpm build`, run `scripts/post-build.sh`, copy `.output/public` to
+  `/tmp/opencode/site/lp9-beta/`, and serve with `python3 -m
+  http.server` (start it with `setsid ... &`, or the tool call hangs).
+  Playwright: `playwright-core` in `/tmp/opencode/pw` + cached
+  `~/.cache/ms-playwright/chromium-1234`. Two browser contexts = two
+  anon partners. The agent model cannot view images, so assert via the
+  DOM / computed styles.
+- **`pnpm build` can exceed the 5-min tool timeout** when a stale vinxi
+  process lingers. Kill stray `vinxi` processes first, and run the build
+  detached with the log in `/tmp/opencode/build.log`.
 
 ## User preferences (durable)
 

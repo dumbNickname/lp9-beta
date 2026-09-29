@@ -36,13 +36,20 @@ the client/server entry points. Public pages are statically generated;
     `entry-server.tsx` **before** the stylesheet, setting
     `data-theme` pre-paint. Keep it before any CSS.
   - Colors are semantic CSS custom properties in
-    `src/styles/tokens.css` (`--color-bg`, `--color-fg`,
-    `--color-muted-bg`, `--color-muted-fg`, `--color-border`,
-    `--color-accent`). Light on `:root`, dark on `[data-theme="dark"]`.
-    Components reference tokens, never raw hues.
-  - Palette is warm-editorial placeholder (bone/charcoal + muted warm
-    accent); the brand designer revises once the name is locked
-    (`DESIGN.md` §14e). Not gamified/scoreboard hues.
+    `src/styles/tokens.css` (`--color-bg`, `--color-surface`,
+    `--color-fg`, `--color-muted-*`, `--color-border`, `--color-accent`,
+    `--color-accent-fg`, `--color-heart`, `--color-heart-soft`,
+    `--color-focus`, `--color-qr-bg`) plus `--text-*`, `--space-*`,
+    `--radius*`, `--shadow-soft`, `--measure`, `--ease`. Light on
+    `:root`, dark on `[data-theme="dark"]`. Components reference
+    tokens, never raw hues (a QA test greps for this).
+  - **Visual language (PRD-32): warm editorial, paper + ink.** Serif
+    display + serif italic for heart comments. Sans for UI chrome. Pill
+    buttons (`.quiet`, `.small`, `.link-button`, `.button` for anchors).
+    `.card` surfaces. Custom SVG hearts (`HeartIcon`), never emoji. No
+    confetti/streaks/progress bars/big numbers. All motion is off under
+    `prefers-reduced-motion`. The brand designer revises once the name
+    is locked (§14e).
 - **CSS uses logical properties only** (`margin-inline`, `padding-block`,
   `border-*-end`, etc.) — RTL-ready from day one (`DESIGN.md` §12e). No
   `margin-left`/`right`/`top`-style physical properties.
@@ -58,14 +65,31 @@ the client/server entry points. Public pages are statically generated;
   try/catch (private-mode / SSR). See `src/lib/theme.ts` for the pattern.
 - Path alias `~/*` → `src/*`.
 
+- **Data layer (`src/lib/data/`)**: all Supabase calls live here.
+  `bytea.ts` has the `\x` hex helpers (shared). `points.ts` has the
+  hearts reads plus the `give_points`/`edit_point_comment`/`delete_point`
+  RPCs and `friendlyPointsError`.
+- **Stores (`src/lib/stores/`)**: module-level signals + `refresh*()` +
+  `use*FocusRefresh()` (§9a/§9c). `points.ts` decrypts into
+  `FeedItem`s, exposes `mySpendable()`, and `hasCommentKey()`
+  (tri-state: `null` = unchecked).
+- **Comments E2E (`src/lib/crypto/comments.ts`)**: `encryptComment`
+  throws without a key, so it can never send plaintext.
+  `decryptComment` returns null on failure. Everything else is
+  plaintext (§12a).
+- **Privacy mode (`src/lib/privacy.ts`)**: in-memory signal, ON at
+  every load (§15c). Any component showing comment text must check
+  `privateMode()`.
+- **Balance (`src/lib/balance.ts`)**: pure, computed, never stored
+  (§13b). Only the viewer's own balance is ever rendered.
+- **Dashboard (`components/Dashboard.tsx`)**: composes the composer,
+  feed, balance, privacy toggle and restore-key flow. `routes/app.tsx`
+  only gates (session → profile → relationship).
+
 ## Work Guidance
 
-- Data access (Phase 1+) goes through a thin swappable layer exposing
-  `refresh()` per entity; all Supabase calls funnel through it
-  (`DESIGN.md` §9c, HANDOFF 1.7–1.8). Not built yet.
-- Comment text is E2E-encrypted client-side (AES-GCM via WebCrypto, no
-  crypto library); everything else is plaintext (`DESIGN.md` §12a).
-  Not built yet.
+- No scoreboards: never render sums, counts, partner balance, or
+  given-vs-received comparisons (§5b, owner 2026-09-29).
 
 ## Verification
 

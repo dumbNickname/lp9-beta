@@ -39,3 +39,13 @@ when coupons exist — no dependency added now; D-31.1).
 ## Open questions
 
 None.
+
+---
+
+## Dev notes
+
+- `src/lib/privacy.ts` module-level signal, default true (reload means
+  ON again).
+- `PrivacyToggle` is in the dashboard head, not the global header (the
+  dashboard is the only place with private content right now).
+- `aria-pressed` = private on. The eye icon gets a strike line when on.

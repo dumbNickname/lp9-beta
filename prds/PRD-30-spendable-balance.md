@@ -41,3 +41,13 @@ the paginated feed. Use a separate lightweight query
 ## Open questions
 
 None.
+
+---
+
+## Dev notes
+
+- `src/lib/balance.ts` `computeSpendable(amounts, claims=[])`. Claims
+  in pending/accepted/delivered subtract; declined/auto_refunded don't.
+- Amounts come from `listReceivedAmounts` (separate query, D-30.1).
+- UI: a serif line in the dashboard head. Shows only the viewer's own
+  number; shows zero-state copy when 0.

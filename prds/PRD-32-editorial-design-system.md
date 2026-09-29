@@ -57,3 +57,23 @@ dashboard layout — calm, mobile-first, intimate; not gamified.
 ## Open questions
 
 None.
+
+---
+
+## Dev notes
+
+- Tokens: added `--color-surface`, `--color-accent-fg`, `--color-heart`,
+  `--color-heart-soft`, `--color-focus`, `--color-qr-bg` (QR quiet zone
+  must stay light in dark theme), `--shadow-soft`, `--radius-lg`,
+  `--measure`, `--ease`, and a `--text-*` scale. Existing names kept.
+- Buttons are pill-shaped; `.quiet`, `.small`, `.link-button`,
+  `.button` (for anchors).
+- Serif italic is used for comments (the note feel). The header is
+  sticky and translucent (`color-mix` + backdrop blur).
+- Home: the h1 is `APP_NAME` (the routes smoke contract) styled as an
+  eyebrow. The display tagline is a `<p class="hero-title">`, followed
+  by a sample note card, 3-step How it works, and a "Plainly" honesty
+  list (§3/§12a copy).
+- `prefers-reduced-motion` kills all animation/transition.
+- Visual QA: I can't view screenshots (no image input). The owner should
+  check the deployed look, or open the PNGs in `/tmp/opencode/shots/`.

@@ -93,3 +93,22 @@ search_path, windows, receiver derived), adversarial arg shapes.
 ## Open questions
 
 None (decisions D-27.1, D-27.2 in `no-human-decisions.md`).
+
+---
+
+## Dev notes
+
+- Migration `0006_points.sql`; shared validator `check_point_comment`
+  (non-definer, immutable). `give_points` derives receiver server-side.
+- Also rejects zero-length ciphertext (empty comment must be null/null).
+- `event_date` has `default current_date` (column), RPC always passes it.
+- bytea helpers moved to `src/lib/data/bytea.ts`.
+- Added `listReceivedAmounts` (for PRD-30, D-30.1) here since it's a
+  pure data-layer read on the same table.
+- Self-test: typecheck/lint/test green. **Live smoke vs prod DB
+  2026-09-29: 20/20 pass** (give, B reads, amount/date/iv rejections,
+  outsider blocked + sees nothing, B cannot edit/delete, direct insert
+  blocked by RLS, direct update no-op, edit sets `edited_at`, backdated
+  give, delete hides from both, double delete -> `not found`).
+- Not live-tested: 24h / 5-min window expiry (needs time travel); SQL
+  uses `created_at <= now() - interval` checks.

@@ -1,3 +1,4 @@
+import { MemoryRouter, Route } from "@solidjs/router";
 import { render } from "@solidjs/testing-library";
 import { describe, expect, it, vi } from "vitest";
 import { APP_NAME } from "~/constants";
@@ -24,9 +25,14 @@ vi.mock("~/lib/stores/profile", () => ({
 }));
 
 describe("route smoke tests", () => {
-  it("renders the home route with APP_NAME", () => {
-    const { getByRole } = render(() => <Home />);
-    expect(getByRole("heading", { level: 1 }).textContent).toContain(APP_NAME);
+  it("renders the home route with APP_NAME and How it works", async () => {
+    const { findByRole, getByRole } = render(() => (
+      <MemoryRouter>
+        <Route path="/" component={Home} />
+      </MemoryRouter>
+    ));
+    expect((await findByRole("heading", { level: 1 })).textContent).toContain(APP_NAME);
+    expect(getByRole("heading", { name: /how it works/i })).toBeInTheDocument();
   });
 
   it("renders the privacy route", () => {

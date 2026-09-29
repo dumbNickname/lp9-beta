@@ -87,12 +87,12 @@ its own end-to-end PRD per `DESIGN.md` §16a.
 
 | #  | Title                                                 | PRD | Status |
 |----|-------------------------------------------------------|-----|--------|
-| 27 | `points` table + RLS + RPCs + data layer              | `prds/PRD-27-points-table-rpcs.md`             | dev-done |
-| 28 | Give hearts (composer, encryption, backdating)        | `prds/PRD-28-give-hearts.md`                   | todo   |
-| 29 | Hearts timeline (decrypt, edit/delete windows)        | `prds/PRD-29-hearts-timeline.md`               | todo   |
-| 30 | Spendable balance                                     | `prds/PRD-30-spendable-balance.md`             | todo   |
-| 31 | Privacy mode (shoulder-surf veil)                     | `prds/PRD-31-privacy-mode.md`                  | todo   |
-| 32 | Warm editorial design system + dashboard layout       | `prds/PRD-32-editorial-design-system.md`       | todo   |
+| 27 | `points` table + RLS + RPCs + data layer              | `prds/PRD-27-points-table-rpcs.md`             | merged |
+| 28 | Give hearts (composer, encryption, backdating)        | `prds/PRD-28-give-hearts.md`                   | dev-done |
+| 29 | Hearts timeline (decrypt, edit/delete windows)        | `prds/PRD-29-hearts-timeline.md`               | dev-done |
+| 30 | Spendable balance                                     | `prds/PRD-30-spendable-balance.md`             | dev-done |
+| 31 | Privacy mode (shoulder-surf veil)                     | `prds/PRD-31-privacy-mode.md`                  | dev-done |
+| 32 | Warm editorial design system + dashboard layout       | `prds/PRD-32-editorial-design-system.md`       | dev-done |
 
 ### Phase 4 — Wishlists + coupon approval
 

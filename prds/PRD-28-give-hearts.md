@@ -68,3 +68,22 @@ when key missing; composer behaviours 1–5 with mocked data layer.
 ## Open questions
 
 None.
+
+---
+
+## Dev notes
+
+- Shipped together with PRD-29..32 as one dashboard slice (orchestrator
+  implemented directly; one commit).
+- `src/lib/crypto/comments.ts`: `encryptComment` **throws** when the key
+  is missing (never plaintext fallback); `decryptComment(key, ct, iv)`
+  takes a key (store fetches it once per refresh) and returns null on
+  failure.
+- `src/components/HeartPicker.tsx`: radiogroup, roving tabindex,
+  arrows/Home/End.
+- Partner name via `getDisplayName(id)` in `src/lib/data/profile.ts`
+  (co-member RLS policy).
+- The composer rotates between 4 noticing prompts as its placeholder.
+- The key check is tri-state (`null` = not checked yet), so the composer
+  never flashes "locked" before the IndexedDB check finishes.
+- Tests: `tests/unit/hearts-ui.test.tsx`, `tests/unit/hearts-lib.test.ts`.
