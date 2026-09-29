@@ -9,6 +9,36 @@
 > ratified or changed, move the rationale into `DESIGN.md`/the PRD and
 > trim the entry here.
 
+## Phase 3 — Hearts (PRD-27..32)
+
+Owner-ratified 2026-09-29 (not autonomous, recorded for context):
+backdate window 30 days / no future; one timeline received + given;
+per-entry heart amounts shown, no totals; no key on device -> block
+comment, allow hearts-only + restore prompt; visual direction warm
+editorial paper + ink.
+
+### D-27.1 All `points` writes via RPC, no INSERT policy
+- **Decision:** RLS has only a SELECT policy; `give_points` is
+  `security definer` and derives `receiver_id` server-side.
+- **Why:** receiver can't be spoofed; one place enforces windows.
+- **Alternative:** INSERT policy with `giver_id = auth.uid()` (§13c
+  sketch) — more surface, receiver needs extra check.
+
+### D-27.2 event_date upper bound = `current_date + 1`
+- **Why:** server `current_date` is UTC; a user in UTC+2 at 01:00 has
+  "today" = server's tomorrow. UI still caps at local today.
+
+### D-27.3 Deleted points hidden by SELECT policy
+- **Decision:** `deleted_at is null` in the RLS predicate, so silent
+  delete is enforced server-side for both partners.
+
+### D-30.1 Balance from a dedicated amounts query, not the feed
+- **Why:** feed is paginated (50); balance must count everything.
+
+### D-31.1 Privacy mode signal is in-memory only
+- **Decision:** plain Solid signal, default ON per load; no
+  `@solid-primitives/storage` until per-coupon flags (Phase 4) need it.
+
 ## PRD-25 — Pairing flow correctness
 
 ### D-25.1 Join requires an explicit confirm step (no auto-redeem)

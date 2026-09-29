@@ -87,7 +87,12 @@ its own end-to-end PRD per `DESIGN.md` §16a.
 
 | #  | Title                                                 | PRD | Status |
 |----|-------------------------------------------------------|-----|--------|
-| —  | (Phase 3 PRDs not yet decomposed)                     | —   | todo   |
+| 27 | `points` table + RLS + RPCs + data layer              | `prds/PRD-27-points-table-rpcs.md`             | dev-done |
+| 28 | Give hearts (composer, encryption, backdating)        | `prds/PRD-28-give-hearts.md`                   | todo   |
+| 29 | Hearts timeline (decrypt, edit/delete windows)        | `prds/PRD-29-hearts-timeline.md`               | todo   |
+| 30 | Spendable balance                                     | `prds/PRD-30-spendable-balance.md`             | todo   |
+| 31 | Privacy mode (shoulder-surf veil)                     | `prds/PRD-31-privacy-mode.md`                  | todo   |
+| 32 | Warm editorial design system + dashboard layout       | `prds/PRD-32-editorial-design-system.md`       | todo   |
 
 ### Phase 4 — Wishlists + coupon approval
 
