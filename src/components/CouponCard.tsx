@@ -1,5 +1,6 @@
 import { createSignal, Show } from "solid-js";
 import HeartIcon from "~/components/HeartIcon";
+import { confirmSheet } from "~/components/ConfirmSheet";
 import { friendlyCouponError } from "~/lib/data/coupons";
 import type { Coupon } from "~/lib/data/types";
 import { privateMode } from "~/lib/privacy";
@@ -47,17 +48,23 @@ export default function CouponCard(props: Props) {
   const hidden = () => privateMode() && isCouponPrivate(props.coupon.id);
 
   const run = async (action: "delete" | "approve" | "decline" | "retire" | "claim") => {
-    if (action === "retire" && !window.confirm("Retire this coupon? It can't be claimed any more.")) {
-      return;
-    }
-    if (action === "delete" && !window.confirm("Delete this coupon?")) return;
-    if (
-      action === "claim" &&
-      !window.confirm(
-        `Claim "${props.coupon.title}" for ${props.coupon.price} hearts? They're set aside until ${props.partnerName} delivers, and returned if it doesn't happen.`,
-      )
-    ) {
-      return;
+    const confirmations = {
+      retire: {
+        title: "Retire this coupon?",
+        body: "It can't be claimed any more. Any open claim is cancelled and its hearts returned.",
+        confirmLabel: "Retire",
+        tone: "danger" as const,
+      },
+      delete: { title: "Delete this coupon?", confirmLabel: "Delete", tone: "danger" as const },
+      claim: {
+        title: `Claim "${props.coupon.title}"?`,
+        body: `${props.coupon.price} hearts are set aside until ${props.partnerName} delivers — and returned if it doesn't happen.`,
+        confirmLabel: `Claim for ${props.coupon.price}`,
+      },
+    };
+    if (action in confirmations) {
+      const ok = await confirmSheet(confirmations[action as keyof typeof confirmations]);
+      if (!ok) return;
     }
     setBusy(true);
     setError("");

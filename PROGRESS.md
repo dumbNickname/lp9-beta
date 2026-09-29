@@ -108,6 +108,15 @@ its own end-to-end PRD per `DESIGN.md` §16a.
 | 40 | Highlight coupons I can afford                        | `prds/PRD-40-affordable-highlight.md`          | dev-done |
 | 43 | Multiple relationships: switcher + `?rel=`            | `prds/PRD-43-relationship-switcher.md`         | dev-done |
 
+### Polish — anonymous mode (owner 2026-09-29: park email, polish first)
+
+| #  | Title                                                 | PRD                                            | Status |
+|----|-------------------------------------------------------|------------------------------------------------|--------|
+| 44 | In-app confirm sheet (replace window.confirm)         | `prds/PRD-44-confirm-sheet.md`                 | dev-done |
+| 45 | "Settings & this device" panel                        | `prds/PRD-45-device-settings.md`               | dev-done |
+| 46 | "New since last visit" + waiting badge                | `prds/PRD-46-new-since-last-visit.md`          | dev-done |
+| 47 | Pairing + onboarding visual polish                    | `prds/PRD-47-pairing-onboarding-polish.md`     | dev-done |
+
 ### Phase 5 — Coupon claim/escrow flow
 
 | #  | Title                                                 | PRD | Status |
@@ -116,6 +125,9 @@ its own end-to-end PRD per `DESIGN.md` §16a.
 | 42 | Claims UI: claim, respond, deliver, coming up, history | `prds/PRD-42-claims-ui.md`                    | dev-done |
 
 ### Phase 6 — Email notifications
+
+**Parked** by owner 2026-09-29. Thinking recorded in `IDEAS.md`
+("Parked: email + account linking").
 
 | #  | Title                                                 | PRD | Status |
 |----|-------------------------------------------------------|-----|--------|

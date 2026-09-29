@@ -19,6 +19,7 @@ interface Props {
   onEdit: (text: string) => Promise<void>;
   onUndo: () => Promise<void>;
   onRestoreKey: () => void;
+  isNew?: boolean;
 }
 
 export default function HeartNote(props: Props) {
@@ -63,10 +64,16 @@ export default function HeartNote(props: Props) {
   };
 
   return (
-    <li class="note" classList={{ "note--mine": props.mine, "note--theirs": !props.mine }}>
+    <li
+      class="note"
+      classList={{ "note--mine": props.mine, "note--theirs": !props.mine, "note--new": !!props.isNew }}
+    >
       <div class="note-meta">
         <span class="note-who">
           {props.mine ? `You to ${props.partnerName}` : `From ${props.partnerName}`}
+          <Show when={props.isNew}>
+            <span class="new-dot">new</span>
+          </Show>
         </span>
         <HeartRow amount={props.item.amount} />
       </div>

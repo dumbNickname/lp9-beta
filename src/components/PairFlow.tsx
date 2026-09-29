@@ -310,12 +310,17 @@ export default function PairFlow() {
     <section class="pair-flow">
       <Show when={view() === "landing"}>
 
-        <div class="pair-flow-landing">
+        <div class="pair-flow-landing card">
           <h2>Pair with your partner</h2>
           <p>
             Link your two accounts to start giving hearts. One of you invites,
-            the other joins.
+            the other joins — easiest when you're side by side.
           </p>
+          <ol class="pair-steps">
+            <li>One of you taps <strong>Invite</strong> and shows the QR code.</li>
+            <li>The other taps <strong>Join</strong> and scans it (or opens the link).</li>
+            <li>That's it — your private notebook for two is ready.</li>
+          </ol>
           <div class="pair-flow-actions">
             <button type="button" onClick={() => setView("invite")}>
               Invite
@@ -328,7 +333,7 @@ export default function PairFlow() {
       </Show>
 
       <Show when={view() === "invite"}>
-        <div class="pair-flow-invite">
+        <div class="pair-flow-invite card">
           <h2>Invite your partner</h2>
           <Show
             when={invite()}
@@ -353,6 +358,7 @@ export default function PairFlow() {
             }
           >
             <p class="pair-flow-waiting" role="status">
+              <span class="pulse-dot" aria-hidden="true" />
               Waiting for your partner to join...
             </p>
             <InviteQR
@@ -369,7 +375,7 @@ export default function PairFlow() {
       </Show>
 
       <Show when={view() === "join"}>
-        <div class="pair-flow-join">
+        <div class="pair-flow-join card">
           <h2>Join your partner</h2>
           <p>Scan the QR code your partner is showing, or paste their invite.</p>
           <Show when={joinError()}>
@@ -385,7 +391,7 @@ export default function PairFlow() {
       </Show>
 
       <Show when={view() === "confirm"}>
-        <div class="pair-flow-confirm">
+        <div class="pair-flow-confirm card">
           <Show when={confirm()?.peekLoading}>
             <p class="pair-flow-waiting" role="status">Loading invite...</p>
           </Show>

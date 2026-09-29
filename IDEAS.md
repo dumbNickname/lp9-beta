@@ -12,6 +12,29 @@
 - Branch protection on `master` is still unset.
 - Pick the final app name (blocks Phase 9).
 
+## Parked: email + account linking (owner 2026-09-29: "park for now")
+
+Thinking so far, to pick up when Phase 6 resumes:
+- **Anonymous users have no email.** Email notifications (§8) require
+  linking an identity first. Google OAuth (`linkIdentity`) keeps
+  `auth.uid()` (§3) and needs the `/privacy` + `/terms` content (§11d)
+  plus the Google Cloud OAuth client (owner action).
+- **Alternative that fits anonymous mode:** magic-link email linking
+  (`updateUser({ email })`) — no Google, and one field. But
+  Supabase's built-in SMTP is rate-limited (a few/hour) and meant for
+  auth mail; it's fine for linking, not for notifications.
+- **Transactional mail** (claim / accepted / declined / daily hearts):
+  a Supabase Edge Function + Resend (free tier ~3k/mo), triggered by a
+  DB webhook on `coupon_claims` status changes, plus a daily cron
+  (pg_cron -> `net.http_post`) for the throttled hearts nudge (§8b). The
+  `user_settings` table (§13a) holds the toggles.
+- **Content-free emails** (§8b, §15e): no titles/comments — "Ben
+  answered your coupon, open the app".
+- **Cheaper interim:** in-app "new since last visit" dots (no email),
+  and the Web Share API to ping the partner via WhatsApp etc. manually.
+- **Multi-device** also depends on linking (§10); the key comes via
+  recovery password (already built).
+
 ## Product / UX
 
 - **Coming up -> .ics export** ("add to my calendar") for accepted

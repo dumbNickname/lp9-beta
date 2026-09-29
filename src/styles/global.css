@@ -1441,3 +1441,190 @@ button.small,
   gap: var(--space-3);
   margin-block-end: var(--space-4);
 }
+
+/* --- Confirm sheet (PRD-44) -------------------------------------------- */
+
+.sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background-color: rgb(20 10 5 / 45%);
+  animation: fade-in 160ms var(--ease);
+}
+
+.sheet {
+  position: fixed;
+  z-index: 51;
+  inset-inline: 0;
+  inset-block-end: 0;
+  max-inline-size: 32rem;
+  margin-inline: auto;
+  padding: var(--space-4) var(--space-4) calc(var(--space-4) + env(safe-area-inset-bottom));
+  background-color: var(--color-surface);
+  border-start-start-radius: var(--radius-lg);
+  border-start-end-radius: var(--radius-lg);
+  box-shadow: 0 -12px 40px -10px rgb(20 10 5 / 40%);
+  animation: sheet-up 220ms var(--ease);
+}
+
+@media (min-width: 40rem) {
+  .sheet {
+    inset-block: 50% auto;
+    translate: 0 -50%;
+    border-radius: var(--radius-lg);
+  }
+}
+
+.sheet-title {
+  font-size: var(--text-xl);
+  margin-block-end: var(--space-2);
+}
+
+.sheet-body {
+  margin-block-end: var(--space-4);
+}
+
+.sheet-actions {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.sheet-actions button {
+  flex: 1;
+}
+
+button.is-danger {
+  background-color: var(--color-heart);
+  border-color: var(--color-heart);
+  color: var(--color-accent-fg);
+}
+
+@keyframes sheet-up {
+  from {
+    transform: translateY(24px);
+    opacity: 0;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* --- Device settings (PRD-45) ------------------------------------------ */
+
+.settings-toggle {
+  font-size: var(--text-sm);
+  color: var(--color-muted-fg);
+}
+
+.settings-panel {
+  margin-block-start: var(--space-3);
+}
+
+.settings-note {
+  font-size: var(--text-sm);
+}
+
+.settings-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+  padding-block: var(--space-3);
+  border-block-start: var(--border-thin);
+}
+
+.settings-label {
+  margin: 0;
+  font-weight: 600;
+  color: var(--color-fg);
+  font-size: var(--text-sm);
+}
+
+.settings-value {
+  margin: 0;
+  font-size: var(--text-xs);
+}
+
+.settings-sub {
+  padding-block-end: var(--space-3);
+}
+
+/* --- New markers (PRD-46) ---------------------------------------------- */
+
+.new-dot {
+  margin-inline-start: var(--space-2);
+  padding-inline: 0.4rem;
+  border-radius: 999px;
+  background-color: var(--color-heart);
+  color: var(--color-accent-fg);
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+}
+
+.note--new {
+  box-shadow:
+    0 0 0 2px var(--color-heart-soft),
+    var(--shadow-soft);
+}
+
+.tab-badge {
+  display: inline-grid;
+  place-items: center;
+  min-inline-size: 1.25rem;
+  block-size: 1.25rem;
+  padding-inline: 0.3rem;
+  border-radius: 999px;
+  background-color: var(--color-heart);
+  color: var(--color-accent-fg);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+/* --- Pairing polish (PRD-47) ------------------------------------------- */
+
+.pair-steps {
+  margin: 0 0 var(--space-3);
+  padding-inline-start: var(--space-4);
+  color: var(--color-muted-fg);
+  font-size: var(--text-sm);
+  display: grid;
+  gap: var(--space-1);
+}
+
+.pair-steps strong {
+  color: var(--color-fg);
+}
+
+.pair-flow-waiting {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 500;
+}
+
+.pulse-dot {
+  inline-size: 0.6rem;
+  block-size: 0.6rem;
+  border-radius: 50%;
+  background-color: var(--color-heart);
+  animation: pulse 1.4s var(--ease) infinite;
+}
+
+@keyframes pulse {
+  50% {
+    transform: scale(1.6);
+    opacity: 0.4;
+  }
+}
+
+.onboarding {
+  background-color: var(--color-surface);
+  border: var(--border-thin);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  padding: var(--space-4);
+}

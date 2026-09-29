@@ -51,6 +51,11 @@ export default function Onboarding() {
 
   return (
     <form class="onboarding" onSubmit={handleSubmit}>
+      <h2>Welcome</h2>
+      <p>
+        A quiet place to notice the small things your person does — and tell
+        them. First, what should they call you?
+      </p>
       <Callout variant="info">
         <p class="nudge">
           Without linking an account, you cannot recover your data if you

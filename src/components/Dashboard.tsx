@@ -12,8 +12,8 @@ import {
   selectRelationship,
   setAddingPartner,
 } from "~/lib/stores/relationship";
-import { refreshCurrentCoupons, resetCoupons } from "~/lib/stores/coupons";
-import { myEscrow, refreshClaims, resetClaims } from "~/lib/stores/claims";
+import { coupons, refreshCoupons, refreshCurrentCoupons, resetCoupons } from "~/lib/stores/coupons";
+import { claims, myEscrow, refreshClaims, resetClaims } from "~/lib/stores/claims";
 import {
   hasCommentKey,
   mySpendable,
@@ -81,7 +81,15 @@ export default function Dashboard(props: Props) {
   createEffect(() => {
     void refreshPoints(props.relationship.id, props.userId);
     void refreshClaims(props.relationship.id);
+    void refreshCoupons(props.relationship.id);
   });
+
+  // Things waiting on me: drafts to approve + claims to answer/deliver.
+  const waitingOnMe = () =>
+    coupons().filter((c) => c.giver_id === props.userId && c.status === "draft").length +
+    claims().filter(
+      (c) => c.deliverer_id === props.userId && (c.status === "pending" || c.status === "accepted"),
+    ).length;
   usePointsFocusRefresh();
 
   const balance = () => mySpendable(props.userId);
@@ -202,6 +210,11 @@ export default function Dashboard(props: Props) {
           onKeyDown={onTabKey}
         >
           Coupons
+          <Show when={waitingOnMe() > 0}>
+            <span class="tab-badge" aria-label={`${waitingOnMe()} waiting for you`}>
+              {waitingOnMe()}
+            </span>
+          </Show>
         </button>
       </div>
 

@@ -1,6 +1,6 @@
 import { Show, createEffect, createSignal } from "solid-js";
 import { APP_NAME } from "~/constants";
-import { loading as sessionLoading, resetAccount, user } from "~/lib/session";
+import { loading as sessionLoading, user } from "~/lib/session";
 import {
   profile,
   profileLoading,
@@ -18,7 +18,9 @@ import {
 import Onboarding from "~/components/Onboarding";
 import PairFlow from "~/components/PairFlow";
 import RecoveryPassword from "~/components/RecoveryPassword";
+import ConfirmHost from "~/components/ConfirmSheet";
 import Dashboard from "~/components/Dashboard";
+import DeviceSettings from "~/components/DeviceSettings";
 
 // One-time "set recovery password" prompt, tracked per relationship in
 // localStorage so it shows once and survives reloads (D-22.3).
@@ -65,20 +67,6 @@ export default function AppShell() {
     setRecoveryDone(true);
   };
 
-  const [resetting, setResetting] = createSignal(false);
-  const handleReset = async () => {
-    if (
-      typeof window !== "undefined" &&
-      !window.confirm(
-        "Reset this device? This clears your local keys and signs you out so you start fresh. Your partner's account is not affected.",
-      )
-    ) {
-      return;
-    }
-    setResetting(true);
-    await resetAccount();
-    if (typeof window !== "undefined") window.location.reload();
-  };
 
   return (
     <main class="app-main">
@@ -123,15 +111,9 @@ export default function AppShell() {
         </Show>
       </Show>
       <footer class="app-reset">
-        <button
-          type="button"
-          class="app-reset-button"
-          onClick={() => void handleReset()}
-          disabled={resetting()}
-        >
-          {resetting() ? "Resetting..." : "Reset account (start fresh)"}
-        </button>
+        <DeviceSettings relationshipId={relationship()?.id ?? null} />
       </footer>
+      <ConfirmHost />
     </main>
   );
 }

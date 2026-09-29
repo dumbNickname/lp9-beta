@@ -111,6 +111,13 @@ the client/server entry points. Public pages are statically generated;
   `CouponsView`. `routes/app.tsx` only gates (session → profile →
   relationship).
 
+- **Confirms**: use `confirmSheet()` from `components/ConfirmSheet.tsx`,
+  never `window.confirm` (host is mounted in `routes/app.tsx`).
+- **Device-local markers** (localStorage): `private_coupons`,
+  `active_relationship`, `last_seen:<rel>`, `recovery_prompted:<rel>`,
+  `pair_invite_pending`, `archetype_hint`. Any new key must be added to
+  `resetAccount()` in `lib/session.ts`.
+
 ## Work Guidance
 
 - No scoreboards: never render sums, counts, partner balance, or

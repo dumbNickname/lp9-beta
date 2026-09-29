@@ -1,5 +1,6 @@
 import { For, Show } from "solid-js";
 import HeartNote from "~/components/HeartNote";
+import { isNewSince, sessionBaseline } from "~/lib/lastSeen";
 import {
   editHeartComment,
   feed,
@@ -17,6 +18,8 @@ interface Props {
 }
 
 export default function HeartsFeed(props: Props) {
+  // eslint-disable-next-line solid/reactivity -- captured once per mount
+  const baseline = sessionBaseline(props.relationshipId);
   return (
     <section class="feed" aria-labelledby="feed-title">
       <div class="feed-head">
@@ -52,6 +55,7 @@ export default function HeartsFeed(props: Props) {
                 item={item}
                 mine={item.giver_id === props.userId}
                 partnerName={props.partnerName}
+                isNew={item.giver_id !== props.userId && isNewSince(baseline, item.created_at)}
                 onEdit={(text) =>
                   editHeartComment(props.relationshipId, props.userId, item.id, text)
                 }
