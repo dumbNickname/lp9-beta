@@ -13,6 +13,16 @@ import {
   setRecoveryPassword,
 } from "~/lib/data/relationship";
 import RecoveryWarning from "~/components/RecoveryWarning";
+import { LockIcon } from "~/components/Icons";
+
+function KeyIcon() {
+  return (
+    <svg class="line-icon" viewBox="0 0 24 24">
+      <circle cx="8" cy="15" r="4" />
+      <path d="M11 12l8-8M16 7l2.5 2.5M14 9l2 2" />
+    </svg>
+  );
+}
 
 export type RecoveryMode = "set" | "change" | "restore";
 
@@ -26,7 +36,7 @@ interface Props {
 }
 
 const HEADINGS: Record<RecoveryMode, string> = {
-  set: "Set a recovery password",
+  set: "Keep your notes safe",
   change: "Change recovery password",
   restore: "Unlock your comments",
 };
@@ -121,11 +131,34 @@ export default function RecoveryPassword(props: Props) {
   };
 
   return (
-    <form class="recovery-password" onSubmit={handleSubmit}>
+    <form
+      class="recovery-password"
+      classList={{ "recovery-password--set": props.mode === "set" }}
+      onSubmit={handleSubmit}
+    >
+      <div class="recovery-art" aria-hidden="true">
+        <KeyIcon />
+      </div>
       <h2>{HEADINGS[props.mode]}</h2>
 
       <Show when={needsConfirm()}>
-        <RecoveryWarning />
+        <ul class="recovery-facts">
+          <li>
+            <span class="recovery-fact-icon recovery-fact-icon--ok" aria-hidden="true">
+              <LockIcon />
+            </span>
+            Notes are encrypted. Only your two devices hold the key.
+          </li>
+          <li>
+            <span class="recovery-fact-icon recovery-fact-icon--warn" aria-hidden="true">!</span>
+            New phone? This password brings your notes back. Forget it, and
+            they stay locked.
+          </li>
+        </ul>
+        <details class="recovery-more">
+          <summary>How recovery works</summary>
+          <RecoveryWarning />
+        </details>
       </Show>
 
       <label>

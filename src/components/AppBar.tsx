@@ -2,6 +2,7 @@ import { createEffect, createSignal, For, on, onCleanup, onMount, Show } from "s
 import HeartIcon from "~/components/HeartIcon";
 import { initial, type PairOption } from "~/components/PairBadge";
 import PrivacyToggle from "~/components/PrivacyToggle";
+import { HelpIcon } from "~/components/Icons";
 import { privateMode } from "~/lib/privacy";
 
 interface Props {
@@ -17,6 +18,7 @@ interface Props {
   onNewPair: () => void;
   onEditName: () => void;
   onOpenSettings: () => void;
+  onOpenGuide: () => void;
 }
 
 type Menu = null | "pair" | "balance" | "more";
@@ -128,7 +130,7 @@ export default function AppBar(props: Props) {
         </button>
       </div>
 
-      <Show when={props.privacyHint && !hintSeen()}>
+      <Show when={props.privacyHint && !hintSeen() && !menu()}>
         <div class="privacy-hint" role="note">
           <p>Someone looking over your shoulder? Tap the eye to veil your notes.</p>
           <button type="button" class="privacy-hint-ok" onClick={dismissHint}>
@@ -210,6 +212,17 @@ export default function AppBar(props: Props) {
             }}
           >
             Edit my name
+          </button>
+          <button
+            type="button"
+            class="pair-menu-item"
+            onClick={() => {
+              setMenu(null);
+              props.onOpenGuide();
+            }}
+          >
+            <HelpIcon />
+            How it works
           </button>
           <button
             type="button"

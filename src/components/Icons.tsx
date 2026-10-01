@@ -47,3 +47,24 @@ export function HelpIcon() {
     </svg>
   );
 }
+
+export function GiftIcon() {
+  return (
+    <svg class="line-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="4" y="9" width="16" height="11" rx="1.8" />
+      <path d="M3.5 9h17M12 9v11" />
+      <path d="M12 9c-1.2-3.2-5.5-4.3-5.5-1.6C6.5 9 9.5 9 12 9zM12 9c1.2-3.2 5.5-4.3 5.5-1.6C17.5 9 14.5 9 12 9z" />
+    </svg>
+  );
+}
+
+export function NotebookIcon() {
+  return (
+    <svg class="line-icon" viewBox="0 0 48 48" aria-hidden="true">
+      <rect x="9" y="6" width="30" height="36" rx="4" />
+      <path d="M15 6v36" />
+      <path d="M21 16h11M21 22h8" />
+      <path d="M27 35.5c-.2 0-.4 0-.5-.2-2.6-2.1-4.8-4-4.8-6.6 0-1.6 1.2-2.8 2.7-2.8 1 0 1.9.5 2.6 1.4.7-.9 1.6-1.4 2.6-1.4 1.5 0 2.7 1.2 2.7 2.8 0 2.6-2.2 4.5-4.8 6.6-.1.1-.3.2-.5.2z" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}

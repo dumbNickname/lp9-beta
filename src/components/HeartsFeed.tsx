@@ -1,5 +1,6 @@
 import { For, Show } from "solid-js";
 import HeartNote from "~/components/HeartNote";
+import { NotebookIcon } from "~/components/Icons";
 import { isNewSince, sessionBaseline } from "~/lib/lastSeen";
 import {
   editHeartComment,
@@ -15,6 +16,7 @@ interface Props {
   userId: string;
   partnerName: string;
   onRestoreKey: () => void;
+  onOpenGuide?: () => void;
 }
 
 export default function HeartsFeed(props: Props) {
@@ -42,9 +44,18 @@ export default function HeartsFeed(props: Props) {
         when={feed().length > 0}
         fallback={
           <Show when={!pointsLoading()}>
-            <p class="feed-empty">
-              Nothing here yet. Notice one small thing today.
-            </p>
+            <div class="empty-state">
+              <span class="empty-art" aria-hidden="true">
+                <NotebookIcon />
+              </span>
+              <p class="feed-empty">Your notebook is empty.</p>
+              <p class="empty-hint">Notice one small thing today.</p>
+              <Show when={props.onOpenGuide}>
+                <button type="button" class="quiet small empty-guide" onClick={() => props.onOpenGuide?.()}>
+                  How it works
+                </button>
+              </Show>
+            </div>
           </Show>
         }
       >

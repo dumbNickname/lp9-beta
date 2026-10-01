@@ -1,11 +1,16 @@
 import { For, Show } from "solid-js";
+import HeartIcon from "~/components/HeartIcon";
+import { GiftIcon, SparkIcon } from "~/components/Icons";
 
 export type Tab = "give" | "mine" | "theirs";
 const TABS: Tab[] = ["give", "mine", "theirs"];
 
-// `#settings` is a separate page inside the dashboard (PRD-51).
-export function readSettings(): boolean {
-  return typeof window !== "undefined" && window.location.hash === "#settings";
+// `#settings` / `#guide` are separate pages inside the dashboard (PRD-51).
+export type Page = "settings" | "guide";
+export function readPage(): Page | null {
+  if (typeof window === "undefined") return null;
+  const h = window.location.hash;
+  return h === "#settings" ? "settings" : h === "#guide" ? "guide" : null;
 }
 
 // Hash sync (D-39.1, PRD-49). Legacy `#coupons` opens My wishes.
@@ -19,7 +24,7 @@ export function readTab(): Tab {
 
 // Absolute URL: a bare "#x" would resolve against <base href> and drop
 // /app (see src/AGENTS.md gotcha).
-export function writeTab(t: Tab | "settings"): void {
+export function writeTab(t: Tab | Page): void {
   try {
     const path = location.pathname + location.search;
     history.replaceState(null, "", t === "give" ? path : `${path}#${t}`);
@@ -69,7 +74,7 @@ export default function TabBar(props: Props) {
               onKeyDown={onKey}
             >
               <span class="tabbar-icon" aria-hidden="true">
-                {t === "give" ? "♥" : t === "mine" ? "✦" : "❀"}
+                {t === "give" ? <HeartIcon filled /> : t === "mine" ? <SparkIcon /> : <GiftIcon />}
               </span>
               <span class="tabbar-label">{label(t)}</span>
               <Show when={badge(t) > 0}>

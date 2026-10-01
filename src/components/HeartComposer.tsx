@@ -1,4 +1,5 @@
-import { createSignal, Show } from "solid-js";
+import { createSignal, For, Show } from "solid-js";
+import HeartIcon from "~/components/HeartIcon";
 import HeartPicker from "~/components/HeartPicker";
 import { COMMENT_MAX } from "~/lib/crypto/comments";
 import { friendlyPointsError } from "~/lib/data/points";
@@ -31,6 +32,8 @@ export default function HeartComposer(props: Props) {
   const [busy, setBusy] = createSignal(false);
   const [error, setError] = createSignal("");
   const [sent, setSent] = createSignal(false);
+  // Hearts that fly off the Send button; bumped per send to replay.
+  const [burst, setBurst] = createSignal<{ n: number; id: number } | null>(null);
   const prompt = PROMPTS[Math.floor(Math.random() * PROMPTS.length)]!;
 
   const today = () => localDateString();
@@ -62,6 +65,7 @@ export default function HeartComposer(props: Props) {
       );
       reset();
       setSent(true);
+      setBurst({ n: a, id: Date.now() });
     } catch (err) {
       setError(friendlyPointsError(err));
     } finally {
@@ -148,12 +152,40 @@ export default function HeartComposer(props: Props) {
       </Show>
 
       <div class="composer-actions">
-        <button type="submit" disabled={busy() || !amount()}>
-          {busy() ? "Sending..." : "Send"}
-        </button>
+        <span class="composer-send-wrap">
+          <button type="submit" class="composer-send" disabled={busy() || !amount()}>
+            <HeartIcon filled />
+            {busy()
+              ? "Sending..."
+              : amount()
+                ? `Send ${amount()} ${amount() === 1 ? "heart" : "hearts"}`
+                : "Send"}
+          </button>
+          <Show when={burst()} keyed>
+            {(b) => (
+              <span class="heart-burst" aria-hidden="true">
+                <For each={Array.from({ length: b.n * 2 }, (_, i) => i)}>
+                  {(i) => (
+                    <span
+                      class="heart-burst-item"
+                      style={{
+                        "--bx": `${Math.round(Math.cos((i / (b.n * 2)) * Math.PI - Math.PI) * 70 + (Math.random() * 20 - 10))}px`,
+                        "--by": `${Math.round(-40 - Math.random() * 70)}px`,
+                        "--bd": `${i * 35}ms`,
+                        "--br": `${Math.round(Math.random() * 50 - 25)}deg`,
+                      }}
+                    >
+                      <HeartIcon filled />
+                    </span>
+                  )}
+                </For>
+              </span>
+            )}
+          </Show>
+        </span>
         <Show when={sent()}>
           <p class="composer-sent" role="status">
-            Sent. {props.partnerName} will see it next time they open the app.
+            Sent to {props.partnerName}.
           </p>
         </Show>
       </div>

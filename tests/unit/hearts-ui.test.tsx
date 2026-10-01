@@ -32,9 +32,9 @@ describe("HeartComposer", () => {
     const { getByRole, getByPlaceholderText, findByRole } = render(() => (
       <HeartComposer {...base} hasKey />
     ));
-    const send = getByRole("button", { name: "Send" });
-    expect(send).toBeDisabled();
+    expect(getByRole("button", { name: "Send" })).toBeDisabled();
     fireEvent.click(getByRole("radio", { name: "3 hearts" }));
+    const send = getByRole("button", { name: "Send 3 hearts" });
     expect(getByRole("radio", { name: "3 hearts" })).toHaveAttribute("aria-checked", "true");
     const ta = getByPlaceholderText(/./) as HTMLTextAreaElement;
     fireEvent.input(ta, { target: { value: "thanks for dinner" } });
@@ -43,7 +43,7 @@ describe("HeartComposer", () => {
     const [rel, user, amount, text, date] = giveHearts.mock.calls[0]!;
     expect([rel, user, amount, text]).toEqual(["r1", "u1", 3, "thanks for dinner"]);
     expect(date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
-    expect(await findByRole("status")).toHaveTextContent(/Bob will see it/);
+    expect(await findByRole("status")).toHaveTextContent(/Sent to Bob/);
   });
 
   it("arrow keys move the heart selection", async () => {
@@ -83,7 +83,7 @@ describe("HeartComposer", () => {
     fireEvent.click(getByRole("button", { name: /unlock with your recovery password/i }));
     expect(onRestoreKey).toHaveBeenCalled();
     fireEvent.click(getByRole("radio", { name: "1 heart" }));
-    fireEvent.click(getByRole("button", { name: "Send" }));
+    fireEvent.click(getByRole("button", { name: "Send 1 heart" }));
     await waitFor(() => expect(giveHearts).toHaveBeenCalled());
     expect(giveHearts.mock.calls[0]![3]).toBe("");
   });

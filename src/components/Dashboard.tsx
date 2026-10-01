@@ -7,7 +7,8 @@ import MyWishes from "~/components/MyWishes";
 import PairBadge from "~/components/PairBadge";
 import RecoveryPassword from "~/components/RecoveryPassword";
 import SettingsPage from "~/components/SettingsPage";
-import TabBar, { type Tab, readSettings, readTab, writeTab } from "~/components/TabBar";
+import GuidePage from "~/components/GuidePage";
+import TabBar, { type Page, type Tab, readPage, readTab, writeTab } from "~/components/TabBar";
 import { getDisplayName } from "~/lib/data/profile";
 import type { Relationship } from "~/lib/data/types";
 import {
@@ -103,7 +104,7 @@ export default function Dashboard(props: Props) {
   // consumed by PairFlow before the dashboard ever mounts.
   const [tab, setTab] = createSignal<Tab>(readTab());
   const selectTab = (t: Tab) => {
-    setSettings(false);
+    setPage(null);
     setTab(t);
     writeTab(t);
     if (t !== "give") {
@@ -113,20 +114,21 @@ export default function Dashboard(props: Props) {
     if (typeof window !== "undefined") window.scrollTo?.({ top: 0 });
   };
   const [editingName, setEditingName] = createSignal(false);
-  const [settings, setSettings] = createSignal(readSettings());
-  const openSettings = () => {
-    setSettings(true);
-    writeTab("settings");
+  const [page, setPage] = createSignal<Page | null>(readPage());
+  const settings = () => page() !== null;
+  const openPage = (p: Page) => {
+    setPage(p);
+    writeTab(p);
     if (typeof window !== "undefined") window.scrollTo?.({ top: 0 });
   };
-  const closeSettings = () => {
-    setSettings(false);
+  const closePage = () => {
+    setPage(null);
     writeTab(tab());
   };
   onMount(() => {
     const onHash = () => {
-      setSettings(readSettings());
-      if (!readSettings()) setTab(readTab());
+      setPage(readPage());
+      if (!readPage()) setTab(readTab());
     };
     const onFocus = () => {
       if (document.visibilityState !== "visible") return;
@@ -159,16 +161,21 @@ export default function Dashboard(props: Props) {
         onSwitch={(id) => selectRelationship(id)}
         onNewPair={() => setAddingPartner(true)}
         onEditName={() => setEditingName(true)}
-        onOpenSettings={openSettings}
-        privacyHint={feed().some((f) => !!f.comment)}
+        onOpenSettings={() => openPage("settings")}
+        onOpenGuide={() => openPage("guide")}
+        privacyHint={!settings() && tab() === "give" && feed().some((f) => !!f.comment)}
       />
 
-      <Show when={settings()}>
+      <Show when={page() === "guide"}>
+        <GuidePage partnerName={partnerName()} onBack={closePage} onGo={selectTab} />
+      </Show>
+
+      <Show when={page() === "settings"}>
         <SettingsPage
           myName={props.displayName}
           partnerName={partnerNameRes.latest ?? null}
           relationshipId={props.relationship.id}
-          onBack={closeSettings}
+          onBack={closePage}
           onNewPair={() => setAddingPartner(true)}
         />
       </Show>
@@ -228,6 +235,7 @@ export default function Dashboard(props: Props) {
               userId={props.userId}
               partnerName={partnerName()}
               onRestoreKey={() => setRestoring(true)}
+              onOpenGuide={() => openPage("guide")}
             />
           </div>
         </div>

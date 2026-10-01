@@ -3,6 +3,7 @@ import { ClaimList } from "~/components/ClaimRow";
 import ComingUp from "~/components/ComingUp";
 import CouponCard from "~/components/CouponCard";
 import Section from "~/components/Section";
+import { GiftIcon } from "~/components/Icons";
 import type { Coupon, Relationship } from "~/lib/data/types";
 import { approve, coupons, decline, retire } from "~/lib/stores/coupons";
 import { claims, isOpen, openClaimFor } from "~/lib/stores/claims";
@@ -77,10 +78,15 @@ export default function ForPartner(props: Props) {
           <Show
             when={list().length > 0}
             fallback={
-              <p class="feed-empty-small">
-                Nothing agreed yet. When {props.partnerName} adds a wish, you'll say
-                yes (or gently pass) here.
-              </p>
+              <div class="empty-state empty-state--small">
+                <span class="empty-art" aria-hidden="true">
+                  <GiftIcon />
+                </span>
+                <p class="feed-empty-small">
+                  No wishes from {props.partnerName} yet. You'll say yes (or gently
+                  pass) here.
+                </p>
+              </div>
             }
           >
             <ul class="coupon-list">

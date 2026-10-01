@@ -73,3 +73,47 @@ Decisions (owner direction + agent choices):
   moment it's relevant; a features page is covered by the in-app guide
   (T5).
 - `ConfirmSheet` gained `choiceSheet()` (3-way) for this.
+
+## T3 — Onboarding + pairing visuals
+
+- Onboarding: floating three-colour hearts, serif headline "Notice the
+  small things. *Say them.*", one big name field, relationship type as
+  chips ("New together" / "Long-term" / "Close friends") instead of a
+  select; language select + honest no-account note moved to a small
+  footer. Via an invite: two avatars + "*Alice* is waiting for you" and
+  the button reads "Join Alice" (one tap pairs; no second confirm).
+- Pair landing: me + dashed "?" avatar joined by pulsing dots, two big
+  tiles (Invite = QR icon, rose; Join = scan icon, sage). Removed the
+  3-step text list.
+- Invite: native "Send link" (Web Share) next to Copy.
+- Failed invite: broken-link visual + "Invite them instead".
+- Recovery prompt ("Keep your notes safe"): key icon, two icon facts;
+  the full honest text (DESIGN §12b) folded into "How recovery works".
+- "Paired" full-screen moment: avatars slide together, heart pops,
+  three sparks, then the three worlds as icon rows. Shown on both
+  devices before the recovery prompt.
+
+## T4 — Dashboard visuals
+
+- Tab icons are SVG (heart / spark / gift) instead of text glyphs.
+- Send button is rose, says "Send 3 hearts"; on success hearts fly out
+  of the button (2 per heart sent; off under reduced motion). "Sent to
+  Bob." replaces the long sentence.
+- Illustrated empty states (notebook for notes, gift for partner
+  wishes) with a "How it works" button on the empty notebook.
+- Contrast: selected-tab label now ink (was world colour at 3.4:1).
+
+## T5 — How it works
+
+- New `#guide` page (⋯ menu, right above Settings; also from the empty
+  notebook). Four tinted cards, one per idea, each with a tiny live mock
+  of the real UI (heart picker, ticket, claim -> yes -> done, veil) and
+  a "Take me there" link. One line of text each.
+- Agent choice: in-app guide instead of a separate public features
+  page; the public homepage already explains the product and is
+  blocked on the name (Phase 9).
+
+Layout audit (Playwright, 360px + 1280px, light + dark): no horizontal
+overflow, nothing off-screen, no tap target < 30px, all text >= 4.5:1.
+Caught + fixed: the privacy coachmark covered the ⋯ menu and the Back
+button -> now only on the Give world with no menu open.

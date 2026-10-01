@@ -143,3 +143,20 @@ describe("Settings page (PRD-51)", () => {
     expect(await findByRole("heading", { level: 1, name: "Settings" })).toBeInTheDocument();
   });
 });
+
+describe("Guide page (#guide)", () => {
+  it("opens from the ⋯ menu; 'Take me there' jumps to the world", async () => {
+    history.replaceState(null, "", "/app");
+    const Dashboard = (await import("~/components/Dashboard")).default;
+    const { getByRole, getAllByRole, findByRole } = render(() => (
+      <Dashboard relationship={rel} userId="me" displayName="Anna" />
+    ));
+    fireEvent.click(getByRole("button", { name: "More" }));
+    fireEvent.click(getAllByRole("button", { name: "How it works" })[0]!);
+    expect(await findByRole("heading", { level: 1, name: "How it works" })).toBeInTheDocument();
+    expect(location.hash).toBe("#guide");
+    fireEvent.click(getAllByRole("button", { name: /take me there/i })[1]!);
+    expect(location.hash).toBe("#mine");
+    expect(getByRole("tab", { name: /my wishes/i })).toHaveAttribute("aria-selected", "true");
+  });
+});
