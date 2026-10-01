@@ -1,4 +1,4 @@
-import { Show, createEffect, createSignal } from "solid-js";
+import { Show, createEffect, createSignal, onMount } from "solid-js";
 import { APP_NAME } from "~/constants";
 import { loading as sessionLoading, user } from "~/lib/session";
 import {
@@ -9,12 +9,16 @@ import {
 } from "~/lib/stores/profile";
 import {
   addingPartner,
+  justPaired,
   relationship,
   relationshipLoading,
   refreshRelationship,
   setAddingPartner,
+  setJustPaired,
   useRelationshipFocusRefresh,
 } from "~/lib/stores/relationship";
+import { captureInviteFromUrl, pendingJoin } from "~/lib/pairing/pendingJoin";
+import PairedMoment from "~/components/PairedMoment";
 import Onboarding from "~/components/Onboarding";
 import PairFlow from "~/components/PairFlow";
 import RecoveryPassword from "~/components/RecoveryPassword";
@@ -45,6 +49,17 @@ function markRecoveryPrompted(relId: string): void {
 }
 
 export default function AppShell() {
+  // Grab a `#pair=` invite before anything else can drop it (onboarding,
+  // remounts). PairFlow reads it from the pendingJoin signal.
+  onMount(() => {
+    captureInviteFromUrl();
+  });
+  // Already paired and opening someone's invite: go straight to the
+  // new-pair flow, which lands on the confirm step.
+  createEffect(() => {
+    if (pendingJoin() && relationship() && !relationshipLoading()) setAddingPartner(true);
+  });
+
   createEffect(() => {
     if (user()) {
       void refreshProfile();
@@ -88,7 +103,15 @@ export default function AppShell() {
                   <PairFlow />
                 </>
               }>
-                <Show when={!recoveryDone()}>
+                <Show when={justPaired() === relationship()?.id}>
+                  <PairedMoment
+                    myName={profile()!.display_name!}
+                    relationship={relationship()!}
+                    userId={user()!.id}
+                    onDone={() => setJustPaired(null)}
+                  />
+                </Show>
+                <Show when={!recoveryDone() && justPaired() !== relationship()?.id}>
                   <RecoveryPassword
                     mode="set"
                     relationshipId={relationship()!.id}
@@ -96,10 +119,10 @@ export default function AppShell() {
                     onSkip={() => dismissRecovery(relationship()!.id)}
                   />
                 </Show>
-                <Show when={relationship()} keyed>
-                  {(rel) => (
+                <Show when={relationship()?.id} keyed>
+                  {() => (
                     <Dashboard
-                      relationship={rel}
+                      relationship={relationship()!}
                       userId={user()!.id}
                       displayName={profile()!.display_name!}
                     />

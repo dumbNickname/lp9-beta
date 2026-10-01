@@ -6,6 +6,7 @@ const [profile, setProfile] = createSignal<Profile | null>(null);
 const [profileLoading, setProfileLoading] = createSignal(false);
 
 let lastFetchTime = 0;
+let loadedOnce = false;
 const THROTTLE_MS = 2000;
 
 export async function refreshProfile(): Promise<void> {
@@ -13,10 +14,13 @@ export async function refreshProfile(): Promise<void> {
   if (now - lastFetchTime < THROTTLE_MS) return;
   lastFetchTime = now;
 
-  setProfileLoading(true);
+  // Only the first load gates the UI; later refreshes update in place so
+  // the app shell never unmounts (and loses state) on focus.
+  if (!loadedOnce) setProfileLoading(true);
   try {
     const p = await getMyProfile();
     setProfile(p);
+    loadedOnce = true;
   } finally {
     setProfileLoading(false);
   }

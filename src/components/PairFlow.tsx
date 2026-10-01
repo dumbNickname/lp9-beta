@@ -1,5 +1,7 @@
 import { createSignal, onCleanup, onMount, Show } from "solid-js";
+import HeartIcon from "~/components/HeartIcon";
 import InviteQR from "~/components/InviteQR";
+import { initial } from "~/components/PairBadge";
 import QRScanner from "~/components/QRScanner";
 import {
   base64ToBytes,
@@ -16,8 +18,14 @@ import {
   redeemPairCode,
   revokePairInvite,
 } from "~/lib/data/relationship";
-import { normalizeScannedInput, parseInviteUrl, parseInvitePayload } from "~/lib/pairing/qr";
+import { normalizeScannedInput, parseInvitePayload } from "~/lib/pairing/qr";
+import {
+  captureInviteFromUrl,
+  clearPendingJoin,
+  joinConfirmed,
+} from "~/lib/pairing/pendingJoin";
 import { onNewRelationship, relationships } from "~/lib/stores/relationship";
+import { profile } from "~/lib/stores/profile";
 import type { Archetype, PairInvitePeek } from "~/lib/data/types";
 
 const POLL_MS = 3000;
@@ -107,6 +115,7 @@ interface ConfirmState {
 }
 
 export default function PairFlow() {
+  const myName = () => profile()?.display_name || "You";
   const [view, setView] = createSignal<View>("landing");
 
   // Invite subview state.
@@ -204,6 +213,7 @@ export default function PairFlow() {
     const payload = normalizeScannedInput(input);
     const parsed = payload ? parseInvitePayload(payload) : null;
     if (!parsed) {
+      clearPendingJoin();
       setJoinError("That does not look like a valid invite.");
       setView("join");
       return;
@@ -229,6 +239,7 @@ export default function PairFlow() {
       // this confirm state.
       if (confirm()?.code !== code) return;
       setConfirm((c) => (c ? { ...c, peek, peekLoading: false } : c));
+      if (joinConfirmed()) void confirmJoin();
     } catch (err) {
       if (confirm()?.code !== code) return;
       const msg = err instanceof Error ? err.message : "Could not load this invite.";
@@ -247,6 +258,7 @@ export default function PairFlow() {
       const relationshipId = await redeemPairCode(current.code);
       const key = await importKeyRaw(base64ToBytes(current.keyBase64));
       await putKey(relationshipId, key);
+      clearPendingJoin();
       await onNewRelationship(relationshipId);
       // Gate re-renders into the dashboard on the active relationship.
     } catch (err) {
@@ -258,29 +270,10 @@ export default function PairFlow() {
   };
 
   const cancelConfirm = () => {
+    clearPendingJoin();
     setConfirm(null);
     setJoinError("");
     setView("join");
-  };
-
-  // Read a `#pair=<payload>` deep link off the current URL, if present, then
-  // strip the fragment so it never re-triggers on re-render/reload. Guarded
-  // for SSR (no window/history). Returns the raw payload or null.
-  const consumeDeepLink = (): string | null => {
-    if (typeof window === "undefined" || !window.location) return null;
-    const payload = parseInviteUrl(window.location.href);
-    if (payload === null) return null;
-    try {
-      if (window.history?.replaceState) {
-        const { pathname, search } = window.location;
-        window.history.replaceState(null, "", `${pathname}${search}`);
-      } else {
-        window.location.hash = "";
-      }
-    } catch {
-      // History API unavailable; the fragment lingers but pairing still runs.
-    }
-    return payload;
   };
 
   // Reload-safety + deep-link handoff. A device is either the inviter (has an
@@ -298,7 +291,8 @@ export default function PairFlow() {
       startPolling(pending.code);
       return;
     }
-    const deepLink = consumeDeepLink();
+    // The shell may already have captured it (e.g. before onboarding).
+    const deepLink = captureInviteFromUrl();
     if (deepLink) {
       handleDecode(deepLink);
     }
@@ -306,27 +300,49 @@ export default function PairFlow() {
 
   onCleanup(stopPolling);
 
+  const confirmName = () => confirm()?.peek?.display_name || "your partner";
+
   return (
     <section class="pair-flow">
       <Show when={view() === "landing"}>
-
-        <div class="pair-flow-landing card">
-          <h2>Pair with your partner</h2>
-          <p>
-            Link your two accounts to start giving hearts. One of you invites,
-            the other joins — easiest when you're side by side.
-          </p>
-          <ol class="pair-steps">
-            <li>One of you taps <strong>Invite</strong> and shows the QR code.</li>
-            <li>The other taps <strong>Join</strong> and scans it (or opens the link).</li>
-            <li>That's it — your private notebook for two is ready.</li>
-          </ol>
-          <div class="pair-flow-actions">
-            <button type="button" onClick={() => setView("invite")}>
-              Invite
+        <div class="pair-flow-landing">
+          <div class="pair-hero" aria-hidden="true">
+            <span class="avatar avatar--me">{initial(myName())}</span>
+            <span class="pair-hero-link">
+              <span class="pair-hero-dot" />
+              <span class="pair-hero-dot" />
+              <span class="pair-hero-dot" />
+            </span>
+            <span class="avatar avatar--partner avatar--empty">?</span>
+          </div>
+          <h2 class="pair-flow-title">Pair with your partner</h2>
+          <p class="pair-flow-lede">One of you invites, the other joins.</p>
+          <div class="pair-choices">
+            <button
+              type="button"
+              class="pair-choice pair-choice--invite"
+              aria-label="Invite"
+              aria-describedby="pair-choice-invite-hint"
+              onClick={() => setView("invite")}
+            >
+              <span class="pair-choice-icon" aria-hidden="true">
+                <QrIcon />
+              </span>
+              <span class="pair-choice-label">Invite</span>
+              <span id="pair-choice-invite-hint" class="pair-choice-hint">Show a QR or send a link</span>
             </button>
-            <button type="button" onClick={() => setView("join")}>
-              Join
+            <button
+              type="button"
+              class="pair-choice pair-choice--join"
+              aria-label="Join"
+              aria-describedby="pair-choice-join-hint"
+              onClick={() => setView("join")}
+            >
+              <span class="pair-choice-icon" aria-hidden="true">
+                <ScanIcon />
+              </span>
+              <span class="pair-choice-label">Join</span>
+              <span id="pair-choice-join-hint" class="pair-choice-hint">Scan their QR or paste a link</span>
             </button>
           </div>
         </div>
@@ -334,14 +350,13 @@ export default function PairFlow() {
 
       <Show when={view() === "invite"}>
         <div class="pair-flow-invite card">
-          <h2>Invite your partner</h2>
+          <h2 class="pair-flow-title">Invite your partner</h2>
           <Show
             when={invite()}
             fallback={
               <>
-                <p>
-                  Create an invite, then show the QR code or share the code with
-                  your partner.
+                <p class="pair-flow-lede">
+                  You'll get a QR code to show and a link to send.
                 </p>
                 <Show when={inviteError()}>
                   <p class="error" role="alert">{inviteError()}</p>
@@ -376,8 +391,8 @@ export default function PairFlow() {
 
       <Show when={view() === "join"}>
         <div class="pair-flow-join card">
-          <h2>Join your partner</h2>
-          <p>Scan the QR code your partner is showing, or paste their invite.</p>
+          <h2 class="pair-flow-title">Join your partner</h2>
+          <p class="pair-flow-lede">Point the camera at their QR, or paste their link.</p>
           <Show when={joinError()}>
             <p class="error" role="alert">{joinError()}</p>
           </Show>
@@ -393,13 +408,29 @@ export default function PairFlow() {
       <Show when={view() === "confirm"}>
         <div class="pair-flow-confirm card">
           <Show when={confirm()?.peekLoading}>
-            <p class="pair-flow-waiting" role="status">Loading invite...</p>
+            <p class="pair-flow-waiting" role="status">
+              <span class="pulse-dot" aria-hidden="true" />
+              Opening invite...
+            </p>
           </Show>
 
           <Show when={confirm() && !confirm()!.peekLoading && confirm()!.peekError}>
-            <h2>Invite unavailable</h2>
+            <div class="pair-hero pair-hero--broken" aria-hidden="true">
+              <span class="avatar avatar--me">{initial(myName())}</span>
+              <span class="pair-hero-link">
+                <span class="pair-hero-dot" />
+                <span class="pair-hero-gap" />
+                <span class="pair-hero-dot" />
+              </span>
+              <span class="avatar avatar--partner avatar--empty">?</span>
+            </div>
+            <h2 class="pair-flow-title">Invite unavailable</h2>
             <p class="error" role="alert">{confirm()!.peekError}</p>
+            <p class="pair-flow-lede">Ask your partner for a fresh invite, or invite them yourself.</p>
             <div class="pair-flow-actions">
+              <button type="button" onClick={() => { cancelConfirm(); setView("invite"); }}>
+                Invite them instead
+              </button>
               <button type="button" onClick={cancelConfirm}>
                 Back
               </button>
@@ -407,11 +438,18 @@ export default function PairFlow() {
           </Show>
 
           <Show when={confirm() && !confirm()!.peekLoading && !confirm()!.peekError}>
-            <h2>
-              Join {confirm()!.peek?.display_name || "your partner"}?
+            <div class="pair-hero" aria-hidden="true">
+              <span class="avatar avatar--me">{initial(myName())}</span>
+              <span class="avatar-heart">
+                <HeartIcon filled />
+              </span>
+              <span class="avatar avatar--partner">{initial(confirmName())}</span>
+            </div>
+            <h2 class="pair-flow-title">
+              Join {confirmName()}?
             </h2>
-            <p>
-              Pairing links your two accounts so you can start giving hearts.
+            <p class="pair-flow-lede">
+              You'll share one private notebook. Only you two can read the notes.
             </p>
             <Show when={confirm()!.redeemError}>
               <p class="error" role="alert">{confirm()!.redeemError}</p>
@@ -436,5 +474,25 @@ export default function PairFlow() {
         </div>
       </Show>
     </section>
+  );
+}
+
+function QrIcon() {
+  return (
+    <svg class="line-icon" viewBox="0 0 24 24">
+      <rect x="4" y="4" width="6" height="6" rx="1.2" />
+      <rect x="14" y="4" width="6" height="6" rx="1.2" />
+      <rect x="4" y="14" width="6" height="6" rx="1.2" />
+      <path d="M14 14h2.5v2.5H14zM17.5 17.5H20V20h-2.5zM14 19v1M19 14h1" />
+    </svg>
+  );
+}
+
+function ScanIcon() {
+  return (
+    <svg class="line-icon" viewBox="0 0 24 24">
+      <path d="M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8M20 16v2.5a1.5 1.5 0 0 1-1.5 1.5H16M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16" />
+      <path d="M7 12h10" />
+    </svg>
   );
 }

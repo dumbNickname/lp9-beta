@@ -14,7 +14,11 @@ const [relationshipLoading, setRelationshipLoading] = createSignal(false);
 const [addingPartner, setAddingPartner] = createSignal(false);
 
 let lastFetchTime = 0;
+let loadedOnce = false;
 const THROTTLE_MS = 2000;
+// Set when a pair was just made on this device; the shell shows the
+// "paired" moment until dismissed.
+const [justPaired, setJustPaired] = createSignal<string | null>(null);
 
 function readUrlRel(): string | null {
   try {
@@ -71,7 +75,8 @@ export async function refreshRelationship(force = false): Promise<void> {
   if (!force && now - lastFetchTime < THROTTLE_MS) return;
   lastFetchTime = now;
 
-  setRelationshipLoading(true);
+  // First load only (see stores/profile.ts).
+  if (!loadedOnce) setRelationshipLoading(true);
   try {
     const rels = (await getMyRelationships()).filter((r) => r.status === "active");
     setRelationships(rels);
@@ -83,6 +88,7 @@ export async function refreshRelationship(force = false): Promise<void> {
     setSelectedId(picked?.id ?? null);
     if (picked) remember(picked.id);
     if (rels.length > 1 && picked) writeUrlRel(picked.id);
+    loadedOnce = true;
   } finally {
     setRelationshipLoading(false);
   }
@@ -100,6 +106,7 @@ export function selectRelationship(id: string): void {
 export async function onNewRelationship(id: string): Promise<void> {
   await refreshRelationship(true);
   selectRelationship(id);
+  setJustPaired(id);
 }
 
 export function useRelationshipFocusRefresh(): void {
@@ -123,4 +130,6 @@ export {
   relationshipLoading,
   addingPartner,
   setAddingPartner,
+  justPaired,
+  setJustPaired,
 };

@@ -51,6 +51,16 @@ export default function InviteQR(props: InviteQRProps) {
     }
   };
 
+  const canShare = () =>
+    typeof navigator !== "undefined" && typeof navigator.share === "function";
+  const shareInvite = async () => {
+    try {
+      await navigator.share({ title: "Join me", text: "Pair with me:", url: inviteUrl() });
+    } catch {
+      // Dismissed or unsupported; the copy button is still there.
+    }
+  };
+
   const copyInvite = async () => {
     const text = inviteUrl();
     try {
@@ -89,20 +99,27 @@ export default function InviteQR(props: InviteQRProps) {
           ref={urlField}
           class="invite-qr-link-field"
           readonly
-          rows={3}
+          rows={2}
           value={inviteUrl()}
           onFocus={selectField}
           aria-label="Full invite link"
         />
       </label>
 
-      <button
-        type="button"
-        class="invite-qr-copy"
-        onClick={() => void copyInvite()}
-      >
-        {copied() ? "Copied" : "Copy invite link"}
-      </button>
+      <div class="invite-qr-buttons">
+        <Show when={canShare()}>
+          <button type="button" class="invite-qr-share" onClick={() => void shareInvite()}>
+            Send link
+          </button>
+        </Show>
+        <button
+          type="button"
+          class="invite-qr-copy"
+          onClick={() => void copyInvite()}
+        >
+          {copied() ? "Copied" : "Copy invite link"}
+        </button>
+      </div>
     </div>
   );
 }

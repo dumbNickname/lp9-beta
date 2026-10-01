@@ -33,6 +33,8 @@ vi.mock("~/lib/stores/relationship", () => ({
   relationships: () => [],
   selectRelationship: vi.fn(),
   onNewRelationship: vi.fn(),
+  justPaired: () => null,
+  setJustPaired: vi.fn(),
 }));
 
 // PairFlow pulls in qrcode; stub it so the gate test doesn't touch canvas.
