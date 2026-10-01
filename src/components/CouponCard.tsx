@@ -3,7 +3,9 @@ import HeartIcon from "~/components/HeartIcon";
 import { confirmSheet } from "~/components/ConfirmSheet";
 import { friendlyCouponError } from "~/lib/data/coupons";
 import type { Coupon } from "~/lib/data/types";
-import { privateMode } from "~/lib/privacy";
+import { LockIcon } from "~/components/Icons";
+import { askReveal } from "~/components/PrivacyToggle";
+import { isVeiled } from "~/lib/privacy";
 import { isCouponPrivate, toggleCouponPrivate } from "~/lib/privateCoupons";
 
 export interface CouponActions {
@@ -47,7 +49,7 @@ export default function CouponCard(props: Props) {
   const [declining, setDeclining] = createSignal(false);
   const [note, setNote] = createSignal("");
 
-  const hidden = () => privateMode() && isCouponPrivate(props.coupon.id);
+  const hidden = () => isCouponPrivate(props.coupon.id) && isVeiled(props.coupon.id);
 
   const run = async (action: "delete" | "approve" | "decline" | "retire" | "claim") => {
     const confirmations = {
@@ -98,12 +100,22 @@ export default function CouponCard(props: Props) {
       <Show
         when={!hidden()}
         fallback={
-          <div class="coupon-hidden">
-            <span>Hidden coupon — turn off private mode to view</span>
-            <button type="button" class="link-button" onClick={() => toggleCouponPrivate(props.coupon.id)}>
-              Unmark
-            </button>
-          </div>
+          <button
+            type="button"
+            class="veil veil--coupon"
+            aria-label="Hidden coupon — private mode. Tap to show"
+            onClick={() => void askReveal(props.coupon.id, "wish")}
+          >
+            <LockIcon />
+            <span class="veil-lines" aria-hidden="true">
+              <span />
+              <span />
+            </span>
+            <span class="coupon-price ticket-stub" aria-hidden="true">
+              <span class="ticket-stub-num">{props.coupon.price}</span>
+              <HeartIcon filled />
+            </span>
+          </button>
         }
       >
         <div class="coupon-main">

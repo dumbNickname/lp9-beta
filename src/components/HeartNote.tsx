@@ -9,7 +9,9 @@ import {
   localDateString,
   withinWindow,
 } from "~/lib/format/date";
-import { privateMode } from "~/lib/privacy";
+import { LockIcon } from "~/components/Icons";
+import { askReveal } from "~/components/PrivacyToggle";
+import { isVeiled } from "~/lib/privacy";
 import type { FeedItem } from "~/lib/stores/points";
 
 interface Props {
@@ -106,8 +108,21 @@ export default function HeartNote(props: Props) {
       >
         <Show when={props.item.comment_ciphertext}>
           <Show
-            when={!privateMode()}
-            fallback={<p class="note-placeholder">Comment hidden — private mode</p>}
+            when={!isVeiled(props.item.id)}
+            fallback={
+              <button
+                type="button"
+                class="veil"
+                aria-label="Comment hidden — private mode. Tap to show"
+                onClick={() => void askReveal(props.item.id)}
+              >
+                <LockIcon />
+                <span class="veil-lines" aria-hidden="true">
+                  <span />
+                  <span />
+                </span>
+              </button>
+            }
           >
             <Show
               when={!props.item.locked}
@@ -138,7 +153,7 @@ export default function HeartNote(props: Props) {
         </span>
         <Show when={!editing() && (canEdit() || canUndo())}>
           <span class="note-actions">
-            <Show when={canEdit() && !privateMode()}>
+            <Show when={canEdit() && !isVeiled(props.item.id)}>
               <button
                 type="button"
                 class="link-button"

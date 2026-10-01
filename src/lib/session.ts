@@ -62,6 +62,8 @@ export async function resetAccount(): Promise<void> {
           k === "archetype_hint" ||
           k === "private_coupons" ||
           k === "active_relationship" ||
+          k === "privacy_mode" ||
+          k === "privacy_hint_seen" ||
           k.startsWith("recovery_prompted:") ||
           k.startsWith("last_seen:"))
       ) {

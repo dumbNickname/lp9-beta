@@ -33,7 +33,9 @@ export default function SettingsPage(props: Props) {
         <div class="settings-row">
           <div>
             <p class="settings-label">Private mode</p>
-            <p class="settings-value">Hides note text and private coupons. On every time the app opens.</p>
+            <p class="settings-value">
+              Veils notes and private wishes on this device. Also the eye in the top bar.
+            </p>
           </div>
           <PrivacyToggle />
         </div>

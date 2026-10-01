@@ -1,11 +1,14 @@
-import { createSignal, For, onCleanup, onMount, Show } from "solid-js";
+import { createEffect, createSignal, For, on, onCleanup, onMount, Show } from "solid-js";
 import HeartIcon from "~/components/HeartIcon";
 import { initial, type PairOption } from "~/components/PairBadge";
 import PrivacyToggle from "~/components/PrivacyToggle";
+import { privateMode } from "~/lib/privacy";
 
 interface Props {
   myName: string;
   partnerName: string;
+  // Show the one-time "tap the eye" coachmark (there are notes to hide).
+  privacyHint?: boolean;
   pairs: PairOption[];
   currentId: string;
   balance: number;
@@ -18,6 +21,16 @@ interface Props {
 
 type Menu = null | "pair" | "balance" | "more";
 
+export const PRIVACY_HINT_KEY = "privacy_hint_seen";
+
+function readHintSeen(): boolean {
+  try {
+    return localStorage.getItem(PRIVACY_HINT_KEY) !== null;
+  } catch {
+    return true;
+  }
+}
+
 // Site root under the GH Pages sub-path. Plain <a> (not router <A>) so the
 // bar also renders outside a Route (tests); a full load of the static home
 // page is fine here.
@@ -28,6 +41,17 @@ export default function AppBar(props: Props) {
   const [menu, setMenu] = createSignal<Menu>(null);
   const toggle = (m: Exclude<Menu, null>) => setMenu((cur) => (cur === m ? null : m));
   let root: HTMLElement | undefined;
+  const [hintSeen, setHintSeen] = createSignal(readHintSeen());
+  const dismissHint = () => {
+    setHintSeen(true);
+    try {
+      localStorage.setItem(PRIVACY_HINT_KEY, "1");
+    } catch {
+      // storage unavailable; hint may show again next load
+    }
+  };
+  // Using the eye counts as having learned it.
+  createEffect(on(privateMode, (on) => on && !hintSeen() && dismissHint(), { defer: true }));
 
   onMount(() => {
     const onDoc = (e: MouseEvent) => {
@@ -86,6 +110,8 @@ export default function AppBar(props: Props) {
           </Show>
         </button>
 
+        <PrivacyToggle />
+
         <button
           type="button"
           class="appbar-more"
@@ -101,6 +127,15 @@ export default function AppBar(props: Props) {
           </svg>
         </button>
       </div>
+
+      <Show when={props.privacyHint && !hintSeen()}>
+        <div class="privacy-hint" role="note">
+          <p>Someone looking over your shoulder? Tap the eye to veil your notes.</p>
+          <button type="button" class="privacy-hint-ok" onClick={dismissHint}>
+            Got it
+          </button>
+        </div>
+      </Show>
 
       <Show when={menu() === "pair"}>
         <div id="appbar-pair-menu" class="popover popover--start">
@@ -166,10 +201,6 @@ export default function AppBar(props: Props) {
 
       <Show when={menu() === "more"}>
         <div id="appbar-more-menu" class="popover popover--end">
-          <div class="popover-row">
-            <span>Private mode</span>
-            <PrivacyToggle />
-          </div>
           <button
             type="button"
             class="pair-menu-item"

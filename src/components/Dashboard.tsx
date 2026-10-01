@@ -5,7 +5,6 @@ import HeartComposer from "~/components/HeartComposer";
 import HeartsFeed from "~/components/HeartsFeed";
 import MyWishes from "~/components/MyWishes";
 import PairBadge from "~/components/PairBadge";
-import PrivacyToggle from "~/components/PrivacyToggle";
 import RecoveryPassword from "~/components/RecoveryPassword";
 import SettingsPage from "~/components/SettingsPage";
 import TabBar, { type Tab, readSettings, readTab, writeTab } from "~/components/TabBar";
@@ -19,6 +18,7 @@ import {
 import { coupons, refreshCoupons, refreshCurrentCoupons, resetCoupons } from "~/lib/stores/coupons";
 import { claims, myEscrow, refreshClaims, resetClaims } from "~/lib/stores/claims";
 import {
+  feed,
   hasCommentKey,
   mySpendable,
   refreshPoints,
@@ -160,6 +160,7 @@ export default function Dashboard(props: Props) {
         onNewPair={() => setAddingPartner(true)}
         onEditName={() => setEditingName(true)}
         onOpenSettings={openSettings}
+        privacyHint={feed().some((f) => !!f.comment)}
       />
 
       <Show when={settings()}>
@@ -222,9 +223,6 @@ export default function Dashboard(props: Props) {
             />
           </div>
           <div class="world-side">
-            <div class="feed-privacy">
-              <PrivacyToggle />
-            </div>
             <HeartsFeed
               relationshipId={props.relationship.id}
               userId={props.userId}

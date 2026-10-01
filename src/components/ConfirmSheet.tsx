@@ -13,20 +13,29 @@ export interface ConfirmOptions {
 }
 
 interface Pending extends ConfirmOptions {
-  resolve: (ok: boolean) => void;
+  // Optional middle choice (e.g. "Turn private mode off").
+  altLabel?: string;
+  resolve: (choice: Choice) => void;
 }
+
+type Choice = "confirm" | "alt" | "cancel";
 
 const [pending, setPending] = createSignal<Pending | null>(null);
 let mounted = false;
 
 export function confirmSheet(opts: ConfirmOptions): Promise<boolean> {
+  return choiceSheet(opts).then((c) => c === "confirm");
+}
+
+// Three-way variant: confirm / alt / cancel.
+export function choiceSheet(opts: ConfirmOptions & { altLabel?: string }): Promise<Choice> {
   if (!mounted) {
-    return Promise.resolve(
+    const ok =
       typeof window !== "undefined" &&
-        window.confirm([opts.title, opts.body].filter(Boolean).join("\n\n")),
-    );
+      window.confirm([opts.title, opts.body].filter(Boolean).join("\n\n"));
+    return Promise.resolve(ok ? "confirm" : "cancel");
   }
-  pending()?.resolve(false);
+  pending()?.resolve("cancel");
   return new Promise((resolve) => setPending({ ...opts, resolve }));
 }
 
@@ -34,24 +43,24 @@ export default function ConfirmHost() {
   mounted = true;
   onCleanup(() => {
     mounted = false;
-    pending()?.resolve(false);
+    pending()?.resolve("cancel");
     setPending(null);
   });
 
   let confirmBtn: HTMLButtonElement | undefined;
   let lastFocus: Element | null = null;
 
-  const close = (ok: boolean) => {
+  const close = (choice: Choice) => {
     const p = pending();
     setPending(null);
-    p?.resolve(ok);
+    p?.resolve(choice);
     if (lastFocus instanceof HTMLElement) lastFocus.focus();
   };
 
   const onKey = (e: KeyboardEvent) => {
     if (e.key === "Escape") {
       e.preventDefault();
-      close(false);
+      close("cancel");
     }
   };
 
@@ -62,7 +71,7 @@ export default function ConfirmHost() {
         queueMicrotask(() => confirmBtn?.focus());
         return (
           <Portal>
-            <div class="sheet-backdrop" onClick={() => close(false)} />
+            <div class="sheet-backdrop" onClick={() => close("cancel")} />
             <div
               class="sheet"
               role="alertdialog"
@@ -80,11 +89,16 @@ export default function ConfirmHost() {
                   ref={confirmBtn}
                   type="button"
                   classList={{ "is-danger": p().tone === "danger" }}
-                  onClick={() => close(true)}
+                  onClick={() => close("confirm")}
                 >
                   {p().confirmLabel ?? "OK"}
                 </button>
-                <button type="button" class="quiet" onClick={() => close(false)}>
+                <Show when={p().altLabel}>
+                  <button type="button" class="quiet" onClick={() => close("alt")}>
+                    {p().altLabel}
+                  </button>
+                </Show>
+                <button type="button" class="quiet" onClick={() => close("cancel")}>
                   {p().cancelLabel ?? "Cancel"}
                 </button>
               </div>

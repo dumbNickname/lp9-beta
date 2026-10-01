@@ -120,9 +120,12 @@ describe("CouponCard", () => {
     expect(getByText("Breakfast in bed")).toBeInTheDocument();
     setPrivateMode(true);
     expect(queryByText("Breakfast in bed")).toBeNull();
-    expect(getByText(/hidden coupon/i)).toBeInTheDocument();
-    fireEvent.click(getByRole("button", { name: "Unmark" }));
+    // Tap the veil -> "Turn private mode off" (window.confirm fallback = cancel
+    // path here, so drive the choice through setPrivateMode instead).
+    expect(getByRole("button", { name: /hidden coupon/i })).toBeInTheDocument();
+    setPrivateMode(false);
     expect(getByText("Breakfast in bed")).toBeInTheDocument();
+    fireEvent.click(getByRole("button", { name: "Unmark private" }));
     expect(JSON.parse(localStorage.getItem("private_coupons")!)).toEqual([]);
   });
 });

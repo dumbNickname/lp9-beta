@@ -886,14 +886,24 @@ cryptographic protection — it's a UI veil.
   natively.
 
 #### 15c. Toggle behavior
-- **Default ON at every app launch.** Private mode resets to "on" each
-  time the app opens. Sticky-off would defeat the threat model
-  (someone glances at the phone you just unlocked).
-- **In-session persistence:** within a single session the toggle is
-  sticky — turning it off stays off until close/reload.
-- **No PIN, no biometric, no auto-re-hide timer in MVP.** Simple eye-icon
-  toggle in the app header. Can layer stricter protections later if
-  users ask.
+- ~~**Default ON at every app launch.** Private mode resets to "on" each
+  time the app opens.~~ ~~**In-session persistence:** within a single
+  session the toggle is sticky.~~
+- **Amended 2026-10-01 (owner):** **OFF by default**; once a user turns
+  it on it is **remembered on this device** (localStorage
+  `privacy_mode`) until turned off. Always-on-at-launch felt odd and
+  hid every note on every open.
+- **One switch:** a single eye button in the app bar (also mirrored in
+  Settings). No other private-mode toggles on screen.
+- **Tap to reveal:** while on, a veiled note/wish is a tappable
+  placeholder. Tapping asks: "Show this one" (that item only, in memory
+  until reload or until the mode is switched on again) / "Turn private
+  mode off" / "Keep hidden".
+- **Discoverability:** a one-time coachmark under the eye appears once
+  there are notes with text ("Tap the eye to veil your notes"); using
+  the eye or "Got it" dismisses it for good on this device.
+- **No PIN, no biometric, no auto-re-hide timer in MVP.** Can layer
+  stricter protections later if users ask.
 
 #### 15d. UI for hidden items
 - **Hidden coupons:** shown as a **locked placeholder row** with explicit

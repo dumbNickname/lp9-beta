@@ -1,23 +1,34 @@
-import { Show } from "solid-js";
-import { privateMode, togglePrivateMode } from "~/lib/privacy";
+import { choiceSheet } from "~/components/ConfirmSheet";
+import { EyeIcon } from "~/components/Icons";
+import { privateMode, reveal, setPrivateMode, togglePrivateMode } from "~/lib/privacy";
 
+// The one private-mode switch: an eye in the app bar (DESIGN §15 amended).
 export default function PrivacyToggle() {
   return (
     <button
       type="button"
-      class="privacy-toggle quiet small"
+      class="privacy-toggle"
+      classList={{ "is-on": privateMode() }}
       aria-pressed={privateMode()}
-      title={privateMode() ? "Comments hidden. Tap to show." : "Comments visible. Tap to hide."}
+      aria-label={privateMode() ? "Private mode on. Tap to turn off" : "Private mode off. Tap to turn on"}
+      title={privateMode() ? "Private mode on" : "Private mode off"}
       onClick={() => togglePrivateMode()}
     >
-      <svg viewBox="0 0 24 24" aria-hidden="true" class="privacy-icon">
-        <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z" />
-        <circle cx="12" cy="12" r="3" />
-        <Show when={privateMode()}>
-          <path d="M3 3l18 18" />
-        </Show>
-      </svg>
-      <span>{privateMode() ? "Private mode on" : "Private mode off"}</span>
+      <EyeIcon closed={privateMode()} />
+      <span class="privacy-toggle-label">{privateMode() ? "Private" : ""}</span>
     </button>
   );
+}
+
+// Tapping a veiled item: show just this one, or switch the mode off.
+export async function askReveal(id: string, what = "note"): Promise<void> {
+  const choice = await choiceSheet({
+    title: `Show this ${what}?`,
+    body: "Private mode is on. This shows just this one until you close the app.",
+    confirmLabel: "Show this one",
+    altLabel: "Turn private mode off",
+    cancelLabel: "Keep hidden",
+  });
+  if (choice === "confirm") reveal(id);
+  if (choice === "alt") setPrivateMode(false);
 }

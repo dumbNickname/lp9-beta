@@ -44,3 +44,32 @@ Decisions:
   confirm step automatically.
 - Both sides get a full-screen "paired" moment (two avatars meeting in
   a heart) before the dashboard; the recovery prompt comes after it.
+
+Verified: local build + Playwright, three anon users. Joiner via link sees
+"Alice is waiting for you" -> "Join Alice" -> paired moment on both
+devices; already-paired user opening a second invite lands on
+"Join Cara?" inside the new-pair flow; half-typed note survives a focus
+refresh.
+
+## T2 — Privacy mode
+
+Review findings: three toggles (app bar menu, above the feed, Settings);
+ON at every launch so every open showed only placeholders; "Hidden
+coupon — turn off private mode to view" sent people hunting for the
+switch; the hidden-coupon row offered "Unmark", which un-privates the
+coupon permanently rather than peeking.
+
+Decisions (owner direction + agent choices):
+- OFF by default, remembered per device once on (`privacy_mode`).
+- One eye button in the app bar (label "Private" only on wide screens;
+  icon-only on phones to keep room for the partner name). Settings keeps
+  a mirror row. Removed the feed and menu toggles.
+- Veiled items are tappable placeholders (lock + two blurred lines; wish
+  veil keeps the price stub so the list still makes sense). Tap ->
+  sheet: "Show this one" / "Turn private mode off" / "Keep hidden".
+  Reveal is per item, in memory; turning the mode on again re-veils all.
+- Discoverability: one-time dark coachmark under the eye once there are
+  notes with text. Agent choice over a features page: it appears at the
+  moment it's relevant; a features page is covered by the in-app guide
+  (T5).
+- `ConfirmSheet` gained `choiceSheet()` (3-way) for this.

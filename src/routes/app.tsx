@@ -11,6 +11,7 @@ import {
   addingPartner,
   justPaired,
   relationship,
+  relationships,
   relationshipLoading,
   refreshRelationship,
   setAddingPartner,
@@ -119,10 +120,12 @@ export default function AppShell() {
                     onSkip={() => dismissRecovery(relationship()!.id)}
                   />
                 </Show>
+                {/* Keyed by id, not object: refreshes return new objects and
+                    must not remount the dashboard (lost drafts/scroll). */}
                 <Show when={relationship()?.id} keyed>
-                  {() => (
+                  {(id: string) => (
                     <Dashboard
-                      relationship={relationship()!}
+                      relationship={relationships().find((r) => r.id === id) ?? relationship()!}
                       userId={user()!.id}
                       displayName={profile()!.display_name!}
                     />

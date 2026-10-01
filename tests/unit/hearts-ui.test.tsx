@@ -185,12 +185,29 @@ describe("HeartNote", () => {
   it("private mode hides the comment but keeps hearts", async () => {
     (await import("~/lib/privacy")).setPrivateMode(true);
     const HeartNote = (await import("~/components/HeartNote")).default;
-    const { queryByText, getByText, getByRole } = render(() => (
+    const { queryByText, getByRole } = render(() => (
       <HeartNote {...noteProps} item={item()} mine={false} />
     ));
     expect(queryByText("you are lovely")).toBeNull();
-    expect(getByText(/hidden — private mode/i)).toBeInTheDocument();
+    expect(getByRole("button", { name: /hidden — private mode/i })).toBeInTheDocument();
     expect(getByRole("img", { name: "4 hearts" })).toBeInTheDocument();
+  });
+
+  it("tapping a veiled note asks; 'Show this one' reveals only that note", async () => {
+    const privacy = await import("~/lib/privacy");
+    privacy.setPrivateMode(true);
+    vi.spyOn(window, "confirm").mockReturnValue(true);
+    const HeartNote = (await import("~/components/HeartNote")).default;
+    const { findByText, getByRole } = render(() => (
+      <HeartNote {...noteProps} item={item()} mine={false} />
+    ));
+    fireEvent.click(getByRole("button", { name: /hidden — private mode/i }));
+    expect(await findByText("you are lovely")).toBeInTheDocument();
+    expect(privacy.privateMode()).toBe(true);
+    // Turning the mode on again re-veils everything.
+    privacy.setPrivateMode(false);
+    privacy.setPrivateMode(true);
+    expect(privacy.isVeiled(item().id)).toBe(true);
   });
 });
 
@@ -204,6 +221,16 @@ describe("PrivacyToggle", () => {
     expect(btn).toHaveAttribute("aria-pressed", "true");
     fireEvent.click(btn);
     expect(btn).toHaveAttribute("aria-pressed", "false");
-    expect(btn).toHaveTextContent(/off/i);
+    expect(btn).toHaveAccessibleName(/off/i);
+    expect(localStorage.getItem("privacy_mode")).toBeNull();
+    fireEvent.click(btn);
+    expect(localStorage.getItem("privacy_mode")).toBe("on");
+  });
+
+  it("is off by default on a fresh device", async () => {
+    localStorage.clear();
+    vi.resetModules();
+    const { privateMode } = await import("~/lib/privacy");
+    expect(privateMode()).toBe(false);
   });
 });

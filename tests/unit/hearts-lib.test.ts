@@ -89,11 +89,11 @@ describe("format/date", () => {
 });
 
 describe("privacy mode", () => {
-  it("defaults ON and toggles", () => {
-    expect(privateMode()).toBe(true);
-    togglePrivateMode();
+  it("defaults OFF (DESIGN §15c amended) and toggles", () => {
     expect(privateMode()).toBe(false);
-    setPrivateMode(true);
+    togglePrivateMode();
     expect(privateMode()).toBe(true);
+    setPrivateMode(false);
+    expect(privateMode()).toBe(false);
   });
 });
