@@ -4,6 +4,7 @@ import ForPartner from "~/components/ForPartner";
 import HeartComposer from "~/components/HeartComposer";
 import HeartsFeed from "~/components/HeartsFeed";
 import MyWishes from "~/components/MyWishes";
+import NoteJar from "~/components/NoteJar";
 import PairBadge from "~/components/PairBadge";
 import RecoveryPassword from "~/components/RecoveryPassword";
 import SettingsPage from "~/components/SettingsPage";
@@ -230,6 +231,9 @@ export default function Dashboard(props: Props) {
             />
           </div>
           <div class="world-side">
+            <Show when={feed().some((f) => f.giver_id !== props.userId && !!f.comment)}>
+              <NoteJar feed={feed()} userId={props.userId} partnerName={partnerName()} />
+            </Show>
             <HeartsFeed
               relationshipId={props.relationship.id}
               userId={props.userId}

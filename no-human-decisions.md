@@ -9,6 +9,36 @@
 > ratified or changed, move the rationale into `DESIGN.md`/the PRD and
 > trim the entry here.
 
+## Design/UX session 2026-10-01 (see `WORKLOG.md`)
+
+### D-UX.1 Invite link: "Join Alice" on onboarding pairs in one tap
+- **Why:** the joiner already saw who invited them and pressed a button
+  naming them; a second "Join Alice?" confirm felt like a loop.
+- **Alternative:** always show the confirm step (old D-25.1 literal).
+
+### D-UX.2 Already-paired user opening an invite -> new-pair flow
+- **Why:** the link was silently ignored before. Now it opens "New
+  pair" on the confirm step; nothing redeems without a tap.
+
+### D-UX.3 Privacy discoverability via a one-time coachmark, not a features page
+- **Why:** shows at the moment it matters (first notes with text); the
+  in-app "How it works" guide covers the rest. Owner suggested a
+  features page as one option.
+
+### D-UX.4 Per-item reveal lasts until reload or until the mode is turned on again
+- **Why:** simplest mental model; no timers (§15c still says no
+  auto-re-hide timer).
+
+### D-UX.5 Gadget = memory jar (partner notes, tap for a random one)
+- **Why:** resurfaces appreciation (core product goal), uses existing
+  data, no numbers or comparison. Visual cap of 14 hearts so it never
+  reads as a count. Rejected: weekly ring (risk of streak feel), daily
+  prompt (already rotating placeholders).
+
+### D-UX.6 Onboarding archetype as chips; default "New together"
+- **Why:** visual, one tap; same values as before. Hidden when joining
+  via a link (inviter's archetype applies).
+
 ## Phase 4 — Wishlists (PRD-35..39)
 
 Owner-ratified: receiver adds, giver approves; price 1–50;

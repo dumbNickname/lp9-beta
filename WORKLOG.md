@@ -117,3 +117,33 @@ Layout audit (Playwright, 360px + 1280px, light + dark): no horizontal
 overflow, nothing off-screen, no tap target < 30px, all text >= 4.5:1.
 Caught + fixed: the privacy coachmark covered the ⋯ menu and the Back
 button -> now only on the Give world with no menu open.
+
+## T6 — Gadget: memory jar
+
+Picked the jar (see `no-human-decisions.md` D-UX.5). In the Give world
+side column, once there is at least one note from your partner with
+text: an SVG jar holding a heart per note (rose / amber / sage, capped
+at 14, so it shows "fuller over time" but never a count), hearts drop
+in on load. Tap -> jar wobbles and a random past note comes out
+("Another" for the next one). Respects private mode (veil + reveal ask).
+
+Caught in E2E: the coachmark (absolute-positioned) covered the heart
+picker. It now sits in the normal flow under the app bar and pushes
+content down; its arrow lines up with the eye (checked at 360 + 1280).
+
+## For the owner to look at (agent can't view images)
+
+- Paired moment on both phones (avatars slide in, heart pops).
+- Onboarding via an invite link ("Alice is waiting for you").
+- Send hearts: heart burst from the button.
+- Memory jar on Give once a partner note exists; tap it.
+- ⋯ -> How it works.
+- Eye in the app bar; with private mode on, tap a veiled note.
+- Dark theme on each of the above.
+
+## Left for later (not done in this session)
+
+- QA agent pass on these changes (`tests/qa/`).
+- PRD-54 security fix (still top of `NEXT_SESSION.md`).
+- `global.css` dedupe (REVIEW #13); this session appended new blocks
+  at the end, grouped by feature.

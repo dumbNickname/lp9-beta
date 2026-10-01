@@ -49,8 +49,10 @@ the client/server entry points. Public pages are statically generated;
     must keep text >= 4.5:1 in both themes. Serif
     display + serif italic for heart comments. Sans for UI chrome. Pill
     buttons (`.quiet`, `.small`, `.link-button`, `.button` for anchors).
-    `.card` surfaces. Custom SVG hearts (`HeartIcon`), never emoji. No
-    confetti/streaks/progress bars/big numbers. All motion is off under
+    `.card` surfaces. Custom SVG hearts (`HeartIcon`) and line icons
+    (`Icons.tsx`), never emoji glyphs for UI. No streaks/progress
+    bars/big numbers/scores. Tasteful motion is OK (owner 2026-10-01):
+    send heart burst, paired moment, jar drop. All motion is off under
     `prefers-reduced-motion`. The brand designer revises once the name
     is locked (§14e).
 - **CSS uses logical properties only** (`margin-inline`, `padding-block`,
@@ -88,9 +90,20 @@ the client/server entry points. Public pages are statically generated;
   throws without a key, so it can never send plaintext.
   `decryptComment` returns null on failure. Everything else is
   plaintext (§12a).
-- **Privacy mode (`src/lib/privacy.ts`)**: in-memory signal, ON at
-  every load (§15c). Any component showing comment text must check
-  `privateMode()`.
+- **Privacy mode (`src/lib/privacy.ts`)**: OFF by default, remembered
+  per device (`privacy_mode`) (§15c amended). One switch: the eye in
+  `AppBar` (`PrivacyToggle`; Settings mirrors it). Components showing
+  comment text or private wishes check `isVeiled(id)` and render a
+  tappable veil that calls `askReveal(id)` (3-way `choiceSheet`).
+- **Invite links (`src/lib/pairing/pendingJoin.ts`)**: `#pair=` is
+  captured once at shell mount into an in-memory signal and stripped
+  from the URL; `PairFlow` and `Onboarding` read it from there. Never
+  persist it (carries the AES key). Store `*Loading` flags gate only
+  the first load (later refreshes update in place); Dashboard is keyed
+  by relationship **id**. Breaking either remounts the shell and loses
+  the invite / drafts.
+- **Paired moment**: `onNewRelationship()` sets `justPaired`; the
+  shell shows `PairedMoment` (full-screen) before the recovery prompt.
 - **Coupons**: `lib/data/coupons.ts` (RPC wrappers, `PRICE_MIN/MAX`),
   `lib/stores/coupons.ts` (mutate-then-refetch), `components/Coupon*`
   + `TemplatePicker`. Templates live in `src/data/coupon-templates.ts`
@@ -112,19 +125,24 @@ the client/server entry points. Public pages are statically generated;
   link, pair switcher, balance pill, ⋯ menu) + `TabBar` with three
   **worlds**: Give (composer + notes), My wishes (`MyWishes`), For
   partner (`ForPartner`). Hash-synced (`#mine`, `#theirs`; legacy
-  `#coupons`), plus `#settings` = `SettingsPage` (You / Pairs / This
-  device / About), opened from the ⋯ menu. World colours: `--world-*` tokens, set per world via
+  `#coupons`), plus pages `#settings` = `SettingsPage` (You / Pairs /
+  This device / About) and `#guide` = `GuidePage` (visual how-it-works),
+  both opened from the ⋯ menu (`readPage()` in `TabBar.tsx`). The Give
+  world side column has `NoteJar` (memory jar of partner notes).
+  World colours: `--world-*` tokens, set per world via
   `--w`/`--w-soft` on `.world--*`; sections use `Section.tsx` (sticky
   tinted header). The site header is hidden on `/app`. `routes/app.tsx`
   only gates (session → profile → relationship).
 
 - **Z-index scale**: section heads 5, site header 10, tabbar 25,
-  appbar (+ its popovers) 40, confirm sheet 50/51. Popovers inherit
+  appbar (+ its popovers) 40, confirm sheet 50/51, paired moment 60.
+  Coachmarks sit in flow (never overlay controls). Popovers inherit
   their parent's stacking context, so raise the container, not the
   popover.
 - **Confirms**: use `confirmSheet()` from `components/ConfirmSheet.tsx`,
   never `window.confirm` (host is mounted in `routes/app.tsx`).
 - **Device-local markers** (localStorage): `private_coupons`,
+  `privacy_mode`, `privacy_hint_seen`,
   `active_relationship`, `last_seen:<rel>`, `recovery_prompted:<rel>`,
   `pair_invite_pending`, `archetype_hint`. Any new key must be added to
   `resetAccount()` in `lib/session.ts`.

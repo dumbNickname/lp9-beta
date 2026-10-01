@@ -22,6 +22,12 @@
 - Status per PRD: `PROGRESS.md`. Most PRDs from 28 on are `dev-done`
   (no separate QA pass yet); SQL PRDs 27/35/41 are merged + live-smoked.
 
+- **Design/UX pass** (invite-link fix, privacy mode rework, visual
+  onboarding/pairing, paired moment, heart burst, How it works guide,
+  memory jar): decisions in `WORKLOG.md`; autonomous choices in
+  `no-human-decisions.md` (D-UX.*). Owner should eyeball the list at
+  the bottom of `WORKLOG.md`.
+
 ## Start here (in order)
 
 1. **Security fix — PRD-54 (`REVIEW.md` #1, HIGH):** members can directly

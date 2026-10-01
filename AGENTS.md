@@ -104,6 +104,8 @@ placeholder. See `DESIGN.md` §14i.
   decisions; promote an item to a PRD before building it.
 - `REVIEW.md` — latest technical + UX review findings (ranked). Fix via
   PRDs; strike items when done.
+- `WORKLOG.md` — log of autonomous work sessions (owner brief, findings,
+  decisions per task, what to eyeball). Append per session.
 - `LICENSE` (AGPL-3.0-or-later), `TRADEMARK.md` — legal.
 - `docs/push-setup.md` — owner's one-time push notification setup.
 
@@ -141,7 +143,8 @@ files add operational contracts; they do not replace `DESIGN.md`.
   run a Playwright E2E with two (or three) anon browser contexts
   against the deployed URL. It caught real bugs unit tests missed
   (hydration nav state, `<base href>` hash URLs, z-index, overflow).
-- **Owner reviews by looking at the UI; the agent can't view images.**
+- **Owner reviews by looking at the UI; the agent can't view images**
+  (screenshot reads fail: no image input).
   Assert layout via DOM/computed styles (bounding boxes, contrast
   maths, `elementFromPoint` for layering) and tell the owner what to
   eyeball.
@@ -253,6 +256,12 @@ files add operational contracts; they do not replace `DESIGN.md`.
 - **`public/` is copied as-is to the site root under BASE_PATH**
   (manifest, icons, `sw.js`). Use relative URLs in the manifest so the
   GH Pages sub-path works.
+- **Playwright E2E helpers** live in `/tmp/opencode/pw/` (`lib.mjs`:
+  `pair()` makes two paired anon users; `audit.mjs`: overflow, off-screen,
+  tap-target and 4.5:1 contrast audit). Gone after a restart; recreate.
+  `/tmp/opencode/build.sh` = rm .output + build + post-build + copy to
+  the local server dir. Overlays/coachmarks: audit with real clicks;
+  `elementFromPoint` misses "covers the next control" bugs.
 - **Rewriting pushed history:** only with the owner's explicit OK, and
   with `git push --force-with-lease=master:<expected-sha>`.
 

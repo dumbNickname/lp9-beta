@@ -2970,10 +2970,9 @@ button.privacy-toggle.is-on {
 }
 
 .privacy-hint {
-  position: absolute;
-  inset-inline-end: var(--space-4);
-  inset-block-start: calc(100% + 0.4rem);
-  z-index: 41;
+  position: relative;
+  margin-block: 0.6rem 0.1rem;
+  margin-inline-start: auto;
   display: flex;
   align-items: center;
   gap: var(--space-2);
@@ -2992,7 +2991,7 @@ button.privacy-toggle.is-on {
   content: "";
   position: absolute;
   inset-block-start: -0.35rem;
-  inset-inline-end: 3.6rem;
+  inset-inline-end: 3.75rem;
   inline-size: 0.7rem;
   block-size: 0.7rem;
   background-color: var(--color-fg);
@@ -3468,4 +3467,148 @@ button.composer-send {
 
 .guide-demo-price .heart-icon {
   color: var(--color-heart);
+}
+
+/* --- Memory jar (gadget) ----------------------------------------------- */
+
+.jar-wrap {
+  display: grid;
+  grid-template-columns: 7.5rem minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-3);
+  margin-block: var(--space-4) var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(80% 90% at 15% 60%, var(--world-give-soft), transparent 70%),
+    var(--color-surface);
+  border: var(--border-thin);
+  box-shadow: var(--shadow-soft);
+}
+
+button.jar {
+  position: relative;
+  display: block;
+  inline-size: 7.5rem;
+  block-size: 9rem;
+  padding: 0;
+  min-block-size: 0;
+  background: none;
+  border: 0;
+  border-radius: var(--radius);
+  color: var(--color-fg);
+}
+
+button.jar:hover {
+  opacity: 1;
+}
+
+button.jar:hover .jar-glass,
+button.jar:focus-visible .jar-glass {
+  transform: rotate(-3deg);
+}
+
+button.jar:disabled {
+  opacity: 1;
+}
+
+.jar-glass {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  transition: transform 200ms var(--ease);
+  transform-origin: 50% 90%;
+}
+
+.jar-body {
+  fill: color-mix(in srgb, var(--color-surface) 55%, transparent);
+  stroke: var(--color-muted-fg);
+  stroke-width: 2.2;
+  stroke-linejoin: round;
+}
+
+.jar-lid {
+  fill: var(--world-mine-soft);
+  stroke: var(--world-mine);
+  stroke-width: 2;
+}
+
+.jar-shine {
+  fill: none;
+  stroke: var(--color-surface);
+  stroke-width: 3;
+  stroke-linecap: round;
+  opacity: 0.9;
+}
+
+.jar-hearts {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.jar-heart {
+  position: absolute;
+  font-size: 1.15rem;
+  translate: -50% -50%;
+  transform: rotate(var(--r)) scale(var(--s));
+  animation: jar-drop 600ms var(--ease) var(--d) both;
+}
+
+.jar-heart--give { color: var(--world-give); }
+.jar-heart--mine { color: var(--world-mine); }
+.jar-heart--theirs { color: var(--world-theirs); }
+
+.jar--shake0 .jar-hearts,
+.jar--shake0 .jar-glass {
+  animation: jar-shake-a 500ms var(--ease);
+}
+
+.jar--shake1 .jar-hearts,
+.jar--shake1 .jar-glass {
+  animation: jar-shake-b 500ms var(--ease);
+}
+
+@keyframes jar-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-3rem) rotate(var(--r)) scale(var(--s));
+  }
+}
+
+@keyframes jar-shake-a {
+  25% { transform: rotate(-7deg); }
+  60% { transform: rotate(5deg); }
+}
+
+@keyframes jar-shake-b {
+  25% { transform: rotate(7deg); }
+  60% { transform: rotate(-5deg); }
+}
+
+.jar-caption {
+  margin: 0;
+  font-size: var(--text-sm);
+}
+
+.jar-caption strong {
+  color: var(--color-fg);
+}
+
+.jar-note {
+  margin: 0;
+  animation: fade-up 320ms var(--ease);
+}
+
+.jar-note .note-text {
+  font-size: var(--text-md);
+  margin-block-end: var(--space-1);
+}
+
+.jar-note-meta {
+  display: flex;
+  gap: var(--space-3);
+  font-size: var(--text-xs);
+  color: var(--color-muted-fg);
 }
