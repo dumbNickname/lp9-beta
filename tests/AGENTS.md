@@ -27,6 +27,13 @@ prove the edge cases the implementer wasn't thinking about.
 
 ## Work Guidance
 
+- When a UI change is intentional (renamed button, select -> chips),
+  update the old test to the new contract in the same commit, and add a
+  regression test for every bug found in E2E (e.g.
+  `tests/unit/invite-link-flow.test.ts`, `pending-invite.test.ts`).
+- IndexedDB returns structured clones: compare `CryptoKey`s by
+  round-tripping an encrypt/decrypt, not `toBe`.
+
 - Test the contract from `DESIGN.md`, not the implementation's incidental
   choices — QA starts cold from the PRD (`DESIGN.md` §16c).
 

@@ -165,6 +165,12 @@ the client/server entry points. Public pages are statically generated;
 - **CSS:** `global.css` is append-grown. Before adding a selector, grep
   for an existing one and edit it instead (duplicates exist, see
   `REVIEW.md` #13). New world-aware styles use `--w` / `--w-soft`.
+- **Coachmarks/hints sit in the normal flow**, never `position:
+  absolute` over content: an overlay hint covered the ⋯ menu, Back and
+  the heart picker. Show them only where relevant (one world, no menu
+  open) and dismiss on first use.
+- **Sticky offsets use `--appbar-h`**, never a hard-coded bar height
+  (the bar is 2 rows on mobile).
 - **Mobile first, then check 360px + 1280px** for overflow (`min-inline-
   size: 0`, `minmax(0, 1fr)` in grids) and fixed/sticky layering.
 - **Desktop may pre-open forms** (e.g. "Add a wish") to use the space;

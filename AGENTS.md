@@ -262,6 +262,19 @@ files add operational contracts; they do not replace `DESIGN.md`.
   `/tmp/opencode/build.sh` = rm .output + build + post-build + copy to
   the local server dir. Overlays/coachmarks: audit with real clicks;
   `elementFromPoint` misses "covers the next control" bugs.
+- **Background tabs freeze timers.** Never rely on a `setInterval` poll
+  alone to finish a cross-device handshake (pairing): the inviter is
+  usually in a chat app while the partner joins. Also finish it from
+  the focus/visibility refresh path (see `src/AGENTS.md` inviter key
+  handoff). E2E: simulate by stubbing `window.setInterval` before the
+  action, then dispatch `visibilitychange` + `focus`.
+- **A gate that unmounts on "loading" loses state.** `<Show>` gates on
+  `*Loading` flags remount whole subtrees on every refresh; one-shot
+  inputs (URL fragments, half-typed text) are lost. Gate on first load
+  only, and key remounts by stable ids, not refetched objects.
+- **Typecheck before every push.** Vitest does not typecheck; a TS error
+  passed all tests locally and failed CI (deploy skipped). Run
+  `pnpm typecheck && pnpm lint && pnpm test` before each commit.
 - **Rewriting pushed history:** only with the owner's explicit OK, and
   with `git push --force-with-lease=master:<expected-sha>`.
 
@@ -279,8 +292,10 @@ files add operational contracts; they do not replace `DESIGN.md`.
 - Record things learned on the go in the DOX docs (this framework).
 - **Write files in small chunks.** The opencode write tool can fail on
   big files. Prefer targeted edits or appends; split large new files.
-- **Don't `pkill -f vinxi` from the same shell command** as other work:
-  the pattern matches the shell's own command line and kills it.
+- **Don't `pkill -f vinxi` (or `pkill -f build.sh`) from the same shell
+  command** as other work: the pattern matches the shell's own command
+  line and kills it (the tool call then hangs to timeout). Check with
+  `pgrep -fa` in a separate call first.
 
 ## Verification
 
