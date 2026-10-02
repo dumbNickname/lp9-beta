@@ -81,238 +81,136 @@ Default section order:
 # Project
 
 Couples appreciation web app. Partners give each other **hearts** with a
-short encrypted comment; hearts become a spendable balance redeemable
-against mutually-approved **coupons**. Product principle: train people
-to notice and verbalize appreciation — nothing should feel transactional
-or like a scoreboard.
+short encrypted note; hearts become a balance spent on mutually-approved
+**wishes** (coupons). Principle: train people to notice and say
+appreciation; nothing transactional, no scoreboard.
 
-The product name is not chosen yet; code uses the `APP_NAME` constant
-(`src/constants.ts`) and the repo/`BASE_PATH` use the `lp9-beta`
-placeholder. See `DESIGN.md` §14i.
+The product name is not chosen yet (placeholder `APP_NAME`, repo and
+sub-path `lp9-beta`; `DESIGN.md` §14i).
 
 ## Source-of-truth docs
 
-- `DESIGN.md` — every locked design decision (the *why*). Authoritative.
-- `HANDOFF.md` — historical phased roadmap (Phase 0–10). Where it
-  disagrees with `DESIGN.md` or `PROGRESS.md`, those win.
-- `PROGRESS.md` — single source of truth for PRD status.
-- `NEXT_SESSION.md` — orientation for resuming work.
-- `prds/PRD-NN-*.md` — one tiny PRD per behavior; the executable unit.
-- `no-human-decisions.md` — review queue of decisions agents made
-  autonomously (momentum mode) that a human may want to revisit.
-- `IDEAS.md` — backlog of ideas, tech debt and owner actions. Not
-  decisions; promote an item to a PRD before building it.
-- `REVIEW.md` — latest technical + UX review findings (ranked). Fix via
-  PRDs; strike items when done.
-- `WORKLOG.md` — log of autonomous work sessions (owner brief, findings,
-  decisions per task, what to eyeball). Append per session.
-- `LICENSE` (AGPL-3.0-or-later), `TRADEMARK.md` — legal.
-- `docs/push-setup.md` — owner's one-time push notification setup.
+- `DESIGN.md` — locked decisions and the why. Authoritative.
+- `PROGRESS.md` — PRD status. `prds/` — one small PRD per behaviour.
+- `NEXT_SESSION.md` — where to resume.
+- `WORKLOG.md` — autonomous sessions: brief, findings, decisions, what
+  the owner should look at.
+- `no-human-decisions.md` — agent choices awaiting owner review.
+- `IDEAS.md` — backlog; promote to a PRD before building.
+- `REVIEW.md` — ranked review findings.
+- `HANDOFF.md` — historical roadmap; loses to DESIGN/PROGRESS.
+- `docs/` — owner setup guides. `LICENSE` (AGPL-3.0+), `TRADEMARK.md`.
 
-These predate DOX and remain authoritative for their content. AGENTS.md
-files add operational contracts; they do not replace `DESIGN.md`.
+AGENTS.md files hold operating rules; they do not replace `DESIGN.md`.
+Docs describe ideas, contracts and where things live, not code lines.
 
 ## Tech stack (locked)
 
-- SolidJS + SolidStart + Vinxi, TypeScript strict, pnpm.
-- Static SSG for public pages; SPA for `/app/*`. Hosted on GitHub Pages
-  with `BASE_PATH` sub-path handling.
-- Supabase (Postgres + Auth + RLS), EU region `eu-central-1` (Frankfurt).
-- Vitest + `@solidjs/testing-library` for tests; ESLint 9 flat config.
+- SolidJS + SolidStart (Vinxi), strict TypeScript, pnpm.
+- Static pages + SPA `/app` on GitHub Pages under a sub-path.
+- Supabase (Postgres, anonymous auth, RLS, Edge Functions), EU
+  Frankfurt.
+- Vitest + Solid testing library; ESLint flat config.
 
 ## Global workflow rules
 
-- **One PRD at a time.** Read the PRD + `DESIGN.md` + `PROGRESS.md`
-  before touching code. On PRD ambiguity, stop and load `grill-me`.
-- **Feature branches + squash merges to `master`.** Branch name
-  `feat/PRD-NN-slug` or `fix/slug`. Never push to `master` directly once
-  branch protection is on. Keep the branch stack linear; merge stable
-  work promptly, don't accumulate open PRs.
-- **Update `PROGRESS.md`** as PRDs move `todo → in-progress → dev-done →
-  qa-done → merged`. Append `## Dev notes` to a PRD on completion.
-- **Secrets never enter the repo.** `.env` is gitignored; a gitleaks
-  pre-commit hook blocks leaks. Only `VITE_`-prefixed public values ship
-  in the browser bundle. See `DESIGN.md` §16g.
-- **Schema changes only via `supabase/migrations/`** — never click-ops.
-- **No emojis in code/files** unless the user asks. (Coupon template
-  emoji in `src/data/coupon-templates.ts` are product content, allowed.)
-- **Solo-owner practice (current):** the owner works alone, so small
-  PRDs are committed straight to `master` and pushed (CI gates deploy).
-  Switch to branches + PRs once branch protection is on.
-- **Verify on the live site, not just unit tests.** After each deploy,
-  run a Playwright E2E with two (or three) anon browser contexts
-  against the deployed URL. It caught real bugs unit tests missed
-  (hydration nav state, `<base href>` hash URLs, z-index, overflow).
-- **Owner reviews by looking at the UI; the agent can't view images**
-  (screenshot reads fail: no image input).
-  Assert layout via DOM/computed styles (bounding boxes, contrast
-  maths, `elementFromPoint` for layering) and tell the owner what to
-  eyeball.
-- **Record owner decisions where they belong:** product rules as dated
-  amendments in `DESIGN.md` (strike old text); autonomous choices in
-  `no-human-decisions.md`; ideas in `IDEAS.md`; review findings in
-  `REVIEW.md`. Keep other docs free of dates and history.
+- One PRD at a time; read it with `DESIGN.md` and `PROGRESS.md`. On
+  ambiguity, ask (grill-me) instead of guessing.
+- Solo-owner practice: small changes go straight to `master` and are
+  pushed; CI gates the deploy. Switch to branches + PRs once branch
+  protection is on.
+- Before every commit: typecheck, lint, test. Tests do not typecheck;
+  a type error once passed tests and silently skipped a deploy.
+- Secrets never enter the repo; only public `VITE_` values reach the
+  browser (§16g). Schema changes only via migrations.
+- No emojis in code/docs (wish templates are product content).
+- Verify on the live site after each deploy with a browser E2E using
+  two or three anonymous users; it catches what unit tests miss.
+- The agent cannot view images: assert layout via DOM and computed
+  styles (boxes, contrast, real clicks for overlays) and tell the owner
+  what to look at.
+- Record decisions where they belong: product rules as dated
+  amendments in `DESIGN.md`; agent choices in `no-human-decisions.md`;
+  ideas in `IDEAS.md`; session story in `WORKLOG.md`. Other docs stay
+  undated.
+- Every bug found in E2E gets a regression test.
 
-## Environment gotchas (learned; keep current)
+## Product/engineering lessons (keep current)
 
-- **Node ≥ 22.13 required** — pnpm 11 refuses older Node (`node:sqlite`
-  builtin). CI (`.github/workflows/deploy.yml`) pins Node 22. Local dev
-  needs the same.
-- **pnpm supply-chain policies are active in this environment:**
-  - `minimumReleaseAge` (~14 days) blocks freshly-published packages.
-    Pin dependencies to mature versions; some are pinned exact in
-    `package.json` (`solid-js`, `vitest`) for this reason.
-  - `strictDepBuilds` makes un-approved native build scripts a hard
-    error. `pnpm-workspace.yaml` allows `esbuild` + `@parcel/watcher`;
-    esbuild MUST build or `vinxi build` fails.
-- **Supabase CLI ships as a shim** (`supabase`) that forwards to a
-  sibling `supabase-go` binary; both must be installed or `supabase
-  init` fails. `scripts/install-supabase-cli.sh` installs both.
-- **`git rebase --continue` opens `$EDITOR`** and hangs headless; run it
-  with `GIT_EDITOR=true`.
-- **`gitleaks protect` entropy filter:** low-entropy fake secrets (e.g.
-  `ghp_aaaa...`) do NOT trip rules. Use high-entropy strings in
-  adversarial tests. "0 commits scanned" on a staged scan is normal.
-- **Supabase API keys have new format (2026+):** Supabase now issues
-  `sb_publishable_...` keys (replaces legacy `eyJ...` JWT anon keys).
-  Both formats work with `@supabase/supabase-js` 2.x `createClient()`.
-  The publishable key uses the `anon` Postgres role, same RLS behavior.
-  Legacy JWT keys still work; Supabase calls them "Legacy anon,
-  service_role API keys" in the dashboard.
-- **Vitest 4.x has no `vi.importModule()`:** use `vi.resetModules()` +
-  dynamic `import()` in `beforeEach` to test modules that throw at load
-  time (e.g. env-var validation). `vi.stubEnv()` + `vi.unstubAllEnvs()`
-  work for `import.meta.env`.
-- **Vinxi prerender runs SSR bundle in a separate Node process** where
-  `VITE_*` env vars are NOT available (they're compile-time Vite
-  replacements, not runtime env). Any module imported during prerender
-  must not eagerly read `import.meta.env.VITE_*` at top level — use
-  lazy init (getter/proxy). `supabase.ts` uses this pattern.
-- **Git remote is `beta`, not `origin`.** Push with `git push beta master`.
-- **Gitleaks trips on `sb_publishable_*` test strings:** use low-entropy
-  fakes like `fake-key` in test stubs, not `sb_publishable_test123`.
-- **High-entropy test fixtures (e.g. base64 AES keys) trip
-  `generic-api-key`:** tests deliberately need high entropy (see
-  `tests/AGENTS.md`), so mark intentional fixtures with a trailing
-  `// gitleaks:allow` comment on the line rather than lowering entropy.
-- **PostgREST requires explicit `.eq()` filters** even when RLS
-  restricts to own rows. Without a filter, UPDATE/SELECT return 400 Bad
-  Request. Always add `.eq("id", user.id)` (or equivalent) on queries.
-- **jsdom test env has `crypto.subtle` (Node global) but NOT
-  `indexedDB`.** For IndexedDB tests, add `fake-indexeddb` dev dep and
-  import `fake-indexeddb/auto`; reset with a fresh `IDBFactory` per test.
-- **PostgREST serializes `bytea` as `\x`-prefixed hex** (Postgres default
-  `bytea_output = hex`). Convert with the `bytesToBytea`/`byteaToBytes`
-  helpers in `src/lib/data/relationship.ts`; pass the same `\x` hex text
-  as RPC `bytea` args. Verified against the live DB (write via
-  `set_recovery_password`, read back identical `\x` hex).
-- **Supabase free tier pauses after ~1 week idle.** Symptom: project
-  host fails DNS (`ENOTFOUND`). After owner restores: ~3 min of 502s,
-  then PostgREST schema cache may briefly report "Could not find the
-  table/function" — wait and retry before concluding migrations are
-  missing.
-- **Live smoke test:** a throwaway Node script using
-  `@supabase/supabase-js` + `.env` values with two anon clients can
-  exercise RPCs end-to-end (pair, recovery). Keep scripts out of the repo
-  (`/tmp/opencode/`) or delete after; they create real anon users.
-- **Run pnpm via nvm:** `source ~/.nvm/nvm.sh` first in each shell
-  (system node is 22.8, too old; nvm default is 24).
-- **Local E2E in a browser:** don't use `vinxi dev` (Vite re-optimizes
-  deps mid-run and reloads the page). Instead run `BASE_PATH=/lp9-beta/
-  pnpm build`, run `scripts/post-build.sh`, copy `.output/public` to
-  `/tmp/opencode/site/lp9-beta/`, and serve with `python3 -m
-  http.server` (start it with `setsid ... &`, or the tool call hangs).
-  Playwright: `playwright-core` in `/tmp/opencode/pw` + cached
-  `~/.cache/ms-playwright/chromium-1234`. Two browser contexts = two
-  anon partners. The agent model cannot view images, so assert via the
-  DOM / computed styles.
-- **`pnpm build` can exceed the 5-min tool timeout** when a stale vinxi
-  process lingers. Kill stray `vinxi` processes first, `rm -rf .output`
-  (otherwise a failed or killed build silently leaves the OLD bundle in
-  place), then run the build detached (`setsid nohup ... &`) with a log
-  and an `RC $?` marker line to poll for. Verify fresh output by
-  grepping the bundle for your new code.
+- **Background tabs freeze timers.** Cross-device handshakes (pairing)
+  must also complete on focus/refresh, not only on a poll.
+- **Unmounting on "loading" loses state.** Gate on first load only; key
+  remounts by stable ids, not refetched objects.
+- **Overlays that float over content block real use.** Hints sit in the
+  flow and appear only where relevant.
+- **One-shot URL inputs** (invite fragments) are captured once at app
+  start and held in memory.
+- **Postgres grants EXECUTE to PUBLIC** on new functions; revoke on
+  helpers. Prefer no write policies + definer RPCs.
+- **PostgREST** needs explicit filters even under RLS, and returns
+  `bytea` as `\x` hex.
 
-- **Subagents (task tool) time out on big scopes** ("Gateway
-  Time-out"). Give each one a narrow, ~10-minute task (one area, few
-  files); run several small ones instead of one broad review.
-- **Solid hydration quirk:** Solid skips attribute writes until the
-  first delegated event marks hydration done, so reactive attributes
-  on SSR'd nodes (e.g. router `<A>` `aria-current`) can go stale on the
-  first client navigation. Write such attributes in an effect
-  (`SiteNav.tsx`).
-- **Postgres grants EXECUTE on new functions to PUBLIC.** Every helper
-  function not meant as an API must get `revoke execute ... from
-  public, anon, authenticated` in the same migration. RLS policies with
-  no column limits (e.g. `for update using (member)`) allow editing
-  every column; prefer no write policies + SECURITY DEFINER RPCs.
-- **Supabase GitHub integration deploys Edge Functions** declared as
-  `[functions.<name>]` in `supabase/config.toml` (with "Deploy to
-  production" on); only migrations are applied otherwise. Function
-  secrets are set in the dashboard, never in the repo.
-- **Portal-rendered UI (sheets, dialogs) lives outside the
-  testing-library container:** query with `screen`, not the
-  render-scoped helpers.
-- **`public/` is copied as-is to the site root under BASE_PATH**
-  (manifest, icons, `sw.js`). Use relative URLs in the manifest so the
-  GH Pages sub-path works.
-- **Playwright E2E helpers** live in `/tmp/opencode/pw/` (`lib.mjs`:
-  `pair()` makes two paired anon users; `audit.mjs`: overflow, off-screen,
-  tap-target and 4.5:1 contrast audit). Gone after a restart; recreate.
-  `/tmp/opencode/build.sh` = rm .output + build + post-build + copy to
-  the local server dir. Overlays/coachmarks: audit with real clicks;
-  `elementFromPoint` misses "covers the next control" bugs.
-- **Background tabs freeze timers.** Never rely on a `setInterval` poll
-  alone to finish a cross-device handshake (pairing): the inviter is
-  usually in a chat app while the partner joins. Also finish it from
-  the focus/visibility refresh path (see `src/AGENTS.md` inviter key
-  handoff). E2E: simulate by stubbing `window.setInterval` before the
-  action, then dispatch `visibilitychange` + `focus`.
-- **A gate that unmounts on "loading" loses state.** `<Show>` gates on
-  `*Loading` flags remount whole subtrees on every refresh; one-shot
-  inputs (URL fragments, half-typed text) are lost. Gate on first load
-  only, and key remounts by stable ids, not refetched objects.
-- **Typecheck before every push.** Vitest does not typecheck; a TS error
-  passed all tests locally and failed CI (deploy skipped). Run
-  `pnpm typecheck && pnpm lint && pnpm test` before each commit.
-- **Rewriting pushed history:** only with the owner's explicit OK, and
-  with `git push --force-with-lease=master:<expected-sha>`.
+## Environment gotchas
+
+- Node ≥ 22.13 (pnpm 11); run pnpm via nvm in each shell. CI pins 22.
+- pnpm policies: minimum release age (pin mature versions) and strict
+  build scripts (esbuild must be allowed).
+- Supabase CLI needs both the shim and its sibling binary (installer
+  script handles it). Never `db push`/`link` locally.
+- Supabase free tier pauses after ~1 week idle (DNS fails); after
+  restore expect a few minutes of 502s and a stale schema cache.
+- Supabase keys: new `sb_publishable_` and legacy JWT both work.
+- Edge Functions deploy only when declared in the Supabase config;
+  their secrets live in the dashboard.
+- Prerender runs without `VITE_*` env: never read them at module load.
+- Git remote is `beta`; `git rebase --continue` needs `GIT_EDITOR=true`.
+- Gitleaks: low-entropy fakes don't trip it; high-entropy fixtures need
+  an inline allow marker; publishable-looking test strings trip it.
+- Tests: no `indexedDB` in jsdom (use fake-indexeddb, fresh per test);
+  modules that throw at load need reset + dynamic import; portal UI is
+  outside the render container (query the screen).
+- Solid hydration can leave reactive attributes stale on SSR'd nodes;
+  write them in an effect.
+- Static `public/` files land under the sub-path; use relative URLs.
+- Local E2E: don't use the dev server (it reloads mid-run). Build with
+  the sub-path, run the post-build step, serve the output with a simple
+  static server under the sub-path, drive two browser contexts with
+  playwright-core and the cached Chromium. Helpers live in a temp dir
+  and vanish on restart; recreate as needed.
+- Builds can exceed the tool timeout: clear the output dir first (a
+  failed build leaves the old bundle), run detached with a log and an
+  exit-code marker, confirm new code is in the bundle.
+- Never `pkill -f <pattern>` in the same command as other work; the
+  pattern matches the shell itself. Check with `pgrep -fa` first.
+- Keep subagent tasks small (~10 min); big scopes time out.
+- Throwaway live smoke scripts stay outside the repo (they create real
+  anonymous users).
+- Rewriting pushed history only with owner OK and force-with-lease.
 
 ## User preferences (durable)
 
-- Communicate in **caveman style** (terse; drop filler, keep all
-  technical substance) unless the user says otherwise.
-- **Always load this skill set for orchestration work here:** `caveman`
-  (comms), `pragmatic` (surgical, verify-first coding), and `grill-me`
-  (interrogate before acting on any ambiguity). Load at session start.
-- Merge stable branches to `master` promptly; avoid a pile of open PRs.
-  Fix issues via follow-up PRs.
-- Do not request out-of-workspace or wide access without explaining why;
-  scope commands to the workspace.
-- Record things learned on the go in the DOX docs (this framework).
-- **Write files in small chunks.** The opencode write tool can fail on
-  big files. Prefer targeted edits or appends; split large new files.
-- **Don't `pkill -f vinxi` (or `pkill -f build.sh`) from the same shell
-  command** as other work: the pattern matches the shell's own command
-  line and kills it (the tool call then hangs to timeout). Check with
-  `pgrep -fa` in a separate call first.
+- Caveman style (terse, full substance) unless told otherwise.
+- Load `caveman`, `pragmatic` and `grill-me` at session start.
+- Mobile first; strong visuals over text; vary type and colour so
+  screens don't read as one block of text.
+- Ask before acting on ambiguity; then work autonomously and log
+  decisions.
+- Docs concise: ideas and contracts, no file/line references.
+- Explain any out-of-workspace access before requesting it.
+- Write files in small chunks (the write tool fails on big files).
 
 ## Verification
 
-- `pnpm typecheck && pnpm lint && pnpm test && pnpm build` must all pass
-  before a code PRD is `dev-done`.
-- `pnpm build` emits static output to `.output/public/`; there must be
-  no server runtime (`.output/server` absent) for the static preset.
+- Typecheck, lint, tests and build pass before work is `dev-done`.
+- Build output is fully static (no server runtime).
 
 ## Child DOX Index
 
-- `src/AGENTS.md` — SolidStart application code (routes, components,
-  lib, styles, entry points, theming).
-- `supabase/AGENTS.md` — database schema, migrations, branch-driven
-  workflow.
+- `src/AGENTS.md` — the web app: platform rules, look and feel,
+  pairing, privacy mode, app shell.
+- `supabase/AGENTS.md` — schema, migrations, RPC/RLS rules, push.
 - `scripts/AGENTS.md` — toolchain installers, git hooks, build helpers.
-- `prds/AGENTS.md` — PRD authoring convention and lifecycle.
-- `tests/AGENTS.md` — Dev unit tests and QA adversarial suites.
-- `.github/AGENTS.md` — CI/CD workflows.
-- `.opencode/agent/` — Dev/QA subagent contracts (`dev.md`, `qa.md`);
-  not an AGENTS.md but the authoritative agent-role definitions.
+- `prds/AGENTS.md` — PRD convention and lifecycle.
+- `tests/AGENTS.md` — unit and QA adversarial suites.
+- `.github/AGENTS.md` — CI/CD and Pages deploy.
+- `.opencode/agent/` — Dev/QA subagent role definitions.

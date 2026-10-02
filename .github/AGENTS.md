@@ -2,55 +2,41 @@
 
 ## Purpose
 
-CI/CD. GitHub Actions workflows for build, secret-scan, and GitHub Pages
-deploy.
+CI/CD: secret scan, build and GitHub Pages deploy.
 
 ## Ownership
 
-Owns `.github/`. Currently one workflow: `workflows/deploy.yml`.
+Owns the GitHub workflows (currently one deploy workflow).
 
 ## Local Contracts
 
-- **`deploy.yml`** runs on push and PR to `master`, jobs in order:
-  1. `gitleaks` — CI secret scan (mirrors the pre-commit hook),
-     `GITLEAKS_CONFIG=.gitleaks.toml`.
-  2. `build` — `pnpm install --frozen-lockfile` → `pnpm typecheck` →
-     `pnpm lint` → `pnpm test` (tests must not need `.env`) → `pnpm build` (with
-     `BASE_PATH` env) → `scripts/post-build.sh` (SPA 404 fallback) →
-     upload-pages-artifact.
-  3. `deploy` — `actions/deploy-pages`, **push-to-master only** (skipped
-     on PRs so PRs validate without publishing).
-- **Node 22** in `setup-node` — pnpm 11 requires ≥22.13, or the runner
-  dies on the `node:sqlite` builtin. Do not lower it.
-- **`BASE_PATH` env** (`/lp9-beta/`) must match the GH Pages project
-  sub-path; update it here if the repo is renamed (`DESIGN.md` §16f).
+- Runs on push and PR to `master`: gitleaks scan → install (frozen
+  lockfile) → typecheck → lint → test (no `.env` needed) → build with
+  the sub-path → SPA 404 fallback → Pages artifact. Deploy runs on push
+  to `master` only.
+- Node 22 (pnpm 11 needs ≥ 22.13). Do not lower.
+- The sub-path env must match the Pages project path; change it if the
+  repo is renamed (§16f).
 
 ## Work Guidance
 
-- Keep GH tokens and Supabase values out of workflow YAML; the anon key
-  + project URL are baked at build time and are public-safe, everything
-  else uses GitHub Actions secrets (`DESIGN.md` §16g).
+- No tokens or private values in workflow files. Public build values
+  (Supabase URL, publishable key, VAPID public key) come from Actions
+  secrets (§16g).
 
 ## Verification
 
-- A PR run must go green (gitleaks + build) before merge. On push to
-  `master`, the deploy job must publish and the Pages URL must serve
-  `/`, `/privacy`, `/terms`, `/app`, with `/app/*` deep-links hitting
-  the shell.
+- PR runs green before merge. After a push, the Pages site serves `/`,
+  `/privacy`, `/terms`, `/app`, and `/app/*` deep links reach the
+  shell.
 
-## One-time owner setup (dashboard)
+## One-time owner setup
 
 - Pages source = GitHub Actions.
-- Branch protection on `master`: require PR, require Supabase Preview +
-  gitleaks checks, linear history.
-- **Repository secrets** (Settings → Secrets → Actions):
-  - `VITE_SUPABASE_URL` — project URL (public-safe, needed at build time
-    for prerender).
-  - `VITE_SUPABASE_ANON_KEY` — publishable/anon key (public-safe, needed
-    at build time for prerender).
-  - `VITE_VAPID_PUBLIC_KEY` — web push public key (public-safe; PRD-53,
-    see `docs/push-setup.md`). Without it Settings says notifications
-    aren't set up.
+- Branch protection on `master` (PR required, Supabase preview +
+  gitleaks checks, linear history).
+- Actions secrets: Supabase URL, publishable key, VAPID public key
+  (without it, Settings reports notifications as not set up).
 
 ## Child DOX Index
 

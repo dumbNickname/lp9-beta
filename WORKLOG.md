@@ -1,194 +1,74 @@
-# WORKLOG — autonomous design/UX session
+# WORKLOG
 
-Owner brief: review code; fix the invite-link experience (redirect loop,
-unclear outcome); review privacy mode; make the app look and feel
-stronger (visual over text, mobile first); add a "how it works" guide
-near settings; pick a gadget. Commit + push each task; verify live.
+Log of autonomous work sessions: owner brief, findings, decisions, what
+to look at. Product rules live in `DESIGN.md`; open agent choices in
+`no-human-decisions.md`.
 
-Owner answers (before leaving):
-- Push each finished task to `master` (CI deploys), verify on live.
-- Tasteful motion is OK (heart burst, paired moment, illustrated empty
-  states). Still no scoreboards / comparisons.
-- Privacy mode: one quick toggle; OFF by default, but discoverable;
-  when ON, tapping a hidden item asks to reveal it or turn the mode off.
-- Gadget: agent picks.
+## Session: design + UX pass
 
-Decisions are listed per task below (newest last). Product-rule changes
-are also recorded as dated amendments in `DESIGN.md`.
+**Brief:** fix the looping invite-link experience; review privacy mode;
+stronger visuals with less text, mobile first; a "how it works" guide;
+pick a gadget. Push each task and verify live.
 
-## T1 — Invite link flow
+**Owner answers:** push per task; tasteful motion OK; privacy mode off
+by default, one quick toggle, tap a hidden item to reveal or turn off;
+agent picks the gadget; mobile header = two rows with a wallet strip.
 
-Findings (reproduced with Playwright on the live site, two anon
-contexts):
-- Joiner opens link -> onboarding -> after "Continue" lands on the
-  generic "Pair with your partner" landing; the invite is gone.
-  Cause: `refreshProfile()` / `refreshRelationship()` set `*Loading`
-  on every refresh, and `routes/app.tsx` shows "Loading..." while
-  loading, unmounting the subtree. `PairFlow` had already consumed and
-  stripped `#pair=`, so the remount started fresh. The same bug
-  remounted the whole Dashboard on every tab focus (lost scroll,
-  half-typed notes).
-- An already-paired user opening an invite link: link silently ignored.
-- No clear end state: joiner/inviter are dropped into the dashboard
-  with a recovery-password form on top; no "you are paired" moment.
+### Invite link
+- **Found:** a new user opening a link went through onboarding and then
+  landed on the generic pairing screen with the invite gone. Every
+  refresh briefly showed "Loading", which unmounted the screen, and the
+  link had already been stripped from the URL. The same bug wiped
+  half-typed notes on tab focus. Links opened by an already-paired user
+  were ignored, and nobody got a clear "you're paired" moment.
+- **Done:** the invite is held in memory from app start until join or
+  cancel; loading only gates the first load; onboarding shows "Alice
+  is waiting for you" and pairs in one tap; already-paired users land
+  in the new-pair flow; both phones get a full-screen paired moment.
 
-Decisions:
-- Loading flags only cover the first load of each store; later
-  refreshes update data in place (no unmount).
-- The invite payload is captured once at app start into an in-memory
-  `pendingJoin` signal (`lib/pairing/pendingJoin.ts`) and the fragment
-  is stripped. It survives onboarding and remounts; cleared on join or
-  cancel. Not persisted (the key must not linger in storage).
-- Onboarding shows who invited you when arriving via a link.
-- Already-paired user + invite link -> opens the "new pair" flow on the
-  confirm step automatically.
-- Both sides get a full-screen "paired" moment (two avatars meeting in
-  a heart) before the dashboard; the recovery prompt comes after it.
+### Inviter's comments locked after pairing
+- **Found:** the inviter sends the link from a chat app, so the app tab
+  is in the background and its pairing poll is frozen. On return a
+  refresh finds the new pair first and the key never moves to it, so
+  the composer asked for a recovery password that didn't exist.
+- **Done:** any refresh that finds the new pair adopts the waiting key
+  (only for a pair this user created as inviter, after the invite, with
+  no key yet) and shows the paired moment.
 
-Verified: local build + Playwright, three anon users. Joiner via link sees
-"Alice is waiting for you" -> "Join Alice" -> paired moment on both
-devices; already-paired user opening a second invite lands on
-"Join Cara?" inside the new-pair flow; half-typed note survives a focus
-refresh.
+### Privacy mode
+- **Found:** three toggles; on at every launch, so each open hid
+  everything; the hidden-wish row offered a permanent "Unmark".
+- **Done:** off by default, remembered per device; one eye in the app
+  bar; veiled items ask "show this one / turn off / keep hidden";
+  one-time hint under the eye once notes exist (`DESIGN.md` §15c).
 
-## T2 — Privacy mode
+### Visuals
+- Onboarding: floating hearts, one big name field, relationship chips.
+- Pairing: Invite/Join as two big tiles, native "Send link", a broken-
+  link visual for a dead invite with "invite them instead".
+- Recovery prompt: two icon facts; the full honest text folded away.
+- Give: icon tabs, "Send 3 hearts" button with a heart burst,
+  illustrated empty states.
+- How it works: four colour-coded cards with tiny mock-ups and "take me
+  there", in the more menu above Settings.
+- Gadget: memory jar. Partner notes drop in as hearts; tap for a random
+  past note. Shows fullness, never a count.
+- Mobile app bar: two rows. The pair name gets the full width (home
+  moved to the menu); the balance is a full-width wallet strip whose
+  heart pulses when hearts arrive. Desktop unchanged.
 
-Review findings: three toggles (app bar menu, above the feed, Settings);
-ON at every launch so every open showed only placeholders; "Hidden
-coupon — turn off private mode to view" sent people hunting for the
-switch; the hidden-coupon row offered "Unmark", which un-privates the
-coupon permanently rather than peeking.
+### Caught by browser tests
+- The privacy hint covered the more menu, Back and the heart picker;
+  it now sits in the page flow and shows only on Give.
+- A type error passed unit tests and failed CI; typecheck now runs
+  before every push.
 
-Decisions (owner direction + agent choices):
-- OFF by default, remembered per device once on (`privacy_mode`).
-- One eye button in the app bar (label "Private" only on wide screens;
-  icon-only on phones to keep room for the partner name). Settings keeps
-  a mirror row. Removed the feed and menu toggles.
-- Veiled items are tappable placeholders (lock + two blurred lines; wish
-  veil keeps the price stub so the list still makes sense). Tap ->
-  sheet: "Show this one" / "Turn private mode off" / "Keep hidden".
-  Reveal is per item, in memory; turning the mode on again re-veils all.
-- Discoverability: one-time dark coachmark under the eye once there are
-  notes with text. Agent choice over a features page: it appears at the
-  moment it's relevant; a features page is covered by the in-app guide
-  (T5).
-- `ConfirmSheet` gained `choiceSheet()` (3-way) for this.
+### For the owner to look at
+- The paired moment on both phones; onboarding via a link.
+- Heart burst on send; balance pulse when hearts arrive.
+- The memory jar; the How it works page.
+- Eye + tap-to-reveal; the mobile header with a long partner name.
+- All of the above in dark theme.
 
-## T3 — Onboarding + pairing visuals
-
-- Onboarding: floating three-colour hearts, serif headline "Notice the
-  small things. *Say them.*", one big name field, relationship type as
-  chips ("New together" / "Long-term" / "Close friends") instead of a
-  select; language select + honest no-account note moved to a small
-  footer. Via an invite: two avatars + "*Alice* is waiting for you" and
-  the button reads "Join Alice" (one tap pairs; no second confirm).
-- Pair landing: me + dashed "?" avatar joined by pulsing dots, two big
-  tiles (Invite = QR icon, rose; Join = scan icon, sage). Removed the
-  3-step text list.
-- Invite: native "Send link" (Web Share) next to Copy.
-- Failed invite: broken-link visual + "Invite them instead".
-- Recovery prompt ("Keep your notes safe"): key icon, two icon facts;
-  the full honest text (DESIGN §12b) folded into "How recovery works".
-- "Paired" full-screen moment: avatars slide together, heart pops,
-  three sparks, then the three worlds as icon rows. Shown on both
-  devices before the recovery prompt.
-
-## T4 — Dashboard visuals
-
-- Tab icons are SVG (heart / spark / gift) instead of text glyphs.
-- Send button is rose, says "Send 3 hearts"; on success hearts fly out
-  of the button (2 per heart sent; off under reduced motion). "Sent to
-  Bob." replaces the long sentence.
-- Illustrated empty states (notebook for notes, gift for partner
-  wishes) with a "How it works" button on the empty notebook.
-- Contrast: selected-tab label now ink (was world colour at 3.4:1).
-
-## T5 — How it works
-
-- New `#guide` page (⋯ menu, right above Settings; also from the empty
-  notebook). Four tinted cards, one per idea, each with a tiny live mock
-  of the real UI (heart picker, ticket, claim -> yes -> done, veil) and
-  a "Take me there" link. One line of text each.
-- Agent choice: in-app guide instead of a separate public features
-  page; the public homepage already explains the product and is
-  blocked on the name (Phase 9).
-
-Layout audit (Playwright, 360px + 1280px, light + dark): no horizontal
-overflow, nothing off-screen, no tap target < 30px, all text >= 4.5:1.
-Caught + fixed: the privacy coachmark covered the ⋯ menu and the Back
-button -> now only on the Give world with no menu open.
-
-## T6 — Gadget: memory jar
-
-Picked the jar (see `no-human-decisions.md` D-UX.5). In the Give world
-side column, once there is at least one note from your partner with
-text: an SVG jar holding a heart per note (rose / amber / sage, capped
-at 14, so it shows "fuller over time" but never a count), hearts drop
-in on load. Tap -> jar wobbles and a random past note comes out
-("Another" for the next one). Respects private mode (veil + reveal ask).
-
-Caught in E2E: the coachmark (absolute-positioned) covered the heart
-picker. It now sits in the normal flow under the app bar and pushes
-content down; its arrow lines up with the eye (checked at 360 + 1280).
-
-## For the owner to look at (agent can't view images)
-
-- Paired moment on both phones (avatars slide in, heart pops).
-- Onboarding via an invite link ("Alice is waiting for you").
-- Send hearts: heart burst from the button.
-- Memory jar on Give once a partner note exists; tap it.
-- ⋯ -> How it works.
-- Eye in the app bar; with private mode on, tap a veiled note.
-- Dark theme on each of the above.
-
-## Left for later (not done in this session)
-
-- QA agent pass on these changes (`tests/qa/`).
-- PRD-54 security fix (still top of `NEXT_SESSION.md`).
-- `global.css` dedupe (REVIEW #13); this session appended new blocks
-  at the end, grouped by feature.
-
-## T7 — Mobile app bar + heart wallet (owner follow-up)
-
-Owner: header unreadable on mobile, pair button squeezed; try moving the
-heart counter out. Owner chose "2-line header + wallet strip" over a
-floating heart coin (the coin would cover card buttons while scrolling).
-
-- `.appbar-row` is a CSS grid. Mobile (< 40rem): row 1 = pair button
-  (takes the free width) + eye + ⋯; row 2 = wallet strip across the
-  full width. Desktop: one row as before (home, pair, compact pill,
-  eye, ⋯).
-- Home icon hidden on mobile (Home stays in the ⋯ menu) so the pair
-  name has room: a 10-letter name now fits at 360px (was cut off).
-- Wallet strip: rose heart coin, big serif number, "hearts to spend"
-  label, and hearts set aside as a dashed "+N set aside" chip. Tap opens
-  the same explanation popover.
-- When the balance goes up while the app is open, a ring pulses out of
-  the coin and the number pops.
-- Sticky section heads / desktop tabs use `--appbar-h` (measured with a
-  ResizeObserver) instead of the hard-coded 3.6rem, because the bar is
-  now taller on mobile.
-- Audit clean at 360/390/1280, light + dark.
-
-## T8 — Inviter's comment field locked right after pairing (owner bug)
-
-Symptom: after pairing, the composer said comments are locked and asked
-for a recovery password, though none was ever set.
-
-Cause (reproduced): the inviter sends the link from a chat app, so the
-app tab is in the background and the browser freezes its 3 s pairing
-poll. When the inviter comes back, the focus refresh of the relationship
-store finds the new pair first; the app switches to the dashboard and
-unmounts PairFlow before the poll moves the encryption key from
-`invite:<code>` to the pair. The key stays orphaned -> "locked".
-
-Fix: `lib/pairing/pendingInvite.ts` `adoptPendingInvite()`. The store's
-refresh adopts the key itself (only onto a pair this user created as
-inviter, created after the invite, with no key yet), then shows the
-paired moment. The PairFlow poll path is unchanged. Verified: background
-inviter -> paired moment, comment field open, partner reads the note.
-
-Note for already-affected test pairs: the key is still on the inviter's
-device under `invite:<code>`; the next app open now adopts it
-automatically as long as `pair_invite_pending` is still in
-localStorage.
+### Left for later
+- QA pass on these changes; PRD-54 security fix; stylesheet dedupe.

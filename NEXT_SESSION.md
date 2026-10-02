@@ -46,8 +46,8 @@
 3. **Unfinished reviews:** the independent review subagents timed out
    (gateway) every time. `REVIEW.md` holds the orchestrator's own
    findings. Re-run in small scopes, one per call, each ~10 min of work:
-   (a) SQL/security, (b) `src/lib`, (c) CSS dedupe (`global.css`
-   ~2.4k lines), (d) UX with Playwright DOM probing on the live site.
+   (a) SQL/security, (b) the app's shared lib, (c) stylesheet dedupe
+   (~3k lines), (d) UX with Playwright DOM probing on the live site.
 4. **QA pass** on dev-done PRDs (QA agent → `tests/qa/`), then mark merged.
 5. Pick polish with the owner from `REVIEW.md` UX list + `IDEAS.md`
    ("Seen while testing", watch rings, delight).

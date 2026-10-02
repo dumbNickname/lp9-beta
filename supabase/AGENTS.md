@@ -2,59 +2,43 @@
 
 ## Purpose
 
-Database source of truth: schema, migrations, and the branch-driven
-workflow connecting this repo to the Supabase project.
+Database source of truth: schema, migrations, server functions, and
+the branch-driven link between this repo and the Supabase project.
 
 ## Ownership
 
-- Owns `supabase/` (config, migrations, seed, this doc).
-- `supabase/README.md` is the human-facing workflow guide; this file is
-  the agent contract. Keep them consistent.
+- Owns config, migrations, seed, Edge Functions and this doc. The
+  folder README is the human workflow guide; keep both consistent.
 
 ## Local Contracts
 
-- **Schema changes only via `supabase/migrations/NNNN_slug.sql`.** Never
-  click-ops in the dashboard (`DESIGN.md` §16e).
-- **Scaffold** with `supabase migration new <slug>` (or hand-name
-  `NNNN_slug.sql` in order). The Supabase GitHub integration applies new
-  migrations to production on push to `master` (solo-owner practice) or
-  to a preview branch on PR.
-- **Every new function:** `security definer` + `set search_path = ''`
-  for RPCs; `revoke execute ... from public, anon, authenticated` for
-  helpers (Postgres grants PUBLIC by default). **No write RLS
-  policies**; writes go through RPCs (see PRD-54 for why).
-- **Verify live** after the migration applies: a throwaway two-client
-  smoke script (root AGENTS.md "Live smoke test").
-- **Do NOT run `supabase db push` or `supabase link`** locally — the
-  branch-driven flow owns all DB changes.
-- **No PAT, no DB password** needed for the branch-driven flow. The only
-  public client values (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`)
-  live in local `.env`, never committed.
-- **Region is `eu-central-1` (Frankfurt)** — EU requirement, do not move
-  (`DESIGN.md` §12d).
-- `config.toml` must contain no secrets; `seed.sql` populates preview
-  branch DBs.
-- **Edge Functions** live in `supabase/functions/<name>/index.ts` (Deno)
-  and must be declared under `[functions.<name>]` in `config.toml` so the
-  GitHub integration deploys them. Secrets go in Dashboard → Edge
-  Functions → Secrets, never in the repo. Excluded from repo tsc/eslint.
-- **pg_net + Vault** (0009): DB triggers call Edge Functions through
-  `push_event()`, which reads URL + shared secret from `vault` and must
-  never raise (notifications must not break user actions). Owner setup:
-  `docs/push-setup.md`.
+- Schema changes only as numbered migrations; never click-ops (§16e).
+- The Supabase GitHub integration applies migrations on push to
+  `master` (or to a preview branch on PR). Never `db push`/`link`
+  locally; no PAT or DB password needed.
+- RPCs: security definer with an empty search path. Helpers: revoke
+  execute from public/anon/authenticated (Postgres grants PUBLIC by
+  default). No write RLS policies; writes go through RPCs.
+- Verify live after a migration with a throwaway two-client smoke
+  script kept outside the repo.
+- Region is EU Frankfurt; do not move (§12d).
+- Config holds no secrets; seed only feeds preview databases.
+- Edge Functions deploy only when declared in config; their secrets
+  live in the dashboard. They are excluded from repo typecheck/lint.
+- Push notifications: DB triggers call a function via pg_net with URL
+  and secret from Vault, and must never fail the user's action. Owner
+  setup lives in `docs/`.
 
 ## Work Guidance
 
-- Data model shape (tables, RLS, RPCs, indexes) is specified in
-  `DESIGN.md` §13. Refine exact SQL when writing each migration.
-- `relationship_id` is denormalized onto child tables for single-lookup
-  RLS predicates (`DESIGN.md` §13f).
+- Data model shape (tables, RLS, RPCs, indexes) is in `DESIGN.md` §13.
+- The pair id is denormalised onto child tables for one-lookup RLS
+  (§13f).
 
 ## Verification
 
-- A migration is ready only when (a) the Supabase preview CI check is
-  green on the PR, and (b) QA verified behavior on the preview env
-  (`DESIGN.md` §16e). Both are live-infra checks (owner/QA), not local.
+- A migration is ready when the preview check is green and behaviour is
+  verified on the preview or live environment.
 
 ## Child DOX Index
 
