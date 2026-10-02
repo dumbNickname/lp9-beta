@@ -43,6 +43,16 @@ export default function AppBar(props: Props) {
   const [menu, setMenu] = createSignal<Menu>(null);
   const toggle = (m: Exclude<Menu, null>) => setMenu((cur) => (cur === m ? null : m));
   let root: HTMLElement | undefined;
+  // Beat the wallet heart when the balance goes up (not on first render).
+  const [bump, setBump] = createSignal(0);
+  createEffect(
+    on(
+      () => props.balance,
+      (now, prev) => {
+        if (prev !== undefined && now > prev) setBump((n) => n + 1);
+      },
+    ),
+  );
   const [hintSeen, setHintSeen] = createSignal(readHintSeen());
   const dismissHint = () => {
     setHintSeen(true);
@@ -64,7 +74,18 @@ export default function AppBar(props: Props) {
     };
     document.addEventListener("click", onDoc);
     document.addEventListener("keydown", onKey);
+    // Sticky things below the bar (section heads, desktop tabs) offset by
+    // its real height, which differs on mobile (2 rows) and desktop.
+    let ro: ResizeObserver | undefined;
+    if (root && typeof ResizeObserver !== "undefined") {
+      const el = root;
+      ro = new ResizeObserver(() =>
+        document.documentElement.style.setProperty("--appbar-h", `${el.offsetHeight}px`),
+      );
+      ro.observe(el);
+    }
     onCleanup(() => {
+      ro?.disconnect();
       document.removeEventListener("click", onDoc);
       document.removeEventListener("keydown", onKey);
     });
@@ -100,15 +121,28 @@ export default function AppBar(props: Props) {
         <button
           type="button"
           class="balance-pill"
+          classList={{ "is-up": bump() > 0 }}
           aria-expanded={menu() === "balance"}
           aria-controls="appbar-balance"
           aria-label={`${props.balance} ${props.balance === 1 ? "heart" : "hearts"} to spend. What is this?`}
           onClick={() => toggle("balance")}
         >
-          <HeartIcon filled />
+          <span class="balance-heart" aria-hidden="true">
+            <Show when={bump()} keyed>
+              {(n: number) => <HeartIcon filled class={`balance-beat beat-${n % 2}`} />}
+            </Show>
+            <HeartIcon filled />
+          </span>
           <span class="balance-num">{props.balance}</span>
+          <span class="balance-label" aria-hidden="true">
+            {props.balance === 1 ? "heart" : "hearts"} to spend
+          </span>
           <Show when={props.escrow > 0}>
-            <span class="balance-escrow" aria-hidden="true">+{props.escrow}</span>
+            <span class="balance-escrow" aria-hidden="true">
+              <HeartIcon />
+              <span class="balance-escrow-num">+{props.escrow}</span>
+              <span class="balance-escrow-label">set aside</span>
+            </span>
           </Show>
         </button>
 

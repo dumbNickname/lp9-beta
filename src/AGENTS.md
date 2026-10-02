@@ -122,7 +122,9 @@ the client/server entry points. Public pages are statically generated;
   `ComingUp`. Balance = received − open − delivered claims, mirroring
   SQL `spendable_hearts`.
 - **Dashboard (`components/Dashboard.tsx`, PRD-49)**: `AppBar` (home
-  link, pair switcher, balance pill, ⋯ menu) + `TabBar` with three
+  link, pair switcher, balance pill, eye, ⋯ menu; CSS grid: 2 rows on
+  mobile with the balance as a full-width wallet strip, 1 row on
+  desktop; publishes its height as `--appbar-h` for sticky offsets) + `TabBar` with three
   **worlds**: Give (composer + notes), My wishes (`MyWishes`), For
   partner (`ForPartner`). Hash-synced (`#mine`, `#theirs`; legacy
   `#coupons`), plus pages `#settings` = `SettingsPage` (You / Pairs /

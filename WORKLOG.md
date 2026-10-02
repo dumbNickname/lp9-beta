@@ -147,3 +147,25 @@ content down; its arrow lines up with the eye (checked at 360 + 1280).
 - PRD-54 security fix (still top of `NEXT_SESSION.md`).
 - `global.css` dedupe (REVIEW #13); this session appended new blocks
   at the end, grouped by feature.
+
+## T7 — Mobile app bar + heart wallet (owner follow-up)
+
+Owner: header unreadable on mobile, pair button squeezed; try moving the
+heart counter out. Owner chose "2-line header + wallet strip" over a
+floating heart coin (the coin would cover card buttons while scrolling).
+
+- `.appbar-row` is a CSS grid. Mobile (< 40rem): row 1 = pair button
+  (takes the free width) + eye + ⋯; row 2 = wallet strip across the
+  full width. Desktop: one row as before (home, pair, compact pill,
+  eye, ⋯).
+- Home icon hidden on mobile (Home stays in the ⋯ menu) so the pair
+  name has room: a 10-letter name now fits at 360px (was cut off).
+- Wallet strip: rose heart coin, big serif number, "hearts to spend"
+  label, and hearts set aside as a dashed "+N set aside" chip. Tap opens
+  the same explanation popover.
+- When the balance goes up while the app is open, a ring pulses out of
+  the coin and the number pops.
+- Sticky section heads / desktop tabs use `--appbar-h` (measured with a
+  ResizeObserver) instead of the hard-coded 3.6rem, because the bar is
+  now taller on mobile.
+- Audit clean at 360/390/1280, light + dark.
