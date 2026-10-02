@@ -32,5 +32,6 @@ restore, hearts, coupons and claims still work end-to-end.
 - Static guard test: no surviving write policy on `relationships`;
   listed helpers revoked; `is_relationship_member` kept for
   `authenticated` only.
-- Live probe runs after the migration is applied by the push to
-  `master`.
+- Live probe 2026-10-02 passed: B's direct updates (status, member_a,
+  recovery blob) affect 0 rows; outsider helper calls get permission
+  denied; pairing and hearts work end-to-end.

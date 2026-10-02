@@ -127,7 +127,7 @@ its own end-to-end PRD per `DESIGN.md` §16a.
 
 | #  | Title                                                 | PRD                                            | Status |
 |----|-------------------------------------------------------|------------------------------------------------|--------|
-| 54 | Lock relationship writes + helper grants (HIGH)       | `prds/PRD-54-lock-relationship-writes.md`      | dev-done (live probe pending) |
+| 54 | Lock relationship writes + helper grants (HIGH)       | `prds/PRD-54-lock-relationship-writes.md`      | merged (live-probed) |
 
 ### Phase 5 — Coupon claim/escrow flow
 

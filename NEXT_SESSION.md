@@ -30,12 +30,9 @@
 
 ## Start here (in order)
 
-1. **Security fix — PRD-54 (`REVIEW.md` #1, HIGH):** members can directly
-   UPDATE any `relationships` column (swap a member → hijack, archive,
-   destroy the recovery blob). New migration: drop policy "members
-   update relationship"; revoke EXECUTE from `public, anon,
-   authenticated` on helper functions (#2). Re-probe live with two anon
-   clients (the probe pattern is in `REVIEW.md` #1).
+1. **"Us" visuals trial:** owner reviews garland, almanac (season /
+   clock / words), milestone ribbon, wish stamps, week warmth on the
+   live site and picks which stay (D-UX.7–10). Remove the rest.
 2. **Push setup check:** ask the owner whether `docs/push-setup.md`
    steps 1–4 are done (GitHub secret `VITE_VAPID_PUBLIC_KEY`, Edge
    Function secrets, Vault secrets). Then verify end-to-end: turn on in

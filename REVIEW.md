@@ -3,11 +3,11 @@
 > **Status:** the orchestrator's own review. The independent reviews
 > (technical + UX subagents) did NOT complete (gateway time-outs); re-run
 > them in small scopes (see `NEXT_SESSION.md`). Nothing below is fixed
-> yet. Promote items to PRDs to fix; strike them here when done.
+> yet unless marked FIXED. Promote items to PRDs to fix; strike them here when done.
 
 ## Technical — security (verified live)
 
-1. **HIGH — any member can UPDATE any column of their relationship
+1. **FIXED (PRD-54, live-probed) — HIGH — any member can UPDATE any column of their relationship
    row directly** (`0002` policy "members update relationship", no
    column restriction). Verified via PostgREST:
    - overwrite/destroy the partner's recovery blob (`wrapped_key_blob`,
@@ -27,7 +27,7 @@
    rows / RLS error. Also call helper functions as an outsider (e.g.
    `rpc("gen_pair_code")`) — fixed = permission denied. Note: `set_recovery_password` lets either member overwrite
    the shared blob; that's acceptable (same key), but log/confirm in UI.
-2. **MEDIUM — helper functions callable by anon/any user** (Postgres
+2. **FIXED (PRD-54) — MEDIUM — helper functions callable by anon/any user** (Postgres
    grants EXECUTE to PUBLIC by default): `gen_pair_code`,
    `is_relationship_member` (lets anyone probe membership of any
    relationship id: returns true/false for the caller only, low
