@@ -152,7 +152,12 @@ Docs describe ideas, contracts and where things live, not code lines.
 
 ## Environment gotchas
 
-- Node ≥ 22.13 (pnpm 11); run pnpm via nvm in each shell. CI pins 22.
+- Node ≥ 22.13 (pnpm 11); CI pins 22. This machine has two Nodes: a
+  preinstalled one (22.8, too old) that plain shells pick up, and an
+  nvm Node (default 24) that carries pnpm. Every shell must load nvm
+  before pnpm/node; if `node -v` shows 22.8 or pnpm is "not found",
+  nvm was not loaded. pnpm lives per nvm Node version: switching
+  versions means reinstalling pnpm.
 - pnpm policies: minimum release age (pin mature versions) and strict
   build scripts (esbuild must be allowed).
 - Supabase CLI needs both the shim and its sibling binary (installer
