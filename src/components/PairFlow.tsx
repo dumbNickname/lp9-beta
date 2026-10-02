@@ -25,22 +25,23 @@ import {
   joinConfirmed,
 } from "~/lib/pairing/pendingJoin";
 import { onNewRelationship, relationships } from "~/lib/stores/relationship";
+import {
+  type PendingInvite,
+  clearPendingInvite,
+  readPendingInvite,
+  tempKeyId,
+  writePendingInvite,
+} from "~/lib/pairing/pendingInvite";
 import { profile } from "~/lib/stores/profile";
 import type { Archetype, PairInvitePeek } from "~/lib/data/types";
 
 const POLL_MS = 3000;
-const PENDING_INVITE_KEY = "pair_invite_pending";
 const ARCHETYPE_HINT_KEY = "archetype_hint";
 const VALID_ARCHETYPES: Archetype[] = [
   "getting_to_know",
   "established_couple",
   "close_friends",
 ];
-
-// The AES key never leaves the device; only its temp keystore entry key.
-function tempKeyId(code: string): string {
-  return `invite:${code}`;
-}
 
 function readArchetypeHint(): Archetype {
   try {
@@ -52,41 +53,6 @@ function readArchetypeHint(): Archetype {
     // storage unavailable
   }
   return "getting_to_know";
-}
-
-interface PendingInvite {
-  code: string;
-  keyBase64: string;
-}
-
-function readPendingInvite(): PendingInvite | null {
-  try {
-    const raw = localStorage.getItem(PENDING_INVITE_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw) as PendingInvite;
-    if (parsed && typeof parsed.code === "string" && typeof parsed.keyBase64 === "string") {
-      return parsed;
-    }
-  } catch {
-    // storage unavailable or malformed
-  }
-  return null;
-}
-
-function writePendingInvite(invite: PendingInvite): void {
-  try {
-    localStorage.setItem(PENDING_INVITE_KEY, JSON.stringify(invite));
-  } catch {
-    // storage unavailable; reload-safety degrades but pairing still works
-  }
-}
-
-function clearPendingInvite(): void {
-  try {
-    localStorage.removeItem(PENDING_INVITE_KEY);
-  } catch {
-    // storage unavailable
-  }
 }
 
 // Map an RPC exception message to a friendly, user-facing string.
@@ -146,6 +112,7 @@ export default function PairFlow() {
   // not here, so pairing enters the app immediately.
   const onPaired = async (relationshipId: string, code: string) => {
     stopPolling();
+    // The store may already have adopted it on a focus refresh.
     const key = await getKey(tempKeyId(code));
     if (key) {
       await putKey(relationshipId, key);
@@ -177,7 +144,7 @@ export default function PairFlow() {
       const key = await generateKey();
       const keyBase64 = bytesToBase64(await exportKeyRaw(key));
       await putKey(tempKeyId(code), key);
-      const pending: PendingInvite = { code, keyBase64 };
+      const pending: PendingInvite = { code, keyBase64, knownIds: [...knownIds] };
       writePendingInvite(pending);
       setInvite(pending);
       startPolling(code);

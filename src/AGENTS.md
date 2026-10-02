@@ -102,6 +102,11 @@ the client/server entry points. Public pages are statically generated;
   the first load (later refreshes update in place); Dashboard is keyed
   by relationship **id**. Breaking either remounts the shell and loses
   the invite / drafts.
+- **Inviter key handoff (`lib/pairing/pendingInvite.ts`)**: the
+  inviter's temp key (`invite:<code>`) is moved onto the new pair by
+  whichever notices it first: PairFlow's poll or the relationship
+  store's refresh (`adoptPendingInvite`). The poll alone is not enough;
+  background tabs freeze timers.
 - **Paired moment**: `onNewRelationship()` sets `justPaired`; the
   shell shows `PairedMoment` (full-screen) before the recovery prompt.
 - **Coupons**: `lib/data/coupons.ts` (RPC wrappers, `PRICE_MIN/MAX`),

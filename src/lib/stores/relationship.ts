@@ -1,5 +1,7 @@
 import { createSignal, onCleanup, onMount } from "solid-js";
 import { getMyRelationships } from "~/lib/data/relationship";
+import { adoptPendingInvite, readPendingInvite } from "~/lib/pairing/pendingInvite";
+import { user } from "~/lib/session";
 import type { Relationship } from "~/lib/data/types";
 
 // All active relationships + the selected one (PRD-43, DESIGN §4).
@@ -79,15 +81,26 @@ export async function refreshRelationship(force = false): Promise<void> {
   if (!loadedOnce) setRelationshipLoading(true);
   try {
     const rels = (await getMyRelationships()).filter((r) => r.status === "active");
+    // Inviter whose tab was in the background while the partner joined:
+    // PairFlow's poll never fired, so give the new pair its key here,
+    // before anything renders it as "locked".
+    let adopted: string | null = null;
+    const me = user()?.id;
+    if (me && readPendingInvite()) adopted = await adoptPendingInvite(rels, me);
     setRelationships(rels);
     const current = selectedId();
-    const keep = current && rels.some((r) => r.id === current) ? current : null;
+    const keep =
+      adopted ?? (current && rels.some((r) => r.id === current) ? current : null);
     const picked = keep
       ? rels.find((r) => r.id === keep)!
       : pickRelationship(rels, readUrlRel(), readRemembered());
     setSelectedId(picked?.id ?? null);
     if (picked) remember(picked.id);
     if (rels.length > 1 && picked) writeUrlRel(picked.id);
+    if (adopted) {
+      setAddingPartner(false);
+      setJustPaired(adopted);
+    }
     loadedOnce = true;
   } finally {
     setRelationshipLoading(false);

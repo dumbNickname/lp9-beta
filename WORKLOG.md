@@ -169,3 +169,26 @@ floating heart coin (the coin would cover card buttons while scrolling).
   ResizeObserver) instead of the hard-coded 3.6rem, because the bar is
   now taller on mobile.
 - Audit clean at 360/390/1280, light + dark.
+
+## T8 — Inviter's comment field locked right after pairing (owner bug)
+
+Symptom: after pairing, the composer said comments are locked and asked
+for a recovery password, though none was ever set.
+
+Cause (reproduced): the inviter sends the link from a chat app, so the
+app tab is in the background and the browser freezes its 3 s pairing
+poll. When the inviter comes back, the focus refresh of the relationship
+store finds the new pair first; the app switches to the dashboard and
+unmounts PairFlow before the poll moves the encryption key from
+`invite:<code>` to the pair. The key stays orphaned -> "locked".
+
+Fix: `lib/pairing/pendingInvite.ts` `adoptPendingInvite()`. The store's
+refresh adopts the key itself (only onto a pair this user created as
+inviter, created after the invite, with no key yet), then shows the
+paired moment. The PairFlow poll path is unchanged. Verified: background
+inviter -> paired moment, comment field open, partner reads the note.
+
+Note for already-affected test pairs: the key is still on the inviter's
+device under `invite:<code>`; the next app open now adopts it
+automatically as long as `pair_invite_pending` is still in
+localStorage.
