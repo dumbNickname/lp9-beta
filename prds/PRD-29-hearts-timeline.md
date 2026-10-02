@@ -1,74 +1,41 @@
 # PRD-29 — Hearts timeline (decrypt, edit/delete windows)
 
-> Tiny PRD per `DESIGN.md` §16b. Ambiguity -> STOP, load `grill-me`.
+> Status: see `PROGRESS.md`.
+> Later changes: privacy veil behaviour per PRD-31 later changes; the
+> timeline now sits inside the worlds shell (PRD-49).
 
 ## Goal
 
-Dashboard shows one chronological timeline of hearts received **and**
-given in the relationship, comments decrypted client-side, with the
-§5d edit (24h) and silent delete (5 min) affordances for the giver.
+One chronological timeline of hearts received and given in the pair,
+comments decrypted on the device, with the §5d edit (24h) and silent
+delete (5 min) affordances for the giver.
 
-## Scope
+## What shipped
 
-**In:**
-- `src/components/HeartsFeed.tsx` + `HeartNote.tsx` (new).
 - One timeline, newest first (owner decision 2026-09-29). Received notes
-  are the visual focus; given notes are quieter ("You -> Bob").
-- Per entry: N small hearts (amount shown per entry; **no totals, no
-  sums, no counts anywhere** — owner decision), decrypted comment,
-  relative date from `event_date` (+ "noted <created_at>" only when
-  backdated), "edited" badge when `edited_at` set (§5d; no original).
-- Undecryptable comment (no key / wrong key) -> "Comment locked on this
-  device" + restore link (reuses `RecoveryPassword mode="restore"`).
-- Giver actions, shown only inside window, computed from `created_at`
-  vs `Date.now()` (server remains the authority):
-  - **Edit** comment while < 24h: inline textarea, re-encrypts with a
-    fresh IV, calls `editPointComment`.
-  - **Undo** (delete) while < 5 min: one tap, no confirm (it's an
-    "oops" affordance), row disappears; silent to partner.
-- Manual refresh button + focus refresh (§9a). Empty state copy that
-  invites noticing, not scoring ("Nothing yet. Notice one small thing
-  today.").
-- Pagination: first 50 only; "older" deferred (idea list).
+  are the visual focus (solid card, rose edge); given notes are quieter
+  (dashed, muted, "You -> Bob").
+- Per entry: N small hearts, decrypted comment, relative date from
+  `event_date`, a "noted <day>" mark only when backdated, and an "edited"
+  badge when edited (original text never kept, §5d).
+- No totals, sums or counts anywhere (owner decision); amount shown only
+  per entry.
+- Comment that cannot be decrypted -> "Comment locked on this device" +
+  restore link.
+- Giver-only actions, shown only inside the window (client check with a
+  short tick; server stays the authority):
+  - Edit comment within 24h: inline, re-encrypted with a fresh IV.
+  - Undo within 5 min: one tap, no confirm ("oops" affordance); entry
+    disappears, silent to the partner.
+- Edit is hidden while private mode is on (it would reveal the text).
+- Manual refresh + refresh on focus (§9a). Empty state invites noticing:
+  "Nothing yet. Notice one small thing today."
+- First 50 entries only; "older" pagination deferred to `IDEAS.md`.
 
-**Out:** privacy-mode veil (PRD-31), balance (PRD-30).
-
-## Touched files / new files
-
-- `src/components/HeartsFeed.tsx`, `src/components/HeartNote.tsx` (new)
-- `src/lib/stores/points.ts` (decrypt cache, edit/delete actions)
-- `src/lib/format/date.ts` (new) — `Intl.RelativeTimeFormat` helpers
-- `src/routes/app.tsx`, `src/styles/global.css`
-- `tests/unit/hearts-feed.test.tsx`, `tests/unit/format-date.test.ts`
-
-## Data model impact
-
-None.
+Out: privacy veil (PRD-31), balance (PRD-30).
 
 ## Verification
 
-1. Received + given entries interleaved by `created_at desc`.
-2. Decrypted text shown; missing key -> locked placeholder.
-3. Edit visible for giver < 24h only; never for receiver.
-4. Undo visible for giver < 5 min only; removes the entry.
-5. `edited_at` -> "edited" badge on both sides.
-6. No aggregate number rendered anywhere in the feed.
-
-## Open questions
-
-None.
-
----
-
-## Dev notes
-
-- `HeartsFeed.tsx` + `HeartNote.tsx`; store `src/lib/stores/points.ts`
-  holds `feed()` (decrypted `FeedItem`s) and `refreshPoints`.
-- Received notes: solid card with a rose edge. Given notes: dashed,
-  muted.
-- Undo/Edit windows are checked on the client with a 15s tick; the
-  server stays authoritative (RPC errors are mapped by
-  `friendlyPointsError`).
-- Edit is hidden while private mode is on (so it can't reveal the
-  comment text).
-- A "noted <day>" badge shows when `event_date` < local created day.
+- Unit tests: received and given interleaved by creation time; locked
+  placeholder without key; edit/undo visibility per window and role;
+  edited badge; no aggregate number rendered.

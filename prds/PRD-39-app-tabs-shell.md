@@ -1,28 +1,39 @@
 # PRD-39 — App tabs (Notes / Coupons) shell
 
-> Tiny PRD per `DESIGN.md` §16b.
+> Status: see `PROGRESS.md`.
+> Later changes: superseded by the three worlds of PRD-49.
 
 ## Goal
 
-Split the paired app into two tabs with a bottom-anchored mobile tab bar
-(top on wide screens). The pair badge + privacy toggle live in a shared
-app header. Prerequisite for PRD-36.
+Split the paired app into Notes and Coupons tabs with a shared header
+(pair badge, privacy toggle, balance on both). Prerequisite for PRD-36.
 
-## Scope
+## What shipped
 
-**In:** tab state synced to `location.hash` (`#notes` / `#coupons`),
-because GH Pages serves `/app` only (D-39.1). No new prerender routes;
-the `#pair=` deep link must keep working (pair handling runs before tabs
-exist). Keyboard + `aria-selected` tabs pattern. Balance shows on both
-tabs.
+- Tab state in the URL hash: `#coupons`; Notes clears the hash. Written
+  with `replaceState`, follows `hashchange`. No new prerender routes.
+- `#pair=` deep link keeps working (pair handling runs before tabs).
+- Accessible tabs pattern: `aria-selected`, arrow keys switch.
+- Rendered as a pill segmented control under the balance instead of the
+  planned bottom bar (simpler, reads well on mobile).
+- Coupons refresh on focus while on the Coupons tab.
 
----
+## Decisions
 
-## Dev notes
+- **D-39.1** Tabs via `location.hash`, not sub-routes. Why: GH Pages
+  only prerenders `/app`; sub-routes would rely on the 404.html
+  fallback (served with HTTP 404). A hash keeps one clean 200 page and
+  back-button support. Alternative: `/app/coupons` route + prerender.
 
-- Tabs live in `Dashboard.tsx` (pill segmented tablist under the
-  balance, not a bottom bar; simpler, and it reads well on mobile).
-  `#coupons` is set via `history.replaceState`; Notes clears the hash.
-  `hashchange` is listened to. Arrow keys switch tabs.
-- Coupons refresh on tab focus while on the Coupons tab.
-- Tests: `tests/unit/dashboard-tabs.test.tsx`.
+## Verification
+
+- Unit tests for tab switching and hash sync.
+
+## Later changes
+
+- Tabs replaced by three worlds Give / My wishes / For partner (PRD-49).
+- Site header hidden inside `/app` since PRD-49; the app has its own app
+  bar (mobile: two rows, pair name + eye + more, then a full-width heart
+  wallet strip; desktop: one row).
+- Settings (PRD-51, `#settings`) and a "How it works" guide (`#guide`)
+  also use hash pages.

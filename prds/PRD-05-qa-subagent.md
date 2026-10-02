@@ -1,76 +1,42 @@
 # PRD-05 — QA subagent definition
 
+> Status: see `PROGRESS.md`.
+
 ## Goal
 
-Create `.opencode/agent/qa.md` for an independent QA subagent that
-verifies a Dev-completed PRD against its `Verification` section,
-writes adversarial tests, and reports findings without modifying the
-production code.
+Define an independent QA subagent that verifies a Dev-completed PRD
+against its Verification section, writes adversarial tests, and reports
+findings without touching production code.
 
-## Scope
+## What shipped
 
-**In:**
-- `.opencode/agent/qa.md` describing:
-  - Trigger: orchestrator invocation **after** a PRD is `dev-done`.
-  - Required reads: the PRD (including `## Dev notes`), `DESIGN.md`,
-    the diff Dev produced, the affected source files.
-  - Allowed tools: `read`, `bash`, `grep`, `glob`. **Write** is
-    allowed only under `tests/qa/` and for appending the
-    `## QA findings` section to the PRD.
-  - **Forbidden: editing files under `src/`, `supabase/migrations/`,
-    `scripts/`, `.opencode/`, or any other production code path.**
-  - `bash` may run pnpm test commands and supabase CLI against the
-    **dev** project. Never `prod`.
-  - Required behaviors:
-    - Execute every step in the PRD's `Verification` section,
-      reporting pass/fail per step.
-    - Author **at least one adversarial test** beyond the PRD's
-      verification list (RLS bypass / time-window edge / encryption
-      boundary / GDPR cascade — whichever applies).
-    - Append `## QA findings` with results + reproduction steps for
-      any failure.
-    - Update `PROGRESS.md` row to `qa-done` only if all checks pass;
-      otherwise leave at `dev-done` and document the failure.
+- QA role definition in `.opencode/agent/`.
+- Trigger: orchestrator invocation after a PRD is `dev-done`.
+- Required reads: the PRD (incl. `## Dev notes`), `DESIGN.md`, Dev's diff,
+  affected source files.
+- Tools: read, bash, grep, glob. Writes allowed only under `tests/qa/` and
+  for appending `## QA findings` to the PRD.
+- Forbidden: editing app source, migrations, scripts, agent definitions or
+  any other production path. Bash may run tests and the Supabase CLI
+  against **dev** only, never `prod`.
+- Required behaviour: run every Verification step with pass/fail; add at
+  least one adversarial test beyond the list (RLS bypass, time-window
+  edge, encryption boundary, GDPR cascade, whichever applies); document
+  failures with repro steps; set `qa-done` only on a full pass, else leave
+  `dev-done`.
+- Out: the Dev role (PRD-04); any feature work.
 
-**Out:**
-- The Dev subagent (PRD-04).
-- Any feature work.
+## Decisions
 
-## Touched files / new files
-
-- `.opencode/agent/qa.md` — new.
-- `tests/qa/` directory created when the first QA test lands (not
-  scaffolded by this PRD).
-
-## Data model impact
-
-None.
-
-## UI behavior
-
-None.
+- Allowed/forbidden lists follow `DESIGN.md` §16c.
+- Frontmatter and tool allow-list follow opencode's subagent API via the
+  `customize-opencode` skill, as in PRD-04.
 
 ## Verification
 
-1. `.opencode/agent/qa.md` exists.
-2. File loads cleanly in opencode.
-3. Allowed/forbidden lists are explicit and consistent with §16c.
-4. Smoke test: orchestrator invokes QA against a trivial dev-done
-   PRD; QA reports findings, does NOT modify `src/`, updates
-   `PROGRESS.md` only on full pass.
-
-**Unit tests:** N/A.
-
-**QA suite:**
-- Adversarial: orchestrator gives QA a PRD whose verification section
-  is missing a check the design clearly requires (e.g. RLS test for
-  a table-touching PRD); QA should flag the gap and ask the
-  orchestrator to amend the PRD before proceeding.
-- Adversarial: orchestrator points QA at a PRD with broken Dev code;
-  QA must report `dev-done` remains, with reproducible failure steps,
-  and **not** "fix" the code itself.
-
-## Open questions
-
-- Same as PRD-04 — frontmatter / tool allow-list specifics defer to
-  the `customize-opencode` skill at execution time.
+- Role file loads cleanly; lists are explicit.
+- Smoke: QA on a trivial dev-done PRD reports findings, leaves source
+  untouched, updates `PROGRESS.md` only on full pass.
+- Adversarial: a PRD missing a check the design requires gets flagged for
+  amendment; broken Dev code is reported (stays `dev-done`), never fixed
+  by QA.

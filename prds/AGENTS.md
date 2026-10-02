@@ -17,11 +17,18 @@ Owns `prds/`. `prds/README.md` documents the authoring convention and
 - **Status lives only in `PROGRESS.md`** (repo root), not in PRD files.
   PRD files never move; their status row changes.
   Flow: `todo → in-progress → dev-done → qa-done → merged`.
-- **Required sections:** Goal, Scope (in/out), Touched files / new
-  files, Data model impact, UI behavior, Verification, Open questions.
-- **After execution:** Dev appends `## Dev notes` (self-test results,
-  choices the PRD left open, gotchas for QA); QA appends `## QA
-  findings`.
+- **Two shapes.** A PRD being built follows the template (Goal, Scope
+  in/out, Touched files, Data model impact, UI behavior, Verification,
+  Open questions); Dev appends Dev notes, QA appends QA findings.
+- **Once shipped, compress to a record:** Goal, What shipped, Decisions,
+  Verification, Gotchas (if durable), Later changes. Drop file lists,
+  dev logs and pass tables; keep the why, scope boundaries, security
+  guarantees, public contracts (RPC/table names, URL formats, storage
+  keys) and owner checks still pending.
+- **Decision IDs (`D-NN.x`) are permanent:** code comments cite them;
+  never renumber or drop them.
+- **Superseded behaviour** is noted under Later changes with a pointer
+  (PRD number, DESIGN section or dated session), not deleted silently.
 - **Ambiguity rule:** if a PRD does not unambiguously cover something,
   stop and load `grill-me` — do not guess (`DESIGN.md` §16b).
 - **Decomposition rule:** future-phase PRDs are written only when the

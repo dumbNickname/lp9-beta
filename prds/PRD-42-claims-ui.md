@@ -1,50 +1,48 @@
 # PRD-42 — Claims UI: claim, respond, deliver, history
 
-## Goal
-Spend hearts. The claimer taps "Claim" on an affordable Ready coupon
-(confirm shows price + resulting balance). The deliverer sees "Ben
-wants: Breakfast in bed" with Accept (optional date + note) / Decline
-(reason). Accepted claims show "Mark delivered"; either can cancel with a
-refund. The claimer can withdraw while pending, and nudge after 7 days.
+> Status: see `PROGRESS.md`.
+> Later changes: the claims sections now live in the PRD-49 worlds.
 
-## Scope
-- `src/lib/stores/claims.ts` (sweep then list on refresh), and a
-  `ClaimsPanel.tsx` at the top of the Coupons tab: "Waiting for you"
-  (deliverer actions), "Your claims" (status + withdraw/nudge),
-  "Coming up".
-- `ComingUp.tsx`: 14-day strip (today..+13) with day cells; accepted
-  claims with a date are placed on their day, undated accepted ones are
-  listed as "Some day soon". Visible to both partners.
-- History (collapsed): delivered / declined / withdrawn / cancelled /
-  auto-refunded, newest first, last 20.
-- Balance line: "N hearts to spend", plus "(M set aside)" when escrow
-  > 0 (shows own escrow only).
-- Coupon cards: "Claim" button on my affordable Ready coupons; "Claimed"
-  chip when an open claim exists.
-- Copy stays warm, no scorekeeping. Declined/cancelled copy says
-  hearts were returned.
+## Goal
+
+Spend hearts. The claimer taps "Claim" on an affordable Ready coupon.
+The deliverer sees "Ben wants: Breakfast in bed" and can accept
+(optional date + note) or decline (reason). Accepted claims can be
+marked delivered; either can cancel with a refund. The claimer can
+withdraw while pending and nudge after 7 days.
+
+## What shipped
+
+- Claim confirm shows the price and says hearts are returned if it
+  doesn't happen.
+- Deliverer actions: "Yes, let's plan it" (optional date + note) / "Not
+  right now" (reason); accepted -> "Mark delivered"; either side Cancel.
+- Claimer actions: Withdraw while pending; "Send a gentle reminder"
+  after 7 days (client check, server enforces).
+- Order on the old Coupons tab: "For you to give" (claims awaiting me),
+  "Your claims", Coming up, then the wish lists.
+- Coming up: 14-day, 7-column strip (today..+13) with dot days and a
+  plan list; undated accepted claims = "Some day soon"; beyond 14 days =
+  "Later". Visible to both partners.
+- History (collapsed toggle): last 20 closed claims (delivered /
+  declined / withdrawn / cancelled / auto-refunded), newest first.
+- Balance line: hearts to spend, plus "N set aside for claims" when my
+  own escrow > 0.
+- Coupon cards: "Claim" on my affordable Ready coupons (PRD-40);
+  "Claimed" chip when an open claim exists.
+- Every refresh runs `sweep_expired_claims` first, then lists (§5f lazy
+  refund).
+- Copy warm, no scorekeeping; declined/cancelled copy says hearts were
+  returned.
 
 ## Verification
-Live 2-partner E2E: give hearts -> approve coupon -> claim -> balance
-drops -> partner accepts with date -> shows in Coming up on both ->
-delivered -> history. Decline refunds. Withdraw refunds.
 
----
+- Unit tests for UI and data layer.
+- Live two-partner E2E: give hearts -> approve coupon -> claim ->
+  balance drops -> partner accepts with date -> shows in Coming up on
+  both -> delivered -> history. Decline and withdraw refund.
 
-## Dev notes
-- `ClaimRow.tsx` (+ `ClaimList`, `claimStatusText`): deliverer "Yes,
-  let's plan it" (optional date + note) / "Not right now" (reason);
-  accepted -> "Mark delivered"; either side Cancel. Claimer Withdraw,
-  and "Send a gentle reminder" after 7 days (client check; server
-  enforces).
-- `ComingUp.tsx`: 14-day, 7-column strip with dot days + a plan list;
-  undated accepted = "Some day soon"; beyond 14 days = "Later".
-- The Coupons tab order is: "For you to give" (claims awaiting me),
-  "Your claims", Coming up, then the wish lists. History toggle (last
-  20 closed claims).
-- Claim confirm uses `window.confirm` with the price + "returned if it
-  doesn't happen" copy.
-- Balance line shows "N set aside for claims" when escrow > 0.
-- `src/lib/stores/claims.ts`: `refreshClaims` sweeps first (§5f lazy
-  refund), then lists.
-- Tests: `tests/unit/claims-ui.test.tsx`, `tests/unit/claims-data.test.ts`.
+## Later changes
+
+- Notes/Coupons tabs replaced by three worlds Give / My wishes / For
+  partner (PRD-49); claim sections moved with their lists.

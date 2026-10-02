@@ -1,84 +1,48 @@
 # PRD-14 — First-launch onboarding (display name + locale + archetype hint)
 
+> Status: see `PROGRESS.md`.
+
 ## Goal
 
-On first launch, after anonymous sign-in, collect display name, locale,
-and an archetype hint, and persist them to the profile.
+On first launch, after anonymous sign-in, collect display name, locale
+and an archetype hint, and persist them, so the user lands on the
+dashboard from then on.
 
-## Scope
+## What shipped
 
-**In:**
-- Onboarding screen at `/app` shown when the profile has no
-  `display_name` yet.
-- Fields: display name (text), locale (`en`/`pl`/`de`), archetype hint
-  (getting_to_know / established_couple / close_friends) — the hint is
-  stored for use at pair time (Phase 2); persist via `updateMyProfile`.
-- Honest data-loss nudge per `DESIGN.md` §3 ("you can't recover it
-  without an account"), non-blocking.
-- Once `display_name` is set, `/app` shows the placeholder dashboard.
+- `/app` shows onboarding while the profile has no `display_name`;
+  once set, the dashboard shows instead. Reload keeps the user past
+  onboarding and keeps the same anonymous user.
+- Fields: display name, locale (`en`/`pl`/`de`), archetype hint
+  (`getting_to_know` / `established_couple` / `close_friends`). Name and
+  locale go to the profile.
+- Honest, non-blocking data-loss nudge per `DESIGN.md` §3 (no account
+  means it cannot be recovered).
+- Out: pairing and archetype template application (Phase 2 / Phase 4),
+  Google account linking (Phase 8).
 
-**Out:**
-- Actual pairing / archetype template application (Phase 2 / Phase 4).
-- Google account linking (Phase 8).
-- Persisting the archetype hint to a relationship (no relationship yet;
-  store on profile or local until Phase 2 — decide in Dev notes).
+## Decisions
 
-## Touched files / new files
-
-- `src/routes/app.tsx` — gate: onboarding vs dashboard on
-  `display_name`.
-- `src/components/Onboarding.tsx` — new form.
-- Possibly `src/lib/data/profile.ts` — extend if archetype hint needs a
-  column (flag in Open questions if so).
-
-## Data model impact
-
-- Ideally none beyond PRD-12. If archetype hint needs storage before
-  relationships exist, note it — a `profiles` column addition would be a
-  new migration (flag, don't assume).
-
-## UI behavior
-
-First launch → form (name, locale, archetype). Submit → profile saved →
-dashboard placeholder. Reload → no form (name persists). Uses theme
-tokens; logical CSS only.
+- Archetype hint stored device-locally under storage key
+  `archetype_hint`, not a profile column: no migration for a temporary
+  pre-pair value. It moves to `relationships.archetype` at pair time.
+- Display name: required, trimmed, max 50 chars.
 
 ## Verification
 
-1. Fresh browser → onboarding form appears at `/app`.
-2. Submit → values persist; reload shows dashboard, not the form.
-3. Locale choice reflected in profile.
-4. Data-loss nudge visible and honestly worded.
+- Unit: form submits the entered values; gate keys off `display_name`.
+- QA: empty name rejected, long input handled, reload mid-onboarding
+  keeps the anon user.
 
-**Unit tests (Dev):**
-- Onboarding renders; submit calls `updateMyProfile` with entered
-  values; gate logic (form vs dashboard) keys off `display_name`.
+## Later changes
 
-**QA suite:**
-- Adversarial: empty display name rejected; overly long input handled.
-- Reload mid-onboarding does not lose the anon user.
-
-## Open questions
-
-- Where to store the archetype hint pre-pairing (profile column vs
-  local)? Dev decides and records; a new column needs its own migration.
-
-## Dev notes
-
-**Decision: archetype hint stored in `localStorage`** — no migration
-needed. Moves to the `relationships.archetype` column at pair time
-(Phase 2). Avoids a profiles column for a temporary pre-pair value.
-
-**Files created/changed:**
-- `src/components/Onboarding.tsx` — form: name, locale, archetype
-- `src/routes/app.tsx` — gate: onboarding vs dashboard based on
-  `display_name`; wires profile store + focus refresh
-- `tests/unit/routes.test.tsx` — updated with mocks for session/profile
-
-**Choices:**
-- Name validation: required, max 50 chars, trimmed.
-- Data-loss nudge shown at top of form per DESIGN.md §3.
-- Uses `<For>` per Solid eslint rules.
-- `archetype_hint` key in localStorage, read at pair time.
-
-**Self-test:** typecheck, lint, 16/16 tests, build all pass.
+- Archetype select became chips ("New together" / "Long-term" / "Close
+  friends"), hidden when joining via an invite link.
+- Language select and the honest no-account note (§3 wording) moved to
+  a small footer.
+- Joiner via link: onboarding shows "<inviter> is waiting for you" and a
+  "Join <name>" button that pairs in one tap (D-UX.1; the D-25.1 confirm
+  still applies to scan/paste). The `#pair=` fragment is captured at app
+  start into memory, so it survives onboarding (design session
+  2026-10-01).
+- Loading gate covers first load only (no remount on refresh).

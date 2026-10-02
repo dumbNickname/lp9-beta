@@ -1,40 +1,42 @@
 # PRD-50 — Layering, column alignment, calendar whose-wish, claim chips
 
-Owner feedback 2026-09-29 on PRD-49.
+> Status: see `PROGRESS.md`.
 
-## Scope + Dev notes
-- **⋯ menu under the tab bar:** popovers live inside `.appbar`'s
-  stacking context (z 20) while `.tabbar` is z 25. The app bar is now
-  z 40 (> tabbar 25, < sheet 50). Verified via `elementFromPoint` on
-  mobile + desktop.
-- **Column alignment:** section headers no longer bleed with a negative
-  margin; they share the card edge. First children of both columns
-  have no top margin -> the columns start on the same line (measured
-  equal tops on My wishes + For partner at 1280px).
-- **Add a wish open by default on desktop** (>= 56rem, via
-  `matchMedia` at mount), with an "Add a wish" heading. After submit
-  it stays open and remounts empty (keyed `formKey`). Mobile keeps it
-  collapsed; the empty state now always shows the "+ Add a wish" button.
-- **Coming up whose-wish:** calendar days are tinted amber (a wish for
-  you) / sage (for partner), split diagonally when both. Per-plan dots
-  and plan rows carry the same colour; a legend "for you / for Ben".
+## Goal
+Owner feedback 2026-09-29 on PRD-49: fix the menu hidden under the tab
+bar, misaligned columns, unclear calendar and noisy claim status.
+
+## What shipped
+- **Layering:** the app bar sits above the tab bar but below sheets, so
+  its "⋯" menu and popovers are no longer covered (popovers live in the
+  app bar's stacking context).
+- **Column alignment:** section headers share the card edge (no
+  bleed); both columns start on the same line.
+- **Add a wish** open by default on desktop (>= 56rem) with a heading;
+  stays open and resets empty after submit. Mobile keeps it collapsed;
+  the empty state always shows "+ Add a wish".
+- **Coming up whose-wish:** calendar days tinted amber (a wish for you)
+  / sage (for partner), split diagonally when both; plan dots and rows
+  match; legend "for you / for Ben".
 - **Claim status de-noised:** "Ben said yes" plus a coloured when-chip
   (`today` = rose filled, `soon` <= 7d = amber, `later`/undated =
-  muted, "date to agree"). The duplicate "(Thu, Oct 1)" is gone. A
-  "Details" toggle reveals timestamps (claimed/accepted/planned/
-  delivered/…/hearts). A state dot before the status (dashed = waiting,
-  sage = agreed, rose = delivered).
-- **Coupon chips** get glyphs: ✓ Agreed (sage), … Waiting, ♥ You have
-  enough, ➜ Claimed.
+  muted, "date to agree"); no duplicate date. A "Details" toggle shows
+  timestamps. A state dot before the status (dashed = waiting, sage =
+  agreed, rose = delivered).
+- **Coupon chips** carry a marker: Agreed (sage), Waiting, You have
+  enough, Claimed.
+- **Follow-up (owner 2026-09-29):** ticket notch circles removed (they
+  looked like stray dots mid-card on mobile); the perforation is just
+  the dashed divider. "5 more" moved next to the status chip as
+  "Agreed · 5 more hearts to go"; the stub shows only the price.
 
 ## Verification
-Local prod build, 14/15 checks pass; the remaining one is a test
-artifact (no Agreed chip on that screen); covered by the unit test.
+- Local prod build: menu hit-tested above the tab bar on mobile +
+  desktop; equal column tops at 1280px; chips covered by unit tests.
 
-## Follow-up (owner 2026-09-29): ticket circles + "5 more"
-- The notch circles (`.ticket-stub::before/::after`, painted with the
-  page bg) looked like stray dots mid-card on mobile, because the stub
-  ends above the actions row, not at the card edge. Removed; the
-  perforation is just the dashed divider.
-- "5 more" under the price was unclear. It's moved next to the status
-  chip as "Agreed · 5 more hearts to go"; the stub shows only the price.
+## Gotchas
+- Popovers can't escape their parent's stacking context: raise the
+  parent, not the popover.
+
+## Later changes
+- Chip glyphs replaced by line icons (owner 2026-10-01).

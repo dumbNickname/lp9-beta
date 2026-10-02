@@ -1,82 +1,50 @@
 # PRD-18 — IndexedDB per-relationship key store
 
+> Status: see `PROGRESS.md`.
+
 ## Goal
 
 Persist and retrieve the per-relationship AES-GCM key in IndexedDB,
 keyed by relationship id, never sending it to Supabase in plaintext.
 
-## Scope
+## What shipped
 
-**In:**
-- `src/lib/crypto/keystore.ts`:
-  - `putKey(relationshipId: string, key: CryptoKey): Promise<void>`.
-  - `getKey(relationshipId: string): Promise<CryptoKey | null>`.
-  - `deleteKey(relationshipId: string): Promise<void>` (for account
-    delete / unpair, §12d).
-  - `hasKey(relationshipId): Promise<boolean>`.
-  - Small IndexedDB wrapper (no library, or a tiny permissive-license
-    one — prefer none; flag if a helper is warranted).
-- Store `CryptoKey` objects directly (structured-clone supports
-  non-extractable keys) OR raw bytes — Dev picks and records.
+- Device-local key store keyed by relationship id: put, get (null if
+  unknown), has, delete (for account delete / unpair, §12d).
+- Small IndexedDB wrapper, no library.
+- Keys persist across reloads; keys of different relationships are
+  isolated (deleting one keeps the others).
+- Security guarantee: key material never goes to any network call. It
+  leaves the crypto layer only into the invite QR/link payload (PRD-19);
+  the server only ever sees a password-wrapped blob (PRD-22).
+- Out: key generation and crypto ops (PRD-17), recovery blob (PRD-22),
+  UI (PRD-21).
 
-**Out:**
-- Key generation / crypto ops (PRD-17).
-- Password-wrapped recovery blob on Supabase (PRD-22).
-- UI (PRD-21).
+## Decisions
 
-## Touched files / new files
-
-- `src/lib/crypto/keystore.ts` — new.
-
-## Data model impact
-
-None (IndexedDB is client-local; no Supabase schema).
-
-## UI behavior
-
-None.
+- Store `CryptoKey` objects directly via structured clone, not raw
+  bytes: simpler, no re-import step.
+- Reads swallow errors and return null, so a corrupt/missing store does
+  not throw.
+- Each operation opens and closes its own connection.
 
 ## Verification
 
-1. `putKey` then `getKey` returns a usable key that decrypts data
-   encrypted with the original (round-trip via PRD-17 helpers).
-2. `getKey` for an unknown relationship returns null.
-3. `deleteKey` removes it; subsequent `getKey` returns null.
-4. Key persists across a simulated reload (new IndexedDB connection).
-5. Key is never serialized to any network call (code review + grep: no
-   key material leaves `src/lib/crypto/**` except into the QR payload in
-   PRD-19).
+- Unit (fake IndexedDB): put/get round-trip decrypts data from the
+  original key, unknown id -> null, delete, has, two-key isolation,
+  persistence across a new connection.
+- Review: no key material in network calls.
 
-**Unit tests (Dev):**
-- `tests/unit/crypto-keystore.test.ts`: put/get/delete/has round-trips
-  using `fake-indexeddb` (dev-only) or the jsdom IndexedDB if present.
-  Document the choice in Dev notes.
+## Gotchas
 
-**QA suite:**
-- Adversarial: two relationships' keys don't collide; deleting one keeps
-  the other; corrupt/missing store handled without throwing on read.
+- jsdom has no IndexedDB: tests use `fake-indexeddb` (dev dependency),
+  fresh factory per test.
+- Device-local storage must also be cleared by Reset account (`src/`
+  AGENTS.md).
 
-## Open questions
+## Later changes
 
-- Store `CryptoKey` directly (structured clone) vs raw bytes? Dev
-  decides (structured clone is simpler and keeps keys non-extractable)
-  and records.
-- Test IndexedDB: does jsdom provide it, or is `fake-indexeddb` needed
-  (dev dependency, check `minimumReleaseAge`)? Dev records.
-
-## Dev notes
-
-**File:** `src/lib/crypto/keystore.ts`
-
-**Decisions:**
-- **Store `CryptoKey` directly** via structured clone (IndexedDB
-  supports it) — simpler than raw bytes, no re-import step.
-- **jsdom has NO IndexedDB** → added `fake-indexeddb@6.2.4` as a dev
-  dependency (30+ days old, passes minimumReleaseAge). Tests import
-  `fake-indexeddb/auto` and reset with a fresh `IDBFactory` per test.
-- `getKey`/`hasKey` swallow read errors → null (corrupt/missing store
-  handled gracefully). Each op opens+closes its own connection, so keys
-  persist across "reloads".
-
-**Self-test:** typecheck, lint, 29/29 tests (6 new: put/get, unknown,
-delete, has, two-key isolation, persistence), build all pass.
+- Inviter keeps a temporary key per pending invite in the store; it is
+  moved onto the new pair by the waiting-screen poll or any later
+  relationship refresh (the poll alone failed in background tabs;
+  design session 2026-10-01).

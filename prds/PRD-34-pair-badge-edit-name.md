@@ -1,46 +1,32 @@
 # PRD-34 — Pair badge + edit my display name
 
-> Tiny PRD per `DESIGN.md` §16b.
+> Status: see `PROGRESS.md`.
+> Later changes: multi-relationship switcher added to the badge
+> (PRD-43); avatars restyled in the 2026-10-01 visual redesign.
 
 ## Goal
 
-The dashboard shows who you're paired with at a glance ("Anna & Bob"
-with initials), and lets you rename yourself: the name your partner
-sees. Owner request 2026-09-29 (a device was paired as "test1").
+Show who you're paired with at a glance ("Anna & Bob" with initials) and
+let you rename yourself, i.e. the name your partner sees. Owner request
+2026-09-29 (a device was paired as "test1").
 
-## Scope
+## What shipped
 
-**In:**
-- `src/components/PairBadge.tsx`: overlapping initial avatars with a
-  heart, "Me & Partner" title, and an inline "Edit my name" form
-  (trimmed, 1..50 chars; same rule as onboarding) via
-  `saveProfile({display_name})`.
-- The partner name is re-fetched on tab focus so the partner's rename
-  appears.
-**Out:**
-- A private nickname for the partner (only you see it). Parked in
+- Pair badge: overlapping initial avatars with a heart and a
+  "Me & Partner" title; unknown partner shows "your partner". Initials
+  take the first full character, so a leading emoji is not split.
+- Inline "Edit my name": trimmed, 1..50 chars (same rule as onboarding),
+  saved through the existing `profiles` own-row UPDATE policy. No schema
+  change.
+- Partner name re-fetched on tab focus so their rename shows up.
+
+Out:
+- Private nickname for the partner (only you see it): parked in
   `IDEAS.md` until the owner confirms interest.
-- Multi-relationship switcher (§4: single-pair UI first).
-
-## Data model impact
-
-None. Uses the existing `profiles` own-row UPDATE policy.
+- Multi-relationship switcher (§4 single-pair UI first): done in PRD-43.
 
 ## Verification
 
-1. Paired dashboard shows both names + initials; unknown partner shows
-   "your partner".
-2. Rename saves the trimmed value; empty is rejected; 50-char max.
-3. The partner's device shows the new name after refocus.
-
-## Open questions
-
-None.
-
----
-
-## Dev notes
-
-- Tests: `tests/unit/pair-badge.test.tsx` (5).
-- `initial()` uses `Array.from` so a leading emoji/surrogate pair isn't
-  split.
+- Unit tests: both names and initials shown; unknown-partner fallback;
+  rename trims, rejects empty, caps at 50.
+- Partner device shows the new name after refocus.

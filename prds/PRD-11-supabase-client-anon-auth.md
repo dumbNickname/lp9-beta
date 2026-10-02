@@ -1,92 +1,53 @@
 # PRD-11 — Supabase client + anonymous sign-in
 
+> Status: see `PROGRESS.md`.
+
 ## Goal
 
 Wire a single Supabase browser client and sign every first-time visitor
 in anonymously so an `auth.users` row exists for them.
 
-## Scope
+## What shipped
 
-**In:**
-- `@supabase/supabase-js` dependency (pin mature version).
-- `src/lib/supabase.ts` — one client from `VITE_SUPABASE_URL` +
-  `VITE_SUPABASE_ANON_KEY`; throws a clear error if either is missing.
-- Anonymous sign-in on app boot: if no session, call
-  `signInAnonymously()`; expose current session/user reactively.
-- `.env.example` already lists both vars (PRD-06); confirm.
-- Owner enables **Anonymous Sign-in** in Supabase dashboard (Auth →
-  Providers) — documented here.
+- One Supabase browser client built from `VITE_SUPABASE_URL` and
+  `VITE_SUPABASE_ANON_KEY`; missing either fails fast with a clear error
+  (no silent undefined).
+- On app boot: if there is no session, sign in anonymously; the current
+  session/user is exposed reactively to the app.
+- Session persists in localStorage, so a reload resumes the same
+  anonymous user. Invisible to the user.
+- Owner enables **Anonymous Sign-in** in the Supabase dashboard (Auth ->
+  Providers).
+- Only the public anon/publishable key reaches the bundle, never
+  `service_role`.
+- Out: `profiles` table (PRD-12), data-access layer (PRD-13), Google
+  account linking (Phase 8).
 
-**Out:**
-- `profiles` table + trigger (PRD-12).
-- Google OAuth linking (Phase 8).
-- Data-access layer abstraction (PRD-13).
+## Decisions
 
-## Touched files / new files
-
-- `package.json` — add `@supabase/supabase-js`.
-- `src/lib/supabase.ts` — new.
-- `src/lib/session.ts` (or a Solid resource/context) — new: reactive
-  current-user accessor + boot-time anon sign-in.
-
-## Data model impact
-
-None (uses built-in `auth.users`; no custom tables yet).
-
-## UI behavior
-
-Invisible: on first load an anonymous user is created; on reload the
-existing session resumes.
+- Pinned a mature `@supabase/supabase-js` 2.x (passes pnpm minimum
+  release age).
+- Uses the new `sb_publishable_` key format; the legacy JWT anon key
+  works identically.
+- Missing env is a fail-fast error, originally thrown at module load.
 
 ## Verification
 
-1. Fresh browser → app boot creates an anonymous user; the same user
-   persists across reload (session in localStorage).
-2. `auth.users` shows one anonymous row per fresh browser (owner checks
-   dashboard on a preview branch).
-3. Missing env vars → client construction throws a clear message, not a
-   silent undefined.
+- Unit: client throws without env vars, constructs with them.
+- QA: garbage/empty key fails clearly without a crash loop; bundle key
+  is the anon one.
+- Live: one anonymous `auth.users` row per fresh browser, same user
+  after reload.
 
-**Unit tests (Dev):**
-- `src/lib/supabase.ts` throws when env vars absent; constructs when
-  present (mock env).
+## Gotchas
 
-**QA suite:**
-- Adversarial: garbage/empty anon key → clear failure, no crash loop.
-- Verify the anon key in the bundle is the anon (not service_role) key.
+- Modules that throw at load need module reset + dynamic import in
+  tests to re-evaluate with different env stubs.
+- Test both key formats: `sb_publishable_` is short (~40 chars), legacy
+  JWT is long.
 
-## Open questions
+## Later changes
 
-(none)
-
-## Dev notes
-
-**Choices made:**
-- Pinned `@supabase/supabase-js@2.108.2` (30+ days old, passes
-  minimumReleaseAge).
-- Used new `sb_publishable_` key format (Supabase 2026+ default).
-  Works identically to legacy JWT anon key with `createClient()`.
-- Session wired via `SessionProvider` component wrapping the router root
-  in `app.tsx`. Uses `onMount` + `subscribeToAuthChanges` for reactivity.
-- `supabase.ts` throws at module load time (not lazily) for missing env
-  vars — fail-fast pattern.
-
-**Files created/changed:**
-- `src/lib/supabase.ts` — client singleton.
-- `src/lib/session.ts` — reactive session signals + init.
-- `src/components/SessionProvider.tsx` — boot-time init wrapper.
-- `src/app.tsx` — wired SessionProvider.
-- `.env.example` — updated comment for new key format.
-- `tests/unit/supabase.test.ts` — env-var validation tests.
-
-**Self-test results:**
-- `pnpm typecheck` — pass
-- `pnpm lint` — pass
-- `pnpm test` — 12/12 pass (3 new tests for supabase module)
-- `pnpm build` — pass (static output, no server runtime)
-
-**Gotchas for QA:**
-- Vitest 4.x lacks `vi.importModule()`. Tests use `vi.resetModules()` +
-  dynamic `import()` to re-evaluate the module with different env stubs.
-- The `sb_publishable_` key is short (~40 chars) vs legacy JWT (~170
-  chars). QA adversarial tests should test both formats.
+- Client is now created lazily on first use, not at module load:
+  prerender runs without `VITE_*` env (root and `src/` AGENTS.md). The
+  clear missing-env error still holds, raised on first use.

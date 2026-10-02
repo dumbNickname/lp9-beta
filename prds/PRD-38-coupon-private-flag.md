@@ -1,28 +1,39 @@
 # PRD-38 — Per-coupon private flag (device-local)
 
-> Tiny PRD per `DESIGN.md` §15b.
+> Status: see `PROGRESS.md`.
+> Later changes: privacy mode reworked (DESIGN §15c amended 2026-10-01);
+> see below.
 
 ## Goal
 
-Mark coupons private on this device. With private mode ON they render as
-a locked placeholder row.
+Let a user mark coupons private on this device; with privacy mode on
+they render as a hidden placeholder (`DESIGN.md` §15b).
 
-## Scope
+## What shipped
 
-**In:** `src/lib/privateCoupons.ts`, a Set of coupon ids persisted in
-`localStorage` (`private_coupons`). **D-38.1:** plain signal +
-defensive localStorage, not `@solid-primitives/storage` (avoids a
-dependency + the pnpm release-age policy; same behaviour). The
-"Mark private"/"Unmark" action is on each card. Placeholder: "Hidden
-coupon — turn off private mode to view". The partner is unaffected.
-The privacy toggle also shows on the Coupons tab.
+- Device-local set of private coupon ids in `localStorage`
+  (`private_coupons`), read defensively. Never sent to the server; the
+  partner is unaffected.
+- "Mark private" / "Unmark private" action on each card.
+- With privacy mode on, private coupons show a placeholder ("Hidden
+  coupon — turn off private mode to view").
+- "Reset account" clears the set.
 
----
+## Decisions
 
-## Dev notes
+- **D-38.1** No `@solid-primitives/storage`: a plain signal with
+  try/catch localStorage behaves the same and avoids a dependency plus
+  pnpm release-age friction. §15b named the lib; the behaviour is what
+  matters.
 
-- `src/lib/privateCoupons.ts` (signal + `localStorage["private_coupons"]`,
-  defensive). "Reset account" clears it (`session.ts`).
-- The card shows "Mark private"/"Unmark private"; the placeholder has an
-  "Unmark" shortcut. The global privacy toggle in the dashboard head
-  covers both tabs.
+## Verification
+
+- Unit tests.
+
+## Later changes
+
+- DESIGN §15c amended 2026-10-01: privacy mode is OFF by default,
+  remembered per device; one eye toggle in the app bar (Settings
+  mirrors). Veiled private wishes are tappable -> "show this one / turn
+  mode off / keep hidden"; one-time hint. The veil replaced the
+  placeholder's old "Unmark" shortcut.

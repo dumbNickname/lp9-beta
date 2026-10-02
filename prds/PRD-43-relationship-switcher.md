@@ -1,47 +1,48 @@
 # PRD-43 — Multiple relationships: switcher + `?rel=`
 
-## Goal
-One account can hold several pairs (the §4 data model already allows it).
-The owner wants a test pair alongside a real partner. Switch from the
-pair badge; the choice is remembered per device, and `?rel=<id>` in the
-URL selects one (bookmarkable).
+> Status: see `PROGRESS.md`.
 
-## Scope
-- Relationship store: `relationships()` (all active), `relationship()`
-  = selected. Selection priority: `?rel=` (if it's one of mine) >
-  localStorage `active_relationship` > newest.
-- PairBadge: when >1 pair or on tap, a menu lists pairs by partner name
-  plus "Pair with someone new" (opens PairFlow while paired; cancel
-  returns). Switching updates `?rel=` via absolute replaceState and
-  refreshes all stores.
-- Per-relationship stores reset on switch (points, coupons, claims).
-- PairFlow polling: detect a NEW relationship (not in the known set)
-  instead of any active one, so an already-paired user can invite again.
-- Reset-account clears `active_relationship`.
-- The recovery prompt stays per relationship (already keyed).
+## Goal
+
+One account can hold several pairs (the §4 data model already allows
+it). The owner wants a test pair alongside a real partner. Switch from
+the pair badge; the choice is remembered per device, and `?rel=<id>`
+selects one (bookmarkable).
+
+## What shipped
+
+- All active relationships are loaded; one is selected. Selection
+  priority: `?rel=` (only if it's one of mine) > localStorage
+  `active_relationship` > newest. Unknown `?rel=` is ignored.
+- `?rel=` is written (absolute `replaceState`) only when the user has
+  more than one pair, so single-pair URLs stay clean.
+- Pair badge menu: pairs by partner name ("Switch") plus "Pair with
+  someone new", which opens the pairing flow while paired with a "Back
+  to my pair" bar.
+- Switching remounts the dashboard per pair and resets per-relationship
+  data (points, coupons, claims); stale responses from the previous
+  pair are dropped.
+- The inviter's pairing poll detects a NEW relationship (not one known
+  when the flow opened), so an already-paired user can invite again.
+  Both success paths select the new pair.
+- Reset account clears `active_relationship`. The recovery prompt stays
+  per relationship.
 
 ## Verification
-User with two pairs: switch -> notes/coupons/balance change; reload
-keeps the selection; `?rel=` opens that pair; an unknown `?rel=` is
-ignored; pairing a third person while paired works.
 
----
+- Unit tests for the pure selection logic and pairing flow.
+- Two-pair user: switching changes notes/coupons/balance; reload keeps
+  the selection; `?rel=` opens that pair; unknown `?rel=` ignored;
+  pairing a third person while paired works.
 
-## Dev notes
-- `src/lib/stores/relationship.ts` rewritten: `relationships()` (active
-  only), `relationship()` = selected, `pickRelationship(rels, url,
-  remembered)` (pure, tested), `selectRelationship`,
-  `onNewRelationship`, `addingPartner` signal. `?rel=` is only written
-  when >1 pair (clean URL for single-pair users); absolute replaceState.
-- `routes/app.tsx`: `<Show when={relationship()} keyed>` remounts the
-  Dashboard per pair; Dashboard resets the points/coupons/claims stores
-  on mount, and the stores drop stale responses after a switch. "Adding"
-  mode renders PairFlow with a "Back to my pair" bar.
-- PairFlow: inviter poll ignores relationships known when the flow
-  opened (`knownIds`); both success paths call `onNewRelationship(id)`
-  (selects the new pair).
-- PairBadge: "Switch" / "Add someone" menu with partner names (fetched
-  per pair).
-- Reset account clears `active_relationship`.
-- Existing PairFlow tests' store mocks gained `onNewRelationship` +
-  `relationships` (test-only).
+## Later changes
+
+- Dashboard remounts only on pair id change; loading gates cover first
+  load only (design session 2026-10-01).
+- Inviter key handoff no longer relies only on the poll (frozen in
+  background tabs): any relationship refresh moves the temp invite key
+  onto the new pair; both sides see a full-screen "paired" moment, then
+  the one-time recovery prompt.
+- Already-paired user opening a pairing link -> new-pair flow (D-UX.2).
+- On mobile the pair name sits in the app bar (PRD-49 and 2026-10-01
+  app bar redesign).

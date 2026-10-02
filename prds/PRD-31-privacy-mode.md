@@ -1,51 +1,43 @@
 # PRD-31 — Privacy mode (shoulder-surf veil)
 
-> Tiny PRD per `DESIGN.md` §16b. Ambiguity -> STOP, load `grill-me`.
+> Status: see `PROGRESS.md`.
+> Later changes: default and persistence replaced by the `DESIGN.md`
+> §15c amendment of 2026-10-01 (see below).
 
 ## Goal
 
-A global private-mode toggle (eye icon in app header) that hides heart
-comments behind a placeholder; ON at every app launch, sticky within the
-session (`DESIGN.md` §15).
+A private-mode toggle (eye icon) that hides heart comments behind a
+placeholder so notes are safe from shoulder-surfing (`DESIGN.md` §15).
 
-## Scope
+## What shipped
 
-**In:**
-- `src/lib/privacy.ts` (new) — `privateMode()` signal, default `true` on
-  module load, `setPrivateMode`, `togglePrivateMode`. In-memory only:
-  reload => ON again (§15c). Session-sticky within the SPA.
-- Header toggle `PrivacyToggle.tsx` — visible on `/app` only; eye /
-  eye-off inline SVG, `aria-pressed`, label "Private mode on/off".
-- `HeartNote` respects it: comment replaced by "Comment hidden — private
-  mode" placeholder (§15d); amount + date still visible.
-- Composer: textarea content itself is not hidden (user is typing it).
+- Eye / eye-off toggle (strike line when on), `aria-pressed` = private
+  on, label "Private mode on/off". Placed in the dashboard head, the only
+  place with private content at the time.
+- When on, each comment shows "Comment hidden — private mode" (§15d);
+  amount and date stay visible.
+- The composer's own text is never hidden (the user is typing it).
+- Originally ON at every launch and in-memory only (reload -> ON again).
 
-**Out:** per-coupon private flags + `@solid-primitives/storage` (Phase 4,
-when coupons exist — no dependency added now; D-31.1).
+Out: per-coupon private flags (PRD-38).
 
-## Touched files / new files
+## Decisions
 
-- `src/lib/privacy.ts`, `src/components/PrivacyToggle.tsx` (new)
-- `src/app.tsx` (header slot) or `src/routes/app.tsx`
-- `src/components/HeartNote.tsx`, `global.css`
-- `tests/unit/privacy.test.tsx`
+- **D-31.1** Privacy mode signal is in-memory only, default ON per load;
+  no storage dependency until per-coupon flags need it. Superseded by
+  §15c 2026-10-01 (now remembered per device).
 
 ## Verification
 
-1. Fresh load: comments hidden, placeholder visible, amounts visible.
-2. Toggle off: comments visible; navigate within app -> still visible.
-3. Reload: hidden again.
+- Unit tests: fresh load hides comments and keeps amounts; toggle off
+  shows them and stays off within the app; reload hides again (original
+  contract, since replaced).
 
-## Open questions
+## Later changes
 
-None.
-
----
-
-## Dev notes
-
-- `src/lib/privacy.ts` module-level signal, default true (reload means
-  ON again).
-- `PrivacyToggle` is in the dashboard head, not the global header (the
-  dashboard is the only place with private content right now).
-- `aria-pressed` = private on. The eye icon gets a strike line when on.
+- §15c amended 2026-10-01 (PRD-38 and design session): OFF by default,
+  remembered per device (localStorage `privacy_mode`).
+- One eye toggle in the app bar; Settings mirrors it.
+- Veiled notes and private wishes are tappable: "Show this one" / "Turn
+  private mode off" / "Keep hidden". One-time hint under the eye.
+- The old hidden-coupon "Unmark" link was replaced by the veil.

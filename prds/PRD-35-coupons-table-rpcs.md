@@ -1,71 +1,53 @@
 # PRD-35 — `coupons` table + RLS + RPCs + data layer
 
-> Tiny PRD per `DESIGN.md` §16b. Ambiguity -> STOP, load `grill-me`.
+> Status: see `PROGRESS.md`.
 
 ## Goal
 
-Server + data layer for wishlists: `coupons` table, member-read RLS, and
-RPCs enforcing who may do what (`DESIGN.md` §6, §13a amended
+Server and data layer for wishlists: a `coupons` table, member-read RLS,
+and RPCs that enforce who may do what (`DESIGN.md` §6, §13a amended
 2026-09-29).
 
-## Scope
+## What shipped
 
-**In:** migration `0007_coupons.sql`:
-- Table per §13a: `title` 1..80 chars, `description` <= 300,
+- Table `coupons` (§13a): `title` 1..80 chars, `description` <= 300,
   `boundaries_note` <= 300, `emoji` <= 16 bytes, `price` 1..50,
-  `status` in draft/approved/declined/retired, `decline_note` <= 200,
-  `template_key` <= 64, timestamps. `receiver_id <> giver_id`. Index
-  `(relationship_id, status)`.
-- RLS: SELECT only, `is_relationship_member(relationship_id)`. No direct
-  writes.
-- RPCs (`security definer`, `search_path = ''`, stable messages):
-  - `submit_coupon(p_rel_id, p_title, p_description, p_boundaries,
-    p_emoji, p_price, p_template_key) returns uuid`: the caller becomes
-    the receiver, the giver is derived as the other member. Relationship
-    must be active.
-  - `update_coupon_draft(p_coupon_id, same fields) returns void`:
-    receiver only, status must be `draft` (a `declined` coupon can't be
-    edited).
-  - `delete_coupon(p_coupon_id)`: receiver only, status draft or
-    declined (hard delete).
-  - `approve_coupon(p_coupon_id)`: giver only, draft -> approved, sets
-    `approved_at`.
-  - `decline_coupon(p_coupon_id, p_note)`: giver only, draft ->
-    declined, sets `declined_at`, `decline_note`.
-  - `retire_coupon(p_coupon_id)`: **either member**, approved -> retired
-    (D-35.1). Claim refunds land with Phase 5.
-  - Messages: `not authenticated`, `not a relationship member`,
-    `relationship not active`, `invalid title`, `invalid price`,
-    `invalid field`, `not found`, `not the receiver`, `not the giver`,
-    `invalid status`.
-- `src/lib/data/coupons.ts`: `listCoupons(relId)` plus the RPC wrappers
-  and `friendlyCouponError`. Types in `types.ts`.
+  `status` draft/approved/declined/retired, `decline_note` <= 200,
+  `template_key` <= 64, timestamps (`approved_at`, `declined_at`, ...).
+  `receiver_id <> giver_id`. Index `(relationship_id, status)`.
+- RLS: SELECT only, for relationship members. No direct writes; all
+  writes via definer RPCs (`search_path = ''`, stable error messages).
+- State machine: draft -> approved | declined; approved -> retired.
+  Declined drafts can't be edited, only deleted.
+- RPCs and who may call them:
+  - `submit_coupon(rel, title, description, boundaries, emoji, price,
+    template_key) returns uuid`: caller becomes the receiver; giver is
+    the other member. Relationship must be active.
+  - `update_coupon_draft`: receiver only, status draft.
+  - `delete_coupon`: receiver only, draft or declined (hard delete).
+  - `approve_coupon`: giver only, draft -> approved.
+  - `decline_coupon(coupon, note)`: giver only, draft -> declined.
+  - `retire_coupon`: either member, approved -> retired (D-35.1). Open
+    claims on it are refunded (added by PRD-41).
+- Messages: `not authenticated`, `not a relationship member`,
+  `relationship not active`, `invalid title`, `invalid price`,
+  `invalid field`, `not found`, `not the receiver`, `not the giver`,
+  `invalid status`. Client maps them to friendly copy.
+- Empty optional fields are trimmed to null. Internal helpers have
+  EXECUTE revoked from API roles.
 
-**Out:** UI (PRD-36+), claims (Phase 5).
+Out: UI (PRD-36+), claims (PRD-41).
+
+## Decisions
+
+- **D-35.1** Either member may retire an approved coupon. Why: the
+  receiver may stop wanting it too, and retiring only refunds, so no
+  harm. Alternative was giver-only per §6b literal.
 
 ## Verification
 
-Live smoke (2 anon clients): A submits -> both see it as draft; B can't
-edit/delete it; A edits the draft; B approves; A can't approve its own
-coupon; approved can't be edited; B declines another -> A sees the note,
-deletes it; price 0/51 rejected; outsider sees nothing; direct insert
-blocked.
-
-## Open questions
-
-None (D-35.1 in `no-human-decisions.md`).
-
----
-
-## Dev notes
-
-- Migration `0007_coupons.sql`. Helpers: `coupon_opt` (trim/empty to
-  null), `check_coupon_fields`, and `load_coupon_for_update` (definer,
-  EXECUTE revoked from API roles).
-- Live smoke 2026-09-29, **21/21 pass**: submit/normalise, price/title
-  bounds, outsider blocked + sees nothing, receiver-only edit/delete,
-  giver-only approve/decline, approved immutable, decline note visible,
-  delete declined, retire, direct insert blocked, internal helper not
-  callable.
-- The retire refund for pending claims is a TODO for Phase 5
-  (`retire_coupon` must be amended when `coupon_claims` exists).
+- Live smoke with two anonymous clients plus an outsider: submit and
+  normalise, price/title bounds (0 and 51 rejected), receiver-only
+  edit/delete, giver-only approve/decline, approved immutable, decline
+  note visible, retire, outsider sees nothing, direct insert blocked,
+  internal helpers not callable. All passed.

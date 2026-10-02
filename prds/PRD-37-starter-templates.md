@@ -1,30 +1,31 @@
 # PRD-37 — Starter coupon templates (empty-wishlist picker)
 
-> Tiny PRD per `DESIGN.md` §16b.
+> Status: see `PROGRESS.md`.
 
 ## Goal
 
-When "I'd love" is empty (or via an "Ideas" button), offer gentle
+When "I'd love" is empty (or via a "Need ideas?" button), offer gentle
 archetype templates (§6c) the user can tick and add as drafts in one tap.
 
-## Scope
+## What shipped
 
-**In:** `src/data/coupon-templates.ts` (typed, keyed; about 8 per
-archetype: getting_to_know / established_couple / close_friends), with
-the relationship's archetype preselected and the others browsable. Each
-template has a key, emoji, title, suggested price, and optional
-boundaries hint. Tone gentle, nothing spicy, culturally broad. Adds via
-`submit_coupon` with `template_key`. Duplicates (same `template_key`
-already in my list) are hidden.
-**Out:** i18n (Phase 7; keep strings in one file).
+- Hardcoded, typed template set (DESIGN §6c): 8 per archetype
+  (getting_to_know / established_couple / close_friends). Each has a
+  key, emoji, title, suggested price (3..40) and optional boundaries
+  hint. Tone gentle, nothing spicy, culturally broad.
+- Picker shows when "I'd love" has no active coupons, or on request. The
+  relationship's archetype is preselected; others browsable.
+- Adds sequentially via `submit_coupon` with `template_key`; templates
+  whose key is already in my list are hidden.
+- Emoji here are product content (the coupon `emoji` field), not UI
+  decoration.
 
----
+Out: i18n (Phase 7; strings kept in one place).
 
-## Dev notes
+## Verification
 
-- `src/data/coupon-templates.ts`: 8 per archetype. Emoji are content
-  (the §6d `emoji` field), not decoration. Prices 3–40.
-- `TemplatePicker.tsx` shows when "I'd love" has no active coupons, or
-  via "Need ideas?". Archetype tabs are preselected from the
-  relationship; keys already in my list are hidden. Adds sequentially
-  via `submit_coupon` with `template_key`.
+- Unit/UI tests; part of the wishlist flow smoke.
+
+## Later changes
+
+- Wishlists now live in the My wishes world (PRD-49).

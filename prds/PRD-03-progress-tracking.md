@@ -1,56 +1,31 @@
 # PRD-03 — Progress tracker + `prds/` convention
 
+> Status: see `PROGRESS.md`.
+
 ## Goal
 
-Lock in the file conventions for tracking work: `PROGRESS.md` at root
-as the single status table, `prds/PRD-NN-slug.md` as immutable PRD
-paths, `prds/PRD-template.md` as the canonical PRD shape.
+Lock in how work is tracked: `PROGRESS.md` at root as the single status
+table, `prds/PRD-NN-slug.md` as stable PRD paths, `prds/PRD-template.md`
+as the canonical PRD shape.
 
-## Scope
+## What shipped
 
-**In:**
-- Confirm `PROGRESS.md` is committed and matches the format in
-  `DESIGN.md` §16d.
-- Confirm `prds/PRD-template.md` is committed and is the contract for
-  all future PRDs.
-- A short `prds/README.md` explaining: numbering, status flow, how
-  PRDs interact with `PROGRESS.md`.
+- `PROGRESS.md` in the `DESIGN.md` §16d format; status lives only there,
+  never in PRD files. Flow: `todo -> in-progress -> dev-done -> qa-done ->
+  merged`.
+- `prds/PRD-template.md` as the contract for every PRD.
+- `prds/README.md`: global numbering, status flow, how PRDs relate to
+  `PROGRESS.md`.
+- Out: decomposing future phases (done lazily, per the decomposition
+  rule); tooling for status transitions (manual edits are fine).
 
-**Out:**
-- Decomposing future-phase PRDs (done lazily per phase per
-  `PROGRESS.md` "decomposition rule").
-- Tooling automation around PRD status transitions (manual edits to
-  `PROGRESS.md` are fine for MVP).
+## Decisions
 
-## Touched files / new files
-
-- `PROGRESS.md` — already created; this PRD verifies it.
-- `prds/PRD-template.md` — already created; this PRD verifies it.
-- `prds/README.md` — new, ~30 lines.
-
-## Data model impact
-
-None.
-
-## UI behavior
-
-None.
+- Convention is owner-confirmed; PRD files never move, only their status
+  row changes.
 
 ## Verification
 
-1. `PROGRESS.md` exists at repo root.
-2. `prds/PRD-template.md` exists.
-3. `prds/README.md` exists and explains numbering + status flow.
-4. Every PRD file under `prds/` follows `PRD-NN-slug.md` naming.
-5. Every PRD listed in `PROGRESS.md` Phase 0 has a corresponding file
-   in `prds/`.
-
-**Unit tests:** none.
-
-**QA suite:**
-- Script: `ls prds/PRD-*.md` and `grep -oE 'prds/PRD-[0-9]+-[a-z-]+\.md' PROGRESS.md`
-  produce the same set (no orphan PRDs, no missing PRDs).
-
-## Open questions
-
-None — convention is owner-confirmed.
+- Every PRD file follows `PRD-NN-slug.md`, and the set of files under
+  `prds/` matches the set referenced in `PROGRESS.md` (no orphans, none
+  missing).

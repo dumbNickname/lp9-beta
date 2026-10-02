@@ -1,69 +1,44 @@
 # PRD-04 — Dev subagent definition
 
+> Status: see `PROGRESS.md`.
+
 ## Goal
 
-Create `.opencode/agent/dev.md` so the orchestrator can hand a single
-PRD to a Dev subagent that has the right tools, the right read context,
-and clear constraints (no scope creep, no unilateral PRD sign-off).
+Define a Dev subagent role so the orchestrator can hand it a single PRD
+with the right tools, the right read context and clear limits (no scope
+creep, no self sign-off).
 
-## Scope
+## What shipped
 
-**In:**
-- `.opencode/agent/dev.md` describing:
-  - Trigger: explicit invocation by the orchestrator with one PRD path.
-  - Required reads on every invocation: the PRD, `DESIGN.md`,
-    `PROGRESS.md`, the files the PRD's "Touched files" section names.
-  - Allowed tools: `read`, `edit`, `write`, `bash`, `grep`, `glob`.
-    `bash` may run pnpm + supabase CLI commands targeting the **dev**
-    Supabase project only.
-  - Forbidden: editing files outside the PRD's stated scope; running
-    migrations against `prod`; marking the PRD `qa-done` or `merged`
-    in `PROGRESS.md`.
-  - Required behaviors:
-    - On any PRD ambiguity, load the `grill-me` skill and stop.
-    - Apply the `pragmatic` skill while writing code.
-    - Write unit tests for the feature; run them; report pass/fail.
-    - Append a `## Dev notes` section to the PRD on completion.
-    - Update `PROGRESS.md` row for this PRD to `dev-done` (and only
-      to `dev-done`).
+- Dev role definition in `.opencode/agent/`.
+- Trigger: explicit orchestrator invocation with one PRD path.
+- Required reads each run: the PRD, `DESIGN.md`, `PROGRESS.md`, and the
+  files in the PRD's scope.
+- Tools: read, edit, write, bash, grep, glob. Bash may run pnpm and the
+  Supabase CLI against the **dev** project only.
+- Forbidden: edits outside the PRD's scope; anything against `prod`;
+  marking a PRD `qa-done` or `merged`.
+- Required behaviour: on ambiguity load `grill-me` and stop; apply
+  `pragmatic`; write and run unit tests and report results; append
+  `## Dev notes` to the PRD; set the PRD's `PROGRESS.md` row to
+  `dev-done` and nothing else.
+- Out: the QA role (PRD-05); any feature work.
 
-**Out:**
-- The QA subagent (PRD-05).
-- Any actual feature work — this PRD only defines the role.
+## Decisions
 
-## Touched files / new files
-
-- `.opencode/agent/dev.md` — new.
-
-## Data model impact
-
-None.
-
-## UI behavior
-
-None.
+- Frontmatter and tool allow-list follow opencode's current subagent API,
+  checked via the `customize-opencode` skill at build time, not guessed.
 
 ## Verification
 
-1. `.opencode/agent/dev.md` exists.
-2. File can be loaded by opencode without a syntax error.
-3. The agent's instructions explicitly cover: required reads, allowed
-   tools, forbidden actions, ambiguity rule, completion handoff.
-4. Smoke test: orchestrator invokes the Dev agent on a trivial test
-   PRD (e.g. "add `# hi` to a scratch file"); agent reads, edits,
-   reports `dev-done`, does not edit anything else.
+- Role file loads in opencode without error and covers required reads,
+  tools, forbidden actions, ambiguity rule and handoff.
+- Smoke: a trivial test PRD is done, reported `dev-done`, nothing else
+  touched.
+- Adversarial: no edits to unrelated files, no `PROGRESS.md` edits beyond
+  its row, nothing against `prod`; a vague PRD triggers `grill-me`.
 
-**Unit tests:** N/A (config file).
+## Later changes
 
-**QA suite:**
-- Adversarial: orchestrator hands the Dev agent a PRD that says "edit
-  file X"; agent should NOT also edit unrelated file Y, NOT touch
-  `PROGRESS.md` beyond its row, NOT run anything against `prod`.
-- Ambiguity: orchestrator hands a deliberately vague PRD; Dev agent
-  must invoke `grill-me`, not improvise.
-
-## Open questions
-
-- Frontmatter format and tool allow-list specifics depend on opencode's
-  current subagent API. Dev agent should consult `customize-opencode`
-  skill at PRD-execution time rather than guessing.
+- Workflow: solo-owner practice commits small changes straight to
+  `master` (branches + PRs once branch protection is on).

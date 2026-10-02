@@ -1,89 +1,45 @@
 # PRD-28 — Give hearts (composer, encryption, backdating)
 
-> Tiny PRD per `DESIGN.md` §16b. Ambiguity -> STOP, load `grill-me`.
+> Status: see `PROGRESS.md`.
+> Later changes: composer now lives in the Give world (PRD-49), not a
+> single dashboard.
 
 ## Goal
 
-A paired user can give their partner 1–5 hearts with an optional
-E2E-encrypted comment (<= 200 chars) and an optional backdated event date.
+A paired user can give their partner 1-5 hearts with an optional
+end-to-end encrypted comment (up to 200 chars) and an optional backdated
+event date. Calm, not gamified: no confetti, streaks or counts.
 
-## Scope
+## What shipped
 
-**In:**
-- `src/lib/crypto/comments.ts` (new) — `encryptComment(relId, text)` ->
-  `{ciphertext, iv} | null` (empty/whitespace -> null); `decryptComment
-  (relId, ct, iv)` -> `string | null` (null when no key / fails). Uses
-  `getKey(relId)` + `aes.ts`. Never logs plaintext.
-- `src/lib/stores/points.ts` (new) — `points()` signal, `refreshPoints
-  (relId)`, `usePointsFocusRefresh`, `give(...)` that calls data layer
-  then refreshes (own actions feel instant, §9a).
-- `src/components/HeartComposer.tsx` (new):
-  - 5-heart selector (radiogroup, arrow-key accessible, `aria-label`
-    "N hearts"); default none selected; send disabled until chosen.
-  - Comment `<textarea>` with live counter, `maxlength=200` (§12c).
-    Placeholder prompts noticing ("What did they do that you loved?").
-  - "When?" — default "Today"; a small "earlier" link reveals
-    `<input type=date>` with `min = today-30`, `max = today` (D-27.2).
-  - **No key on device (owner decision 2026-09-29):** comment field
-    disabled with a note + "Unlock with recovery password" action that
-    opens `RecoveryPassword mode="restore"`; hearts-only send still
-    allowed. Plaintext NEVER sent.
-  - After send: gentle confirmation ("Sent. They'll see it next time
-    they open the app."), form resets. Errors via `friendlyPointsError`.
-- Wire into dashboard in `src/routes/app.tsx` (replaces the "Welcome
-  back" line). Partner's `display_name` shown ("For Bob").
+- Heart picker: 5 hearts as an accessible radiogroup (arrows, Home/End,
+  "N hearts" labels); nothing selected by default; send disabled until
+  chosen.
+- Comment field with live counter, hard cap 200 chars (§12c). Placeholder
+  rotates between noticing prompts ("What did they do that you loved?").
+- "When?": defaults to today; an "earlier" link reveals a date picker
+  bounded to the last 30 days through local today (D-27.2).
+- Comments are encrypted on the device with the pair key (AES-GCM, fresh
+  12-byte IV); empty comment sends null/null. Plaintext is never sent or
+  logged; encryption throws instead of falling back when no key exists.
+- No key on this device (owner decision 2026-09-29): comment field
+  disabled with a note and an "Unlock with recovery password" action;
+  hearts-only send still allowed. Key check is tri-state so the composer
+  never flashes "locked" before the check finishes.
+- After send: gentle confirmation ("Sent. They'll see it next time they
+  open the app."), form resets, list refreshes at once (own actions feel
+  instant, §9a). Partner's display name shown ("For Bob").
 
-**Out:** feed (PRD-29), balance (PRD-30), bonus heart, emails (Phase 6).
+Out: feed (PRD-29), balance (PRD-30), bonus heart, emails (Phase 6).
 
-## Touched files / new files
+## Decisions
 
-- `src/lib/crypto/comments.ts`, `src/lib/stores/points.ts`,
-  `src/components/HeartComposer.tsx` (new)
-- `src/routes/app.tsx`, `src/styles/global.css`
-- Partner profile fetch: `src/lib/data/profile.ts` gets
-  `getProfileById(id)` (RLS co-member policy already allows it).
-- `tests/unit/heart-composer.test.tsx`, `tests/unit/crypto-comments.test.ts`
-
-## Data model impact
-
-None (uses PRD-27).
-
-## UI behavior
-
-See Scope. Calm, not gamified: no confetti, no streaks, no counts.
+- No-key behaviour: block the comment, allow hearts-only, offer restore
+  (owner, 2026-09-29).
+- Shipped together with PRD-29..32 as one dashboard slice.
 
 ## Verification
 
-1. Select 3 hearts, type comment, send -> RPC called with ciphertext +
-   12-byte iv; plaintext absent from request args.
-2. Empty comment -> ciphertext/iv null.
-3. 201st char not accepted; counter shows remaining.
-4. Date picker bounds: today-30..today.
-5. No key -> comment disabled, restore action visible, hearts-only works.
-6. Keyboard: arrow keys move heart selection; send reachable via Tab.
-
-**Unit tests (Dev):** encrypt/decrypt round-trip with stored key; null
-when key missing; composer behaviours 1–5 with mocked data layer.
-
-## Open questions
-
-None.
-
----
-
-## Dev notes
-
-- Shipped together with PRD-29..32 as one dashboard slice (orchestrator
-  implemented directly; one commit).
-- `src/lib/crypto/comments.ts`: `encryptComment` **throws** when the key
-  is missing (never plaintext fallback); `decryptComment(key, ct, iv)`
-  takes a key (store fetches it once per refresh) and returns null on
-  failure.
-- `src/components/HeartPicker.tsx`: radiogroup, roving tabindex,
-  arrows/Home/End.
-- Partner name via `getDisplayName(id)` in `src/lib/data/profile.ts`
-  (co-member RLS policy).
-- The composer rotates between 4 noticing prompts as its placeholder.
-- The key check is tri-state (`null` = not checked yet), so the composer
-  never flashes "locked" before the IndexedDB check finishes.
-- Tests: `tests/unit/hearts-ui.test.tsx`, `tests/unit/hearts-lib.test.ts`.
+- Unit tests: RPC receives ciphertext + 12-byte IV and no plaintext;
+  empty comment -> nulls; 200-char cap; date bounds; no-key state;
+  keyboard selection; encrypt/decrypt round-trip and missing-key failure.

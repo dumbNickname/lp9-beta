@@ -34,7 +34,9 @@ See `PRD-template.md`. Required sections:
 - **Open questions** — flag rather than guess. Empty section means
   no ambiguity.
 
-After execution, agents fill:
+Once a PRD has shipped it is compressed into a short record (Goal,
+What shipped, Decisions, Verification, Gotchas, Later changes); see
+`AGENTS.md` here. During execution, agents fill:
 
 - `## Dev notes` — Dev appends self-test results, choices the PRD
   didn't pin down.
