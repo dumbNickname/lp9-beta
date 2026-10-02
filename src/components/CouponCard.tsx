@@ -1,4 +1,4 @@
-import { createSignal, Show } from "solid-js";
+import { createSignal, For, Show } from "solid-js";
 import HeartIcon from "~/components/HeartIcon";
 import { confirmSheet } from "~/components/ConfirmSheet";
 import { friendlyCouponError } from "~/lib/data/coupons";
@@ -41,6 +41,25 @@ function statusLabel(c: Coupon, mine: boolean, partner: string, claimed: boolean
     case "retired":
       return "Retired";
   }
+}
+
+// Coffee-card stamps towards a wish: at most 10 stamps, each worth
+// price/10 hearts on big wishes. Self-referential, never compared.
+function StampCard(props: { price: number; short: number }) {
+  const slots = () => Math.min(props.price, 10);
+  const filled = () =>
+    Math.floor(((props.price - props.short) / props.price) * slots());
+  return (
+    <span class="stamps" aria-hidden="true">
+      <For each={Array.from({ length: slots() }, (_, i) => i)}>
+        {(i) => (
+          <span class="stamp" classList={{ "is-on": i < filled() }} style={{ "--sd": `${i * 50}ms` }}>
+            <HeartIcon filled={i < filled()} />
+          </span>
+        )}
+      </For>
+    </span>
+  );
 }
 
 export default function CouponCard(props: Props) {
@@ -155,6 +174,7 @@ export default function CouponCard(props: Props) {
               : statusLabel(props.coupon, props.mine, props.partnerName, !!props.claimed)}
           </span>
           <Show when={(props.short ?? 0) > 0 && !props.claimed}>
+            <StampCard price={props.coupon.price} short={props.short ?? 0} />
             <span class="coupon-short">
               {props.short} more {props.short === 1 ? "heart" : "hearts"} to go
             </span>

@@ -4,7 +4,10 @@ import ForPartner from "~/components/ForPartner";
 import HeartComposer from "~/components/HeartComposer";
 import HeartsFeed from "~/components/HeartsFeed";
 import MyWishes from "~/components/MyWishes";
+import Garland from "~/components/Garland";
 import NoteJar from "~/components/NoteJar";
+import Together from "~/components/Together";
+import { weekWarmth } from "~/lib/together";
 import PairBadge from "~/components/PairBadge";
 import RecoveryPassword from "~/components/RecoveryPassword";
 import SettingsPage from "~/components/SettingsPage";
@@ -151,7 +154,7 @@ export default function Dashboard(props: Props) {
     claims().filter((c) => c.claimer_id === props.userId && c.status === "accepted").length;
 
   return (
-    <div class="dashboard" classList={{ [`dashboard--${tab()}`]: true }}>
+    <div class="dashboard" classList={{ [`dashboard--${tab()}`]: true }} data-warmth={weekWarmth(feed())}>
       <AppBar
         myName={props.displayName}
         partnerName={partnerName()}
@@ -229,10 +232,16 @@ export default function Dashboard(props: Props) {
               hasKey={hasCommentKey() !== false}
               onRestoreKey={() => setRestoring(true)}
             />
+            <Show when={feed().length > 0}>
+              <Garland feed={feed()} userId={props.userId} partnerName={partnerName()} />
+            </Show>
           </div>
           <div class="world-side">
             <Show when={feed().some((f) => f.giver_id !== props.userId && !!f.comment)}>
               <NoteJar feed={feed()} userId={props.userId} partnerName={partnerName()} />
+            </Show>
+            <Show when={feed().length > 0}>
+              <Together feed={feed()} userId={props.userId} partnerName={partnerName()} />
             </Show>
             <HeartsFeed
               relationshipId={props.relationship.id}

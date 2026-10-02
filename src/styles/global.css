@@ -3797,3 +3797,524 @@ button.balance-pill[aria-expanded="true"] {
     font-size: var(--text-lg);
   }
 }
+
+/* --- "Us" visuals: garland, almanac, stamps, warmth -------------------- */
+
+.garland {
+  margin-block: var(--space-4) var(--space-2);
+  padding: var(--space-3) var(--space-3) var(--space-2);
+  border-radius: var(--radius-lg);
+  border: var(--border-thin);
+  background:
+    radial-gradient(70% 80% at 50% 0%, color-mix(in srgb, var(--world-mine-soft) 70%, transparent), transparent 75%),
+    var(--color-surface);
+  box-shadow: var(--shadow-soft);
+}
+
+.garland-head,
+.together-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.garland-title,
+.together-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-style: italic;
+  font-weight: 500;
+}
+
+.garland-ribbon {
+  position: relative;
+  overflow: hidden;
+  padding: 0.1rem 0.7rem;
+  border-radius: 999px;
+  background-color: var(--world-mine-soft);
+  color: var(--world-mine);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.garland-ribbon::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 30%, rgb(255 255 255 / 55%) 50%, transparent 70%);
+  translate: -120% 0;
+  animation: ribbon-shine 3.2s var(--ease) 600ms infinite;
+}
+
+@keyframes ribbon-shine {
+  40%,
+  100% {
+    translate: 120% 0;
+  }
+}
+
+.garland-stage {
+  position: relative;
+  block-size: 5.5rem;
+  margin-block: var(--space-1) 0;
+}
+
+.garland-string {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: 0;
+  inline-size: 100%;
+  block-size: 4rem;
+  overflow: visible;
+}
+
+.garland-string path {
+  fill: none;
+  stroke: var(--color-muted-fg);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  opacity: 0.7;
+}
+
+.garland-bulbs {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: 0;
+  block-size: 4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.garland-slot {
+  position: absolute;
+  translate: -50% 0;
+  transform-origin: 50% 0;
+  animation: bulb-sway 4.5s ease-in-out var(--gd) infinite alternate;
+}
+
+@keyframes bulb-sway {
+  from {
+    rotate: calc(var(--sway) * 4deg - 3deg);
+  }
+  to {
+    rotate: calc(var(--sway) * -4deg + 3deg);
+  }
+}
+
+button.garland-bulb {
+  --bulb: var(--world-give);
+  position: relative;
+  display: grid;
+  justify-items: center;
+  inline-size: 1.4rem;
+  min-block-size: 2.2rem;
+  padding: 0;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  animation: bulb-in 500ms var(--ease) var(--gd) both;
+}
+
+button.garland-bulb:disabled {
+  opacity: 1;
+}
+
+.garland-bulb--mine {
+  --bulb: var(--world-mine);
+}
+
+.garland-bulb--theirs {
+  --bulb: var(--world-theirs);
+}
+
+.garland-cap {
+  inline-size: 0.45rem;
+  block-size: 0.35rem;
+  border-radius: 2px 2px 1px 1px;
+  background-color: var(--color-muted-fg);
+}
+
+.garland-glass {
+  inline-size: 0.95rem;
+  block-size: 1.25rem;
+  border-radius: 50% 50% 50% 50% / 42% 42% 58% 58%;
+  background-color: color-mix(in srgb, var(--color-muted-bg) 80%, transparent);
+  border: 1px solid var(--color-border);
+  transition:
+    transform 200ms var(--ease),
+    box-shadow 300ms var(--ease);
+}
+
+.garland-bulb--l1 .garland-glass,
+.garland-bulb--l2 .garland-glass,
+.garland-bulb--l3 .garland-glass {
+  border-color: transparent;
+  background:
+    radial-gradient(40% 35% at 38% 32%, rgb(255 255 255 / 70%), transparent 70%),
+    var(--bulb);
+}
+
+.garland-bulb--l1 .garland-glass {
+  box-shadow: 0 0 6px 1px color-mix(in srgb, var(--bulb) 45%, transparent);
+}
+
+.garland-bulb--l2 .garland-glass {
+  box-shadow: 0 0 12px 3px color-mix(in srgb, var(--bulb) 55%, transparent);
+  animation: bulb-glow 2.8s ease-in-out infinite alternate;
+}
+
+.garland-bulb--l3 .garland-glass {
+  transform: scale(1.12);
+  box-shadow: 0 0 18px 6px color-mix(in srgb, var(--bulb) 60%, transparent);
+  animation: bulb-glow 2.2s ease-in-out infinite alternate;
+}
+
+.garland-bulb:not(:disabled):hover .garland-glass,
+.garland-bulb.is-open .garland-glass {
+  transform: scale(1.25);
+}
+
+.garland-bulb.is-today::after {
+  content: "";
+  position: absolute;
+  inset-block-end: -0.55rem;
+  inline-size: 0.3rem;
+  block-size: 0.3rem;
+  border-radius: 50%;
+  background-color: var(--color-fg);
+  opacity: 0.55;
+}
+
+@keyframes bulb-glow {
+  to {
+    filter: brightness(1.15) saturate(1.1);
+  }
+}
+
+@keyframes bulb-in {
+  from {
+    opacity: 0;
+    transform: translateY(-0.6rem);
+  }
+}
+
+.garland-caption,
+.together-caption {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--color-muted-fg);
+}
+
+.garland-caption {
+  text-align: center;
+}
+
+/* Notes of one day (garland / season) */
+.day-peek {
+  margin-block-start: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius);
+  background-color: color-mix(in srgb, var(--world-give-soft) 55%, var(--color-surface));
+  animation: fade-up 260ms var(--ease);
+}
+
+.day-peek-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-muted-fg);
+}
+
+.day-peek-list {
+  display: grid;
+  gap: var(--space-2);
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.day-peek-item {
+  display: grid;
+  gap: 0.1rem;
+}
+
+.day-peek-who {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--world-give);
+}
+
+.day-peek-who .heart-row {
+  font-size: 0.7rem;
+}
+
+.day-peek-text {
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  line-height: 1.4;
+}
+
+/* Almanac: season dots / day clock / words */
+.together {
+  margin-block: var(--space-4);
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  border: var(--border-thin);
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-soft);
+}
+
+.together-tabs {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  border-radius: 999px;
+  background-color: var(--color-muted-bg);
+}
+
+button.together-tab {
+  min-block-size: 1.9rem;
+  padding: 0.15rem 0.75rem;
+  background: none;
+  border: 0;
+  color: var(--color-muted-fg);
+  font-size: var(--text-xs);
+}
+
+button.together-tab[aria-pressed="true"] {
+  background-color: var(--color-surface);
+  color: var(--world-give);
+  box-shadow: 0 1px 3px rgb(60 40 20 / 15%);
+}
+
+.season,
+.dayclock,
+.words {
+  margin-block-start: var(--space-3);
+  animation: fade-up 260ms var(--ease);
+}
+
+.season-grid {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 0.3rem;
+  margin-block-end: var(--space-2);
+}
+
+.season-week {
+  display: grid;
+  gap: 0.3rem;
+}
+
+button.season-dot,
+.season-dot {
+  display: block;
+  inline-size: 100%;
+  aspect-ratio: 1;
+  min-block-size: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background-color: transparent;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-border) 70%, transparent);
+}
+
+button.season-dot:disabled {
+  opacity: 1;
+}
+
+.season-dot--future {
+  box-shadow: none;
+}
+
+.season-dot--l1 {
+  background-color: color-mix(in srgb, var(--world-give) 35%, var(--color-surface));
+  box-shadow: none;
+  scale: 0.7;
+}
+
+.season-dot--l2 {
+  background-color: color-mix(in srgb, var(--world-give) 65%, var(--color-surface));
+  box-shadow: none;
+  scale: 0.85;
+}
+
+.season-dot--l3 {
+  background:
+    radial-gradient(40% 40% at 35% 30%, rgb(255 255 255 / 45%), transparent 70%),
+    var(--world-give);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--world-give) 50%, transparent);
+}
+
+button.season-dot:not(:disabled):hover,
+button.season-dot.is-open {
+  outline: 2px solid var(--world-mine);
+  outline-offset: 1px;
+}
+
+.dayclock {
+  display: grid;
+  grid-template-columns: 9rem minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.dayclock-face {
+  inline-size: 9rem;
+  block-size: 9rem;
+}
+
+.dayclock-rim {
+  fill: color-mix(in srgb, var(--world-mine-soft) 45%, var(--color-surface));
+  stroke: var(--color-border);
+}
+
+/* Night half (18h..6h) is a soft dusk tint on the left side. */
+.dayclock-night {
+  fill: none;
+  stroke: color-mix(in srgb, var(--world-theirs) 22%, transparent);
+  stroke-width: 6;
+  stroke-dasharray: 169.65 169.65;
+  stroke-dashoffset: -169.65;
+}
+
+.dayclock-petal {
+  fill: color-mix(in srgb, var(--world-give) 70%, transparent);
+  transform-box: fill-box;
+  transform-origin: 0 50%;
+  animation: petal-open 600ms var(--ease) var(--pd) both;
+}
+
+.dayclock-petal.is-peak {
+  fill: var(--world-give);
+}
+
+@keyframes petal-open {
+  from {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+}
+
+.dayclock-tick {
+  fill: var(--color-muted-fg);
+  font-size: 7px;
+  text-anchor: middle;
+  font-family: var(--font-body);
+}
+
+.dayclock-core {
+  fill: var(--world-mine);
+}
+
+.words-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: baseline;
+  gap: var(--space-1) var(--space-3);
+  margin: 0 0 var(--space-2);
+  padding: var(--space-2) 0;
+  list-style: none;
+}
+
+.words-word {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: var(--wsz);
+  line-height: 1.2;
+  rotate: var(--wr);
+  color: var(--world-give);
+}
+
+.words-word--mine {
+  color: var(--world-mine);
+}
+
+.words-word--theirs {
+  color: var(--world-theirs);
+}
+
+.words .together-caption {
+  text-align: center;
+}
+
+/* Wish stamp card */
+.stamps {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin-inline-end: var(--space-2);
+  vertical-align: middle;
+}
+
+.stamp {
+  display: grid;
+  place-items: center;
+  inline-size: 1.15rem;
+  block-size: 1.15rem;
+  border-radius: 50%;
+  border: 1.5px dashed color-mix(in srgb, var(--world-mine) 45%, transparent);
+  color: color-mix(in srgb, var(--world-mine) 35%, transparent);
+  font-size: 0.6rem;
+}
+
+.stamp.is-on {
+  border: 1.5px solid var(--world-mine);
+  background-color: var(--world-mine-soft);
+  color: var(--world-mine);
+  rotate: -8deg;
+  animation: stamp-in 380ms var(--ease) var(--sd) both;
+}
+
+@keyframes stamp-in {
+  from {
+    opacity: 0;
+    scale: 1.8;
+  }
+}
+
+/* Week warmth: the page glow warms on weeks with more notes. */
+.dashboard[data-warmth="1"] {
+  --warm: 18%;
+}
+
+.dashboard[data-warmth="2"] {
+  --warm: 34%;
+}
+
+.dashboard[data-warmth="3"] {
+  --warm: 50%;
+}
+
+.dashboard[data-warmth="1"],
+.dashboard[data-warmth="2"],
+.dashboard[data-warmth="3"] {
+  background-image: radial-gradient(
+    90% 40% at 50% 0%,
+    color-mix(in srgb, var(--world-give-soft) var(--warm), transparent),
+    transparent 75%
+  );
+  background-repeat: no-repeat;
+}
+
+@media (max-width: 30rem) {
+  .dayclock {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+  }
+}

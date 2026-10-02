@@ -171,6 +171,8 @@ describe("CouponCard affordable + claim", () => {
     ));
     expect(getByText("5 more hearts to go")).toBeInTheDocument();
     expect(container.querySelector(".ticket-stub")!.textContent).toBe("20");
+    expect(container.querySelectorAll(".stamp")).toHaveLength(10);
+    expect(container.querySelectorAll(".stamp.is-on")).toHaveLength(7);
   });
 });
 

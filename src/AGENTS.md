@@ -67,6 +67,12 @@ page shell where pairs give hearts, wish and claim.
 - More menu holds How it works (visual guide), Settings, Home.
 - Give world includes the memory jar (partner notes, tap for a random
   one); the jar shows fullness, never a count.
+- "Us" visuals (trial, owner reviews which stay): garland of the last
+  14 days, almanac card (season dots, day clock, my words), shared
+  milestone ribbon, wish stamp card, week warmth tint. Computed on the
+  device from the decrypted feed; never split per partner (words show
+  only my own notes and hide in private mode); day peeks honour private
+  mode.
 - In-app confirm sheets only, never native dialogs.
 - Layering: section heads < site header < tab bar < app bar/popovers <
   sheets < paired moment. Hints/coachmarks sit in the page flow and

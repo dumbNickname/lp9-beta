@@ -9,6 +9,24 @@
 > ratified or changed, move the rationale into `DESIGN.md`/the PRD and
 > trim the entry here.
 
+## "Us" visuals trial 2026-10-02 (owner: build all, prune later)
+
+### D-UX.7 Shared palette, never per partner
+- Garland bulbs, season dots and clock petals count both partners'
+  notes together; colours rotate by position, not by who gave.
+
+### D-UX.8 Words = my notes only, hidden in private mode
+- Partner's words would read as a judgement of them; private mode
+  hides the cloud because it is note content.
+
+### D-UX.9 Stamp card on "saving up" wishes
+- Max 10 stamps (big wishes: one stamp = price/10). Is a progress
+  visual despite "no progress bars"; owner asked for it as a trial.
+
+### D-UX.10 Milestones 1 / 10 / 25 / 50 shared notes; week warmth 0-3
+- Absolute thresholds on hearts in the last 7 days; quiet weeks just
+  return to the normal background.
+
 ## Design/UX session 2026-10-01 (see `WORKLOG.md`)
 
 ### D-UX.1 Invite link: "Join Alice" on onboarding pairs in one tap
