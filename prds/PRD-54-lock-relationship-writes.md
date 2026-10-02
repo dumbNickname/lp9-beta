@@ -25,3 +25,12 @@ The live probe in `REVIEW.md` #1: B's direct updates to status /
 member_a / wrap columns affect 0 rows or error; outsider
 `rpc("gen_pair_code")` -> permission denied; pairing, recovery set /
 restore, hearts, coupons and claims still work end-to-end.
+
+## Dev notes
+- Migration `0010` as scoped. The client never writes `relationships`
+  directly (only `profiles`), so no app code changes.
+- Static guard test: no surviving write policy on `relationships`;
+  listed helpers revoked; `is_relationship_member` kept for
+  `authenticated` only.
+- Live probe runs after the migration is applied by the push to
+  `master`.
