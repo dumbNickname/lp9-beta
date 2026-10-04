@@ -116,6 +116,11 @@ Thinking so far, to pick up when Phase 6 resumes:
   per relationship on my side. Asked owner; unconfirmed.
 - **Heart comment prompts per archetype**: rotate prompts tuned to
   getting_to_know / established_couple / close_friends.
+- **Appreciation symbol per pair** (owner agreed): hearts read romantic,
+  awkward for close friends. Default by archetype (close friends =
+  star; getting to know = owner to pick, maybe star), pair can change it
+  in Settings. Copy follows the symbol ("Send a star", star balance),
+  not only the icon. Different symbols also tell pairs apart.
 - **"Read" moment**: the first time the receiver opens a new note, give
   it a soft unfold animation; show new-since-last-visit notes first
   (local `last_seen_at`). No read receipts to the sender (avoid
