@@ -134,6 +134,11 @@ Docs describe ideas, contracts and where things live, not code lines.
   ideas in `IDEAS.md`; session story in `WORKLOG.md`. Other docs stay
   undated.
 - Every bug found in E2E gets a regression test.
+- Always update docs in the same commit as the work, unasked: the DOX
+  pass plus the source-of-truth docs (`PROGRESS.md` status,
+  `NEXT_SESSION.md` next steps and owner items, a `WORKLOG.md` entry,
+  `REVIEW.md` items fixed, owner guides in `docs/` when setup changes).
+  A task is not done until they match reality.
 
 ## Product/engineering lessons (keep current)
 

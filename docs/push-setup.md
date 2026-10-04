@@ -12,7 +12,9 @@ Never commit the private key or the webhook secret.
 ## 1. GitHub — public key for the web build
 Repo → Settings → Secrets and variables → Actions → **New repository
 secret**
-- `VITE_VAPID_PUBLIC_KEY` = the `VAPID_PUBLIC_KEY` value.
+- `VAPID_PUBLIC_KEY` = the public key (the workflow also accepts the
+  name `VITE_VAPID_PUBLIC_KEY`). Must be a **Repository secret**, not a
+  Variable or an environment secret.
 Then re-run the latest "Deploy to GitHub Pages" workflow (or push any
 commit).
 
@@ -81,4 +83,5 @@ select vault.update_secret(
   from public.push_subscriptions order by created_at desc limit 20;
   ```
 - Settings shows "Notifications aren't set up on this site yet" → step 1
-  missing (public key not baked into the build).
+  missing or misnamed (public key not baked into the build), or the
+  last deploy ran before the secret was added: re-run it.

@@ -18,7 +18,8 @@
     worlds Give / My wishes / For partner, ticket cards, Coming-up
     calendar, desktop 2 columns, settings page (`#settings`);
   - installable PWA (manifest, icons, theme-colour, offline shell SW);
-  - web push code (opt-in, content-free) — **owner setup pending**.
+  - web push (opt-in, content-free): server side live; web build
+    needs a redeploy with the public key.
 - Status per PRD: `PROGRESS.md`. Most PRDs from 28 on are `dev-done`
   (no separate QA pass yet); SQL PRDs 27/35/41 are merged + live-smoked.
 
@@ -33,13 +34,11 @@
 1. **"Us" visuals trial:** owner reviews garland, almanac (season /
    clock / words), milestone ribbon, wish stamps, week warmth on the
    live site and picks which stay (D-UX.7–10). Remove the rest.
-2. **Push setup check:** ask the owner whether `docs/push-setup.md`
-   steps 1–4 are done (GitHub secret `VITE_VAPID_PUBLIC_KEY`, Edge
-   Function secrets, Vault secrets). Then verify end-to-end: turn on in
-   Settings on a real device, partner sends a heart, check
-   `net._http_response` + function logs. The `notify` function is
-   deployed by the Supabase GitHub integration (it answered 401 to
-   unsigned calls).
+2. **Push: verify the web side.** Server side verified live (heart ->
+   trigger -> `notify` -> push sent). Builds lacked the public key: the
+   repo secret is named `VAPID_PUBLIC_KEY`; the workflow now accepts it.
+   Browser E2E: B turns on in Settings, A sends a heart, B's service
+   worker shows the notification. Then mark PRD-53 merged.
 3. **Unfinished reviews:** the independent review subagents timed out
    (gateway) every time. `REVIEW.md` holds the orchestrator's own
    findings. Re-run in small scopes, one per call, each ~10 min of work:
@@ -65,7 +64,7 @@
 
 ## Owner action items
 
-- Push setup (`docs/push-setup.md`).
+- Push: none (steps 1–4 done).
 - Branch protection on `master`; sign Supabase DPA before launch; pick
   the final app name (blocks Phase 9 + brand icon).
 

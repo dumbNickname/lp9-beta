@@ -71,4 +71,23 @@ agent picks the gadget; mobile header = two rows with a wallet strip.
 - All of the above in dark theme.
 
 ### Left for later
-- QA pass on these changes; PRD-54 security fix; stylesheet dedupe.
+- QA pass on these changes; stylesheet dedupe.
+
+## Session: used invite links, push check
+
+**Brief:** reopening a used invite link should land in the app; check
+the owner's push setup; confirm the PRD-54 fix.
+
+- Used invite + already paired -> back to the pair (DESIGN §4
+  amendment). Live E2E first still showed the error: RPC errors are
+  plain objects, so the "already used" text was never read. Fixed with
+  a shared data-layer helper; regression test with the real error shape.
+- A claims test had a hard-coded date that went stale; now relative.
+- Push: server side verified live (trigger -> `notify` -> push sent).
+  Web build lacked the public key: the repo secret was named
+  `VAPID_PUBLIC_KEY`, the workflow read `VITE_VAPID_PUBLIC_KEY`. The
+  workflow now accepts either; owner guide updated.
+- PRD-54 re-probed live: relationship UPDATE (archive, member swap,
+  blob overwrite) changes 0 rows; outsider reads 0 rows; helpers denied.
+- README title is now `lp9`. The in-app `APP_NAME` constant is
+  unchanged (owner to decide).

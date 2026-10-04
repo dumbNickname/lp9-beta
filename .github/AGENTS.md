@@ -35,8 +35,9 @@ Owns the GitHub workflows (currently one deploy workflow).
 - Pages source = GitHub Actions.
 - Branch protection on `master` (PR required, Supabase preview +
   gitleaks checks, linear history).
-- Actions secrets: Supabase URL, publishable key, VAPID public key
-  (without it, Settings reports notifications as not set up).
+- Actions secrets (repository secrets): Supabase URL, publishable key,
+  VAPID public key (named `VAPID_PUBLIC_KEY` or `VITE_VAPID_PUBLIC_KEY`;
+  without it, Settings reports notifications as not set up).
 
 ## Child DOX Index
 
