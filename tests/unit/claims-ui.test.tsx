@@ -1,6 +1,7 @@
 import { cleanup, fireEvent, render, waitFor } from "@solidjs/testing-library";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Claim, Coupon } from "~/lib/data/types";
+import { addDays, localDateString } from "~/lib/format/date";
 
 const rpc = vi.fn();
 vi.mock("~/lib/supabase", () => ({
@@ -56,13 +57,14 @@ describe("ClaimRow", () => {
     expect(getByText("Waiting for you")).toBeInTheDocument();
     fireEvent.click(getByRole("button", { name: /yes, let's plan it/i }));
     const date = container.querySelector('input[type="date"]') as HTMLInputElement;
-    fireEvent.input(date, { target: { value: "2026-10-03" } });
+    const when = addDays(localDateString(), 3);
+    fireEvent.input(date, { target: { value: when } });
     fireEvent.input(getByRole("textbox"), { target: { value: "Saturday morning?" } });
     fireEvent.click(getByRole("button", { name: "Say yes" }));
     await waitFor(() =>
       expect(rpc).toHaveBeenCalledWith("accept_claim", {
         p_claim_id: "k1",
-        p_date: "2026-10-03",
+        p_date: when,
         p_note: "Saturday morning?",
       }),
     );

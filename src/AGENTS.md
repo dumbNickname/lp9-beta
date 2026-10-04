@@ -42,7 +42,8 @@ page shell where pairs give hearts, wish and claim.
   reads it once on open, strips it from the URL and holds it in memory
   only (never storage) until join or cancel, so it survives onboarding.
 - Joiner via link sees who invited them; one "Join <name>" tap pairs.
-  An already-paired user opening an invite lands in the new-pair flow.
+  An already-paired user opening an invite lands in the new-pair flow;
+  if that invite is already used, they go straight back to their pair.
 - The inviter's key is moved onto the new pair by whichever notices the
   pair first: the waiting-screen poll or any later refresh. Background
   tabs freeze the poll, so the refresh path is required.

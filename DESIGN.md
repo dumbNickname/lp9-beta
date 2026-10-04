@@ -52,6 +52,10 @@ the partner missed it (because they didn't have their phone, etc.).
   intimate two-person feedback loop.
 - **Schema implication:** A `relationship` row links exactly two users; a
   user can appear in many `relationship` rows.
+- **Amended 2026-10-04 (owner):** reopening an already-used invite link
+  (e.g. no home-screen icon, link is the way back) while paired lands in
+  the app, not on an "invite unavailable" error. Unpaired users still see
+  the error.
 
 ### 5. Points & coupons mechanics
 

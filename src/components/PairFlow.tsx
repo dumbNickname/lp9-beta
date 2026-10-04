@@ -24,7 +24,11 @@ import {
   clearPendingJoin,
   joinConfirmed,
 } from "~/lib/pairing/pendingJoin";
-import { onNewRelationship, relationships } from "~/lib/stores/relationship";
+import {
+  onNewRelationship,
+  relationships,
+  setAddingPartner,
+} from "~/lib/stores/relationship";
 import {
   type PendingInvite,
   clearPendingInvite,
@@ -210,6 +214,14 @@ export default function PairFlow() {
     } catch (err) {
       if (confirm()?.code !== code) return;
       const msg = err instanceof Error ? err.message : "Could not load this invite.";
+      // Reopening an already-used invite link (no home-screen icon) while
+      // already paired: just go back to the app.
+      if (msg.includes("already been used") && relationships().length > 0) {
+        clearPendingJoin();
+        setConfirm(null);
+        setAddingPartner(false);
+        return;
+      }
       setConfirm((c) =>
         c ? { ...c, peekLoading: false, peekError: msg } : c,
       );
