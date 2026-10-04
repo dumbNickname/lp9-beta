@@ -156,6 +156,34 @@ describe("HeartNote", () => {
     expect(r2.queryByRole("button", { name: "Edit" })).toBeNull();
   });
 
+  it("ticks only for my notes inside the edit window, and hides undo when it closes", async () => {
+    vi.useFakeTimers({ toFake: ["setInterval", "clearInterval", "Date"] });
+    try {
+      const HeartNote = (await import("~/components/HeartNote")).default;
+      const theirs = render(() => <HeartNote {...noteProps} item={item()} mine={false} />);
+      expect(vi.getTimerCount()).toBe(0);
+      theirs.unmount();
+      const old = new Date(Date.now() - 25 * 3600_000).toISOString();
+      const stale = render(() => (
+        <HeartNote {...noteProps} item={item({ giver_id: "u1", created_at: old })} mine />
+      ));
+      expect(vi.getTimerCount()).toBe(0);
+      stale.unmount();
+      const fresh = item({ giver_id: "u1" });
+      const r = render(() => <HeartNote {...noteProps} item={fresh} mine />);
+      expect(vi.getTimerCount()).toBe(1);
+      expect(r.getByRole("button", { name: "Undo" })).toBeInTheDocument();
+      vi.advanceTimersByTime(6 * 60_000);
+      expect(r.queryByRole("button", { name: "Undo" })).toBeNull();
+      expect(r.getByRole("button", { name: "Edit" })).toBeInTheDocument();
+      vi.advanceTimersByTime(24 * 3600_000);
+      expect(r.queryByRole("button", { name: "Edit" })).toBeNull();
+      expect(vi.getTimerCount()).toBe(0);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("edit saves new text", async () => {
     const HeartNote = (await import("~/components/HeartNote")).default;
     const { getByRole, container } = render(() => (

@@ -15,6 +15,7 @@ import GuidePage from "~/components/GuidePage";
 import TabBar, { type Page, type Tab, readPage, readTab, writeTab } from "~/components/TabBar";
 import { getDisplayName } from "~/lib/data/profile";
 import type { Relationship } from "~/lib/data/types";
+import { otherMember } from "~/lib/relationship";
 import {
   relationships,
   selectRelationship,
@@ -38,10 +39,7 @@ interface Props {
 }
 
 export default function Dashboard(props: Props) {
-  const partnerId = () =>
-    props.relationship.member_a === props.userId
-      ? props.relationship.member_b
-      : props.relationship.member_a;
+  const partnerId = () => otherMember(props.relationship, props.userId);
   // Re-fetched on tab focus so a partner's rename shows up (PRD-34).
   const [partnerTick, setPartnerTick] = createSignal(0);
   const [partnerNameRes] = createResource(
@@ -55,7 +53,7 @@ export default function Dashboard(props: Props) {
     () => ({
       pairs: relationships().map((r) => ({
         id: r.id,
-        other: r.member_a === props.userId ? r.member_b : r.member_a,
+        other: otherMember(r, props.userId),
       })),
       tick: partnerTick(),
     }),
@@ -71,13 +69,6 @@ export default function Dashboard(props: Props) {
   );
   const pairs = () =>
     relationships().map((r) => ({ id: r.id, partnerName: pairNames.latest?.get(r.id) ?? "…" }));
-  onMount(() => {
-    const onFocus = () => {
-      if (document.visibilityState === "visible") setPartnerTick((t) => t + 1);
-    };
-    document.addEventListener("visibilitychange", onFocus);
-    onCleanup(() => document.removeEventListener("visibilitychange", onFocus));
-  });
 
   const [restoring, setRestoring] = createSignal(false);
 
@@ -131,11 +122,13 @@ export default function Dashboard(props: Props) {
   };
   onMount(() => {
     const onHash = () => {
-      setPage(readPage());
-      if (!readPage()) setTab(readTab());
+      const p = readPage();
+      setPage(p);
+      if (!p) setTab(readTab());
     };
     const onFocus = () => {
       if (document.visibilityState !== "visible") return;
+      setPartnerTick((t) => t + 1);
       void refreshClaims(props.relationship.id);
       if (tab() !== "give") refreshCurrentCoupons();
     };

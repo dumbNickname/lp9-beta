@@ -4,6 +4,7 @@ import { askReveal } from "~/components/PrivacyToggle";
 import { formatEventDay } from "~/lib/format/date";
 import { isVeiled } from "~/lib/privacy";
 import type { FeedItem } from "~/lib/stores/points";
+import { hueAt } from "~/lib/together";
 
 interface Props {
   feed: FeedItem[];
@@ -41,8 +42,6 @@ export default function NoteJar(props: Props) {
     setShake((n) => n + 1);
   };
 
-  const colors = ["give", "mine", "theirs"] as const;
-
   return (
     <section class="jar-wrap" aria-labelledby="jar-title">
       <h2 id="jar-title" class="visually-hidden">Memory jar</h2>
@@ -73,7 +72,7 @@ export default function NoteJar(props: Props) {
               const [x, y, r, s] = SLOTS[i()]!;
               return (
                 <span
-                  class={`jar-heart jar-heart--${colors[i() % 3]}`}
+                  class={`jar-heart jar-heart--${hueAt(i())}`}
                   style={{
                     "inset-inline-start": `${x}%`,
                     "inset-block-start": `${y}%`,

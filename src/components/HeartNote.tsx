@@ -1,4 +1,4 @@
-import { createSignal, onCleanup, onMount, Show } from "solid-js";
+import { createEffect, createMemo, createSignal, onCleanup, Show } from "solid-js";
 import { HeartRow } from "~/components/HeartIcon";
 import { COMMENT_MAX } from "~/lib/crypto/comments";
 import { friendlyPointsError } from "~/lib/data/points";
@@ -25,9 +25,14 @@ interface Props {
 }
 
 export default function HeartNote(props: Props) {
-  // Tick so the undo/edit affordances disappear when their windows close.
+  // Tick so the undo/edit affordances disappear when their windows close;
+  // only my notes inside the edit window (the longer one) need it.
   const [now, setNow] = createSignal(Date.now());
-  onMount(() => {
+  const ticking = createMemo(
+    () => props.mine && withinWindow(props.item.created_at, EDIT_WINDOW_MS, now()),
+  );
+  createEffect(() => {
+    if (!ticking()) return;
     const t = setInterval(() => setNow(Date.now()), 15_000);
     onCleanup(() => clearInterval(t));
   });

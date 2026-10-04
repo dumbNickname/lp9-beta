@@ -5,6 +5,7 @@ import { SparkIcon, TicketIcon } from "~/components/Icons";
 import { initial } from "~/components/PairBadge";
 import { getDisplayName } from "~/lib/data/profile";
 import type { Relationship } from "~/lib/data/types";
+import { otherMember } from "~/lib/relationship";
 
 interface Props {
   myName: string;
@@ -16,10 +17,7 @@ interface Props {
 // Full-screen "you're paired" moment shown once on both devices right after
 // pairing, so the outcome is unmistakable before the dashboard appears.
 export default function PairedMoment(props: Props) {
-  const partnerId = () =>
-    props.relationship.member_a === props.userId
-      ? props.relationship.member_b
-      : props.relationship.member_a;
+  const partnerId = () => otherMember(props.relationship, props.userId);
   const [partner] = createResource(partnerId, (id) => getDisplayName(id).catch(() => null));
   const partnerName = () => partner() || "your partner";
   let btn: HTMLButtonElement | undefined;

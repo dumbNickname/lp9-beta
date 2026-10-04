@@ -2,7 +2,7 @@ import { createMemo, createSignal, For, Show } from "solid-js";
 import DayPeek from "~/components/DayPeek";
 import { formatEventDay } from "~/lib/format/date";
 import type { FeedItem } from "~/lib/stores/points";
-import { dayLevel, lastDays, reachedMilestone } from "~/lib/together";
+import { dayLevel, hueAt, lastDays, reachedMilestone } from "~/lib/together";
 
 interface Props {
   feed: FeedItem[];
@@ -14,7 +14,6 @@ const DAYS = 14;
 const W = 320;
 const H = 64;
 const SAG = 18;
-const hues = ["give", "mine", "theirs"] as const;
 
 // y of the hanging string at x (a soft parabola between two pins).
 function stringY(x: number): number {
@@ -65,7 +64,7 @@ export default function Garland(props: Props) {
                 >
                   <button
                     type="button"
-                    class={`garland-bulb garland-bulb--l${level()} garland-bulb--${hues[i() % 3]}`}
+                    class={`garland-bulb garland-bulb--l${level()} garland-bulb--${hueAt(i())}`}
                     classList={{ "is-open": open() === d.date, "is-today": i() === DAYS - 1 }}
                     disabled={level() === 0}
                     aria-pressed={open() === d.date}

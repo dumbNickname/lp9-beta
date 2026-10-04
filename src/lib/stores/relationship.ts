@@ -1,4 +1,5 @@
 import { createSignal } from "solid-js";
+import { readLocal, writeLocal } from "~/lib/storage";
 import { useFocusRefresh } from "~/lib/useFocusRefresh";
 import { getMyRelationships } from "~/lib/data/relationship";
 import { adoptPendingInvite, readPendingInvite } from "~/lib/pairing/pendingInvite";
@@ -33,19 +34,11 @@ function readUrlRel(): string | null {
 }
 
 function readRemembered(): string | null {
-  try {
-    return localStorage.getItem(ACTIVE_REL_KEY);
-  } catch {
-    return null;
-  }
+  return readLocal(ACTIVE_REL_KEY);
 }
 
 function remember(id: string): void {
-  try {
-    localStorage.setItem(ACTIVE_REL_KEY, id);
-  } catch {
-    // storage unavailable
-  }
+  writeLocal(ACTIVE_REL_KEY, id);
 }
 
 // Reflect the selection in `?rel=` with an absolute URL (see the

@@ -13,16 +13,7 @@ import {
   setRecoveryPassword,
 } from "~/lib/data/relationship";
 import RecoveryWarning from "~/components/RecoveryWarning";
-import { LockIcon } from "~/components/Icons";
-
-function KeyIcon() {
-  return (
-    <svg class="line-icon" viewBox="0 0 24 24">
-      <circle cx="8" cy="15" r="4" />
-      <path d="M11 12l8-8M16 7l2.5 2.5M14 9l2 2" />
-    </svg>
-  );
-}
+import { KeyIcon, LockIcon } from "~/components/Icons";
 
 export type RecoveryMode = "set" | "change" | "restore";
 

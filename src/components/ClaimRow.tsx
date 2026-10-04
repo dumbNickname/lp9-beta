@@ -1,7 +1,8 @@
 import { createSignal, For, Show } from "solid-js";
 import { friendlyClaimError } from "~/lib/data/claims";
 import type { Claim, Coupon } from "~/lib/data/types";
-import { addDays, localDateString } from "~/lib/format/date";
+import { canNudge, claimStatusText } from "~/lib/claims";
+import { addDays, localDateString, scheduleLabel, urgencyOf } from "~/lib/format/date";
 import { accept, cancel, declineC, deliver, nudge, withdraw } from "~/lib/stores/claims";
 
 interface Props {
@@ -11,55 +12,13 @@ interface Props {
   partnerName: string;
 }
 
-const DAY_MS = 86_400_000;
-
-export function claimStatusText(c: Claim, mine: boolean, partner: string): string {
-  switch (c.status) {
-    case "pending":
-      return mine ? `Waiting for ${partner}` : "Waiting for you";
-    case "accepted":
-      return mine ? `${partner} said yes` : "You said yes";
-    case "delivered":
-      return "Delivered";
-    case "declined":
-      return mine ? `${partner} can't right now — hearts returned` : "You passed — hearts returned";
-    case "withdrawn":
-      return "Withdrawn — hearts returned";
-    case "cancelled":
-      return "Cancelled — hearts returned";
-    case "auto_refunded":
-      return "No answer in 14 days — hearts returned";
-  }
-}
-
-export type Urgency = "today" | "soon" | "later" | "undated";
-
-// How soon an accepted claim happens: today/tomorrow, within a week, later.
-export function urgencyOf(date: string | null): Urgency {
-  if (!date) return "undated";
-  const today = localDateString();
-  if (date <= addDays(today, 1)) return "today";
-  if (date <= addDays(today, 7)) return "soon";
-  return "later";
-}
-
-const fmtStamp = (iso: string | null) =>
-  iso
-    ? new Intl.DateTimeFormat("en", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" }).format(
-        new Date(iso),
-      )
-    : null;
-
-// Future-facing date label, e.g. "tomorrow" / "Sat, Oct 3".
-export function scheduleLabel(date: string): string {
-  const today = localDateString();
-  if (date === today) return "today";
-  if (date === addDays(today, 1)) return "tomorrow";
-  const [y, m, d] = date.split("-").map(Number) as [number, number, number];
-  return new Intl.DateTimeFormat("en", { weekday: "short", day: "numeric", month: "short" }).format(
-    new Date(y, m - 1, d),
-  );
-}
+const stampFmt = new Intl.DateTimeFormat("en", {
+  day: "numeric",
+  month: "short",
+  hour: "numeric",
+  minute: "2-digit",
+});
+const fmtStamp = (iso: string | null) => (iso ? stampFmt.format(new Date(iso)) : null);
 
 export default function ClaimRow(props: Props) {
   const [mode, setMode] = createSignal<"idle" | "accept" | "decline" | "cancel">("idle");
@@ -87,13 +46,6 @@ export default function ClaimRow(props: Props) {
   };
   const mine = () => props.claim.claimer_id === props.userId;
   const deliverer = () => props.claim.deliverer_id === props.userId;
-  const canNudge = () => {
-    const c = props.claim;
-    if (!mine() || c.status !== "pending") return false;
-    const age = Date.now() - new Date(c.claimed_at).getTime();
-    const sinceNudge = c.nudged_at ? Date.now() - new Date(c.nudged_at).getTime() : Infinity;
-    return age >= 7 * DAY_MS && sinceNudge >= DAY_MS;
-  };
 
   const run = async (
     action: "accept" | "decline" | "deliver" | "withdraw" | "cancel" | "nudge",
@@ -196,7 +148,7 @@ export default function ClaimRow(props: Props) {
               Withdraw
             </button>
           </Show>
-          <Show when={canNudge()}>
+          <Show when={canNudge(props.claim, props.userId)}>
             <button type="button" class="link-button" onClick={() => void run("nudge")} disabled={busy()}>
               Send a gentle reminder
             </button>

@@ -8,13 +8,7 @@ import type {
   RelationshipWrap,
 } from "./types";
 
-export {
-  friendlyPairError,
-  friendlyPeekError,
-  InviteError,
-  isUsedInvite,
-  type InviteErrorCode,
-} from "./pairErrors";
+export { friendlyPairError, isUsedInvite } from "./pairErrors";
 
 const COLUMNS = "id, member_a, member_b, archetype, status, created_at, paired_at";
 const WRAP_COLUMNS = "wrapped_key_blob, wrap_salt, wrap_iterations, wrap_algo";

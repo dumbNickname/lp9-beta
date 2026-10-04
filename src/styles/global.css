@@ -830,6 +830,7 @@ button.small,
   block-size: 2.75rem;
   border-radius: 50%;
   font-family: var(--font-display);
+  font-size: var(--text-lg);
   font-weight: 500;
   border: 2px solid var(--color-bg);
 }

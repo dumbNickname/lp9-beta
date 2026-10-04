@@ -1,6 +1,6 @@
 import { For, Show } from "solid-js";
 import type { Claim, Coupon } from "~/lib/data/types";
-import { addDays, localDateString } from "~/lib/format/date";
+import { addDays, localDateString, parseLocalDate } from "~/lib/format/date";
 
 interface Props {
   claims: Claim[];
@@ -9,6 +9,9 @@ interface Props {
   partnerName: string;
   days?: number;
 }
+
+const weekdayFmt = new Intl.DateTimeFormat("en", { weekday: "narrow" });
+const planFmt = new Intl.DateTimeFormat("en", { weekday: "short", day: "numeric", month: "short" });
 
 // Two-week "Coming up" strip (owner 2026-09-29): accepted claims placed on
 // their scheduled day; undated accepted claims listed as "some day soon".
@@ -32,10 +35,7 @@ export default function ComingUp(props: Props) {
   const title = (c: Claim) => props.coupons.get(c.coupon_id)?.title ?? "a coupon";
   const emoji = (c: Claim) => props.coupons.get(c.coupon_id)?.emoji || "♡";
 
-  const weekday = (d: string) => {
-    const [y, m, dd] = d.split("-").map(Number) as [number, number, number];
-    return new Intl.DateTimeFormat("en", { weekday: "narrow" }).format(new Date(y, m - 1, dd));
-  };
+  const weekday = (d: string) => weekdayFmt.format(parseLocalDate(d));
   const dayNum = (d: string) => Number(d.slice(8));
 
   return (
@@ -88,9 +88,7 @@ export default function ComingUp(props: Props) {
                 {(c) => (
                   <li class="plan" classList={{ "plan--mine": c.claimer_id === props.userId }}>
                     <span class="plan-date">
-                      {new Intl.DateTimeFormat("en", { weekday: "short", day: "numeric", month: "short" }).format(
-                        new Date(Number(d.slice(0, 4)), Number(d.slice(5, 7)) - 1, dayNum(d)),
-                      )}
+                      {planFmt.format(parseLocalDate(d))}
                     </span>
                     <span aria-hidden="true">{emoji(c)}</span>
                     <span class="plan-title">{title(c)}</span>

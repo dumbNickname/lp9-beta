@@ -8,9 +8,16 @@ export function localDateString(d: Date = new Date()): string {
   return `${y}-${m}-${day}`;
 }
 
+// YYYY-MM-DD as local midnight.
+export function parseLocalDate(s: string): Date {
+  const [y, m, d] = s.split("-").map(Number) as [number, number, number];
+  return new Date(y, m - 1, d);
+}
+
 export function addDays(dateStr: string, days: number): string {
-  const [y, m, d] = dateStr.split("-").map(Number) as [number, number, number];
-  return localDateString(new Date(y, m - 1, d + days));
+  const d = parseLocalDate(dateStr);
+  d.setDate(d.getDate() + days);
+  return localDateString(d);
 }
 
 function daysBetween(fromStr: string, toStr: string): number {
@@ -29,10 +36,28 @@ export function formatEventDay(
   if (diff >= 0 && diff < 7) {
     return new Intl.RelativeTimeFormat(locale, { numeric: "auto" }).format(-diff, "day");
   }
-  const [y, m, d] = eventDate.split("-").map(Number) as [number, number, number];
   return new Intl.DateTimeFormat(locale, { day: "numeric", month: "short" }).format(
-    new Date(y, m - 1, d),
+    parseLocalDate(eventDate),
   );
+}
+
+export type Urgency = "today" | "soon" | "later" | "undated";
+
+// How soon an accepted claim happens: today/tomorrow, within a week, later.
+export function urgencyOf(date: string | null, today: string = localDateString()): Urgency {
+  if (!date) return "undated";
+  if (date <= addDays(today, 1)) return "today";
+  if (date <= addDays(today, 7)) return "soon";
+  return "later";
+}
+
+const scheduleFmt = new Intl.DateTimeFormat("en", { weekday: "short", day: "numeric", month: "short" });
+
+// Future-facing date label, e.g. "tomorrow" / "Sat, Oct 3".
+export function scheduleLabel(date: string, today: string = localDateString()): string {
+  if (date === today) return "today";
+  if (date === addDays(today, 1)) return "tomorrow";
+  return scheduleFmt.format(parseLocalDate(date));
 }
 
 export const EDIT_WINDOW_MS = 24 * 60 * 60 * 1000;

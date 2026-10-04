@@ -41,3 +41,38 @@ describe("PRD-54: relationship writes locked", () => {
     expect(all).toContain("grant execute on function public.is_relationship_member(uuid) to authenticated");
   });
 });
+
+describe("every security definer function is locked from anon", () => {
+  const defined = [...new Set([...all.matchAll(/create or replace function public\.(\w+)\s*\(/g)].map((m) => m[1] ?? ""))];
+  const triggers = new Set(["handle_new_user", "on_point_push", "on_coupon_push", "on_claim_push"]);
+  it.each(defined.filter((n) => !triggers.has(n)))("%s is not executable by anon", (name) => {
+    const helperRevoke = new RegExp(`revoke execute on function public\\.${name}\\([^)]*\\) from public, anon`);
+    const rpcList = new RegExp(`'public\\.${name}\\([^)]*\\)'`);
+    expect(helperRevoke.test(all) || rpcList.test(all), `${name} needs a revoke from public, anon`).toBe(true);
+  });
+  it("default privileges drop EXECUTE for public and anon", () => {
+    expect(all).toContain("alter default privileges in schema public revoke execute on functions from public, anon");
+  });
+});
+
+describe("security follow-ups (0012)", () => {
+  it("pairing invites are not directly insertable", () => {
+    expect(all).toContain('drop policy if exists "creator insert invite" on public.pairing_invites');
+  });
+  it("profiles: only display_name, locale, theme are updatable", () => {
+    expect(all).toContain("revoke update on public.profiles from anon, authenticated");
+    expect(all).toContain("grant update (display_name, locale, theme) on public.profiles to authenticated");
+  });
+  it("push endpoints limited to browser push services", () => {
+    const re = /(googleapis\\\.com|mozilla\\\.com|push\\\.apple\\\.com|notify\\\.windows\\\.com)/;
+    const sql = all.slice(all.lastIndexOf("create or replace function public.save_push_subscription"));
+    expect(re.test(sql)).toBe(true);
+    for (const ok of [
+      "https://fcm.googleapis.com/fcm/send/abc",
+      "https://updates.push.services.mozilla.com/wpush/v2/abc",
+      "https://web.push.apple.com/abc",
+      "https://wns2-par02p.notify.windows.com/w/?token=abc",
+    ]) expect(/^https:\/\/([a-z0-9-]+\.)*(googleapis\.com|mozilla\.com|push\.apple\.com|notify\.windows\.com)\//.test(ok)).toBe(true);
+    expect(/^https:\/\/([a-z0-9-]+\.)*(googleapis\.com|mozilla\.com|push\.apple\.com|notify\.windows\.com)\//.test("https://evil.example/googleapis.com/")).toBe(false);
+  });
+});

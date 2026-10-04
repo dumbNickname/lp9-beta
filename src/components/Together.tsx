@@ -3,7 +3,7 @@ import DayPeek from "~/components/DayPeek";
 import { formatEventDay } from "~/lib/format/date";
 import { privateMode } from "~/lib/privacy";
 import type { FeedItem } from "~/lib/stores/points";
-import { dayLevel, hourCounts, hourLabel, peakHour, seasonGrid, topWords } from "~/lib/together";
+import { dayLevel, hourCounts, hueAt, hourLabel, peakHour, seasonGrid, topWords } from "~/lib/together";
 
 interface Props {
   feed: FeedItem[];
@@ -189,7 +189,7 @@ function Words(props: Props) {
             <For each={words()}>
               {(w, i) => (
                 <li
-                  class={`words-word words-word--${["give", "mine", "theirs"][i() % 3]}`}
+                  class={`words-word words-word--${hueAt(i())}`}
                   style={{ "--wsz": `${0.95 + (w.n / max()) * 1.1}rem`, "--wr": `${((i() * 37) % 9) - 4}deg` }}
                 >
                   {w.word}

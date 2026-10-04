@@ -1,11 +1,7 @@
 // Wrapped localStorage access: SSR-safe and silent when storage is
 // unavailable (private mode, quota, blocked).
 function store(): Storage | null {
-  try {
-    return typeof localStorage === "undefined" ? null : localStorage;
-  } catch {
-    return null;
-  }
+  return typeof localStorage === "undefined" ? null : localStorage;
 }
 
 export function readLocal(key: string): string | null {

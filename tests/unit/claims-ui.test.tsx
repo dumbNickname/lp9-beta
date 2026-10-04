@@ -109,7 +109,7 @@ describe("ClaimRow", () => {
   });
 
   it("terminal statuses say hearts were returned", async () => {
-    const { claimStatusText } = await import("~/components/ClaimRow");
+    const { claimStatusText } = await import("~/lib/claims");
     for (const s of ["declined", "withdrawn", "cancelled", "auto_refunded"] as const) {
       expect(claimStatusText(claim({ status: s }), true, "Bob")).toMatch(/hearts returned/);
     }

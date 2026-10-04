@@ -1,8 +1,13 @@
-import { addDays, localDateString } from "~/lib/format/date";
+import { addDays, localDateString, parseLocalDate } from "~/lib/format/date";
 import type { Point } from "~/lib/data/types";
 
 // Shared, non-comparing "us" visuals (Give world). All computed on this
 // device from the already-decrypted feed; never split per partner.
+
+// World colours, cycled for decorative hearts/bulbs/words.
+export const HUES = ["give", "mine", "theirs"] as const;
+export type Hue = (typeof HUES)[number];
+export const hueAt = (i: number): Hue => HUES[i % HUES.length]!;
 
 export interface DayBucket<T extends Point = Point> {
   date: string;
@@ -34,8 +39,7 @@ export function lastDays<T extends Point>(
 }
 
 function weekday(date: string): number {
-  const [y, m, d] = date.split("-").map(Number) as [number, number, number];
-  return (new Date(y, m - 1, d).getDay() + 6) % 7;
+  return (parseLocalDate(date).getDay() + 6) % 7;
 }
 
 // `weeks` columns of Monday..Sunday; days after today are null.

@@ -2,11 +2,15 @@
 // components can use it while those are mocked.
 import { errorMessage, friendlyFrom, type FriendlyTable } from "./errors";
 
-const INVITE_ERRORS: FriendlyTable = [
-  ["invalid code", "That invite code is not valid."],
-  ["code already used", "That invite has already been used."],
-  ["code expired", "That invite has expired."],
+export type InviteErrorCode = "used" | "expired" | "invalid" | "unknown";
+
+const INVITE_CODES: readonly (readonly [needle: string, text: string, code: InviteErrorCode])[] = [
+  ["invalid code", "That invite code is not valid.", "invalid"],
+  ["code already used", "That invite has already been used.", "used"],
+  ["code expired", "That invite has expired.", "expired"],
 ];
+
+const INVITE_ERRORS: FriendlyTable = INVITE_CODES.map(([needle, text]) => [needle, text] as const);
 
 const PAIR_ERRORS: FriendlyTable = [
   ...INVITE_ERRORS,
@@ -25,8 +29,6 @@ export function friendlyPairError(err: unknown): string {
   return friendlyFrom(err, PAIR_ERRORS, "Could not pair. Please try again.");
 }
 
-export type InviteErrorCode = "used" | "expired" | "invalid" | "unknown";
-
 // Carries a machine-readable code; the message stays the friendly text.
 export class InviteError extends Error {
   readonly code: InviteErrorCode;
@@ -39,10 +41,7 @@ export class InviteError extends Error {
 
 export function inviteErrorCode(err: unknown): InviteErrorCode {
   const msg = errorMessage(err);
-  if (msg.includes("code already used")) return "used";
-  if (msg.includes("code expired")) return "expired";
-  if (msg.includes("invalid code")) return "invalid";
-  return "unknown";
+  return INVITE_CODES.find(([needle]) => msg.includes(needle))?.[2] ?? "unknown";
 }
 
 export function isUsedInvite(err: unknown): boolean {
