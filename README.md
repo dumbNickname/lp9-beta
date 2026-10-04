@@ -1,4 +1,4 @@
-# `APP_NAME`
+# lp9
 
 > A small web app that helps a couple notice, name, and reward the
 > appreciation that day-to-day life would otherwise leave unsaid: one
@@ -6,11 +6,11 @@
 > become a spendable balance, and the balance can be redeemed against
 > coupons each partner has approved on the other's wishlist.
 
-**`APP_NAME` is a placeholder.** A final product name has not been
+**`lp9` is a working title.** A final product name has not been
 chosen yet. See [`DESIGN.md`](./DESIGN.md) §14 for the (deferred)
 naming decision and the verification checklist that gates it. Until a
-name is locked in, code and copy refer to the product as `APP_NAME` so
-a global rename stays cheap.
+name is locked in, code refers to the product through one `APP_NAME`
+constant so a global rename stays cheap.
 
 ## Status
 

@@ -18,6 +18,7 @@ import {
   redeemPairCode,
   revokePairInvite,
 } from "~/lib/data/relationship";
+import { errorMessage } from "~/lib/data/errors";
 import { normalizeScannedInput, parseInvitePayload } from "~/lib/pairing/qr";
 import {
   captureInviteFromUrl,
@@ -61,7 +62,7 @@ function readArchetypeHint(): Archetype {
 
 // Map an RPC exception message to a friendly, user-facing string.
 function friendlyRedeemError(err: unknown): string {
-  const msg = err instanceof Error ? err.message : String(err ?? "");
+  const msg = errorMessage(err);
   if (msg.includes("invalid code")) return "That invite code is not valid.";
   if (msg.includes("code already used")) return "That invite has already been used.";
   if (msg.includes("code expired")) return "That invite has expired.";

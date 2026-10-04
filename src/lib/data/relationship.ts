@@ -1,5 +1,6 @@
 import { supabase } from "~/lib/supabase";
 import { byteaToBytes, bytesToBytea } from "./bytea";
+import { errorMessage } from "./errors";
 import type {
   Archetype,
   PairInvitePeek,
@@ -56,7 +57,7 @@ export async function redeemPairCode(code: string): Promise<string> {
 // underlying messages match redeem_pair_code's, so the mapping is shared in
 // spirit; kept here so the data layer throws presentable errors.
 export function friendlyPeekError(err: unknown): string {
-  const msg = err instanceof Error ? err.message : String(err ?? "");
+  const msg = errorMessage(err);
   if (msg.includes("invalid code")) return "That invite code is not valid.";
   if (msg.includes("code already used")) return "That invite has already been used.";
   if (msg.includes("code expired")) return "That invite has expired.";

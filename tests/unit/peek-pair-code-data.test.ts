@@ -67,6 +67,12 @@ describe("peekPairCode", () => {
     await expect(peekPairCode("X")).rejects.toThrow(/already been used/i);
   });
 
+  it("maps a plain-object RPC error (real Supabase shape)", async () => {
+    mockRpc.mockResolvedValue({ data: null, error: { message: "code already used", code: "P0001" } });
+    const { peekPairCode } = await import("~/lib/data/relationship");
+    await expect(peekPairCode("X")).rejects.toThrow(/already been used/i);
+  });
+
   it("throws when the RPC returns an empty result set", async () => {
     mockRpc.mockResolvedValue({ data: [], error: null });
     const { peekPairCode } = await import("~/lib/data/relationship");

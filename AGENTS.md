@@ -148,7 +148,9 @@ Docs describe ideas, contracts and where things live, not code lines.
 - **Postgres grants EXECUTE to PUBLIC** on new functions; revoke on
   helpers. Prefer no write policies + definer RPCs.
 - **PostgREST** needs explicit filters even under RLS, and returns
-  `bytea` as `\x` hex.
+  `bytea` as `\x` hex. RPC errors are plain `{ message }` objects, not
+  `Error`s: read the message via the shared data-layer helper, and mock
+  that shape in tests.
 
 ## Environment gotchas
 
