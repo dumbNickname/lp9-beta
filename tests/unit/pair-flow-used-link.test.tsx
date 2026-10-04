@@ -1,5 +1,6 @@
 import { render, waitFor } from "@solidjs/testing-library";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { InviteError } from "~/lib/data/pairErrors";
 
 const mockPeekPairCode = vi.fn();
 const mockRedeemPairCode = vi.fn();
@@ -36,7 +37,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   vi.resetModules();
   localStorage.clear();
-  mockPeekPairCode.mockRejectedValue(new Error("That invite has already been used."));
+  mockPeekPairCode.mockRejectedValue(new InviteError("used", "That invite has already been used."));
   window.history.replaceState(null, "", "/app#pair=v1%3AUSED1234%3AAQID");
 });
 

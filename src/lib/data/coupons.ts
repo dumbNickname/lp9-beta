@@ -1,4 +1,5 @@
 import { supabase } from "~/lib/supabase";
+import { friendlyFrom, type FriendlyTable } from "./errors";
 import type { Coupon, CouponInput } from "./types";
 
 export const PRICE_MIN = 1;
@@ -62,7 +63,7 @@ export const retireCoupon = (id: string) => simple("retire_coupon", { p_coupon_i
 export const declineCoupon = (id: string, note: string | null) =>
   simple("decline_coupon", { p_coupon_id: id, p_note: note });
 
-const FRIENDLY: [string, string][] = [
+const FRIENDLY: FriendlyTable = [
   ["invalid title", `Give it a title (up to ${TITLE_MAX} characters).`],
   ["invalid price", `Price must be between ${PRICE_MIN} and ${PRICE_MAX} hearts.`],
   ["invalid field", "One of the fields is too long."],
@@ -74,12 +75,5 @@ const FRIENDLY: [string, string][] = [
 ];
 
 export function friendlyCouponError(err: unknown): string {
-  const msg =
-    err && typeof err === "object" && "message" in err
-      ? String((err as { message: unknown }).message)
-      : String(err ?? "");
-  for (const [needle, text] of FRIENDLY) {
-    if (msg.includes(needle)) return text;
-  }
-  return "Something went wrong. Please try again.";
+  return friendlyFrom(err, FRIENDLY, "Something went wrong. Please try again.");
 }

@@ -1,4 +1,5 @@
 import { createSignal } from "solid-js";
+import { readLocal, removeLocal, writeLocal } from "~/lib/storage";
 
 // Shoulder-surf veil (DESIGN.md §15, amended): OFF by default, remembered
 // on this device once turned on. While on, comments and private wishes are
@@ -7,11 +8,7 @@ import { createSignal } from "solid-js";
 export const PRIVACY_KEY = "privacy_mode";
 
 function load(): boolean {
-  try {
-    return localStorage.getItem(PRIVACY_KEY) === "on";
-  } catch {
-    return false;
-  }
+  return readLocal(PRIVACY_KEY) === "on";
 }
 
 const [privateMode, setPrivateModeSignal] = createSignal(
@@ -24,12 +21,8 @@ const [revealed, setRevealed] = createSignal<Set<string>>(new Set());
 export function setPrivateMode(on: boolean): void {
   setPrivateModeSignal(on);
   setRevealed(new Set<string>());
-  try {
-    if (on) localStorage.setItem(PRIVACY_KEY, "on");
-    else localStorage.removeItem(PRIVACY_KEY);
-  } catch {
-    // storage unavailable; the choice lasts for this session
-  }
+  if (on) writeLocal(PRIVACY_KEY, "on");
+  else removeLocal(PRIVACY_KEY);
 }
 
 export function togglePrivateMode(): void {

@@ -1,11 +1,12 @@
 import { createResource, createSignal, For, Show } from "solid-js";
 import HeartIcon from "~/components/HeartIcon";
-import { initial } from "~/components/PairBadge";
+import { initial, NAME_MAX } from "~/components/PairBadge";
 import { peekPairCode } from "~/lib/data/relationship";
 import { parseInvitePayload } from "~/lib/pairing/qr";
 import { pendingJoin, setJoinConfirmed } from "~/lib/pairing/pendingJoin";
 import { saveProfile, refreshProfile } from "~/lib/stores/profile";
 import Callout from "~/components/Callout";
+import { writeArchetypeHint } from "~/lib/archetypeHint";
 
 const ARCHETYPES = [
   { value: "getting_to_know", label: "New together" },
@@ -47,19 +48,15 @@ export default function Onboarding() {
       setError("Tell us your name first.");
       return;
     }
-    if (trimmed.length > 50) {
-      setError("Keep it to 50 characters or fewer.");
+    if (trimmed.length > NAME_MAX) {
+      setError(`Keep it to ${NAME_MAX} characters or fewer.`);
       return;
     }
     setError("");
     setSubmitting(true);
     try {
       await saveProfile({ display_name: trimmed, locale: locale() });
-      try {
-        localStorage.setItem("archetype_hint", archetype());
-      } catch {
-        // storage unavailable
-      }
+      writeArchetypeHint(archetype());
       // The button said "Join <name>", so the confirm step can go ahead.
       if (joining() && inviterName()) setJoinConfirmed(true);
       await refreshProfile();
@@ -118,7 +115,7 @@ export default function Onboarding() {
           type="text"
           value={name()}
           onInput={(e) => setName(e.currentTarget.value)}
-          maxLength={50}
+          maxLength={NAME_MAX}
           required
           autocomplete="given-name"
           placeholder={joining() ? "So they know it's you" : "How your partner will see you"}

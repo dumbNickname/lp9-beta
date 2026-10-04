@@ -1,4 +1,5 @@
 import { supabase } from "~/lib/supabase";
+import { friendlyFrom, type FriendlyTable } from "./errors";
 import { byteaToBytes, bytesToBytea } from "./bytea";
 import type { EncryptedComment, HeartAmount, Point } from "./types";
 
@@ -86,7 +87,7 @@ export async function deletePoint(pointId: string): Promise<void> {
   if (error) throw error;
 }
 
-const FRIENDLY: [string, string][] = [
+const FRIENDLY: FriendlyTable = [
   ["edit window closed", "This note can no longer be edited (24 hours have passed)."],
   ["delete window closed", "It's too late to undo this one."],
   ["invalid event date", "Pick a date within the last 30 days."],
@@ -97,12 +98,5 @@ const FRIENDLY: [string, string][] = [
 ];
 
 export function friendlyPointsError(err: unknown): string {
-  const msg =
-    err && typeof err === "object" && "message" in err
-      ? String((err as { message: unknown }).message)
-      : String(err ?? "");
-  for (const [needle, text] of FRIENDLY) {
-    if (msg.includes(needle)) return text;
-  }
-  return "Something went wrong. Please try again.";
+  return friendlyFrom(err, FRIENDLY, "Something went wrong. Please try again.");
 }

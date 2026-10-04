@@ -18,7 +18,7 @@ import {
   redeemPairCode,
   revokePairInvite,
 } from "~/lib/data/relationship";
-import { errorMessage } from "~/lib/data/errors";
+import { friendlyPairError, isUsedInvite } from "~/lib/data/pairErrors";
 import { normalizeScannedInput, parseInvitePayload } from "~/lib/pairing/qr";
 import {
   captureInviteFromUrl,
@@ -38,39 +38,10 @@ import {
   writePendingInvite,
 } from "~/lib/pairing/pendingInvite";
 import { profile } from "~/lib/stores/profile";
-import type { Archetype, PairInvitePeek } from "~/lib/data/types";
+import type { PairInvitePeek } from "~/lib/data/types";
+import { readArchetypeHint } from "~/lib/archetypeHint";
 
 const POLL_MS = 3000;
-const ARCHETYPE_HINT_KEY = "archetype_hint";
-const VALID_ARCHETYPES: Archetype[] = [
-  "getting_to_know",
-  "established_couple",
-  "close_friends",
-];
-
-function readArchetypeHint(): Archetype {
-  try {
-    const raw = localStorage.getItem(ARCHETYPE_HINT_KEY);
-    if (raw && (VALID_ARCHETYPES as string[]).includes(raw)) {
-      return raw as Archetype;
-    }
-  } catch {
-    // storage unavailable
-  }
-  return "getting_to_know";
-}
-
-// Map an RPC exception message to a friendly, user-facing string.
-function friendlyRedeemError(err: unknown): string {
-  const msg = errorMessage(err);
-  if (msg.includes("invalid code")) return "That invite code is not valid.";
-  if (msg.includes("code already used")) return "That invite has already been used.";
-  if (msg.includes("code expired")) return "That invite has expired.";
-  if (msg.includes("cannot pair with yourself")) return "You cannot pair with yourself.";
-  if (msg.includes("relationship already exists")) return "You are already paired with this person.";
-  return "Could not pair. Please try again.";
-}
-
 type View = "landing" | "invite" | "join" | "confirm";
 
 // The parsed invite payload held in memory until the user taps Join on the
@@ -130,14 +101,29 @@ export default function PairFlow() {
 
   const startPolling = (code: string) => {
     stopPolling();
-    pollTimer = setInterval(() => {
+    let inFlight = false;
+    let paired = false;
+    const timer = setInterval(() => {
+      if (inFlight || paired) return;
+      inFlight = true;
       void (async () => {
-        // Newest active relationship; ignore ones that existed before this
-        // invite so an already-paired user can pair again (PRD-43).
-        const rel = await getMyActiveRelationship();
-        if (rel && !knownIds.has(rel.id)) await onPaired(rel.id, code);
+        try {
+          // Newest active relationship; ignore ones that existed before this
+          // invite so an already-paired user can pair again (PRD-43).
+          const rel = await getMyActiveRelationship();
+          if (pollTimer !== timer || paired) return;
+          if (rel && !knownIds.has(rel.id)) {
+            paired = true;
+            await onPaired(rel.id, code);
+          }
+        } catch {
+          // Transient failure; the next tick retries.
+        } finally {
+          inFlight = false;
+        }
       })();
     }, POLL_MS);
+    pollTimer = timer;
   };
 
   const beginInvite = async () => {
@@ -217,7 +203,7 @@ export default function PairFlow() {
       const msg = err instanceof Error ? err.message : "Could not load this invite.";
       // Reopening an already-used invite link (no home-screen icon) while
       // already paired: just go back to the app.
-      if (msg.includes("already been used") && relationships().length > 0) {
+      if (isUsedInvite(err) && relationships().length > 0) {
         clearPendingJoin();
         setConfirm(null);
         setAddingPartner(false);
@@ -244,7 +230,7 @@ export default function PairFlow() {
     } catch (err) {
       // Stay on the confirm view with a Back option; no key was stored.
       setConfirm((c) =>
-        c ? { ...c, busy: false, redeemError: friendlyRedeemError(err) } : c,
+        c ? { ...c, busy: false, redeemError: friendlyPairError(err) } : c,
       );
     }
   };

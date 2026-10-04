@@ -16,23 +16,28 @@ const [claims, setClaims] = createSignal<Claim[]>([]);
 const [claimsError, setClaimsError] = createSignal(false);
 
 let currentRel: string | null = null;
+let seq = 0;
 
 export async function refreshClaims(relId: string): Promise<void> {
   currentRel = relId;
+  const my = ++seq;
   try {
     // Lazy 14-day auto-refund before reading (§5f). Failure is non-fatal.
     await sweepExpiredClaims(relId).catch(() => 0);
     const rows = await listClaims(relId);
-    if (currentRel === relId) setClaims(rows);
+    if (my !== seq) return;
+    setClaims(rows);
     setClaimsError(false);
   } catch {
-    setClaimsError(true);
+    if (my === seq) setClaimsError(true);
   }
 }
 
 export function resetClaims(): void {
   currentRel = null;
+  seq++;
   setClaims([]);
+  setClaimsError(false);
 }
 
 async function after<T>(p: Promise<T>): Promise<T> {
@@ -50,7 +55,7 @@ export const withdraw = (id: string) => after(withdrawClaim(id));
 export const cancel = (id: string, note: string | null) => after(cancelClaim(id, note));
 export const nudge = (id: string) => after(nudgeClaim(id));
 
-export const OPEN: Claim["status"][] = ["pending", "accepted"];
+const OPEN: Claim["status"][] = ["pending", "accepted"];
 export const isOpen = (c: Claim) => OPEN.includes(c.status);
 
 export function myClaims(userId: string): Claim[] {

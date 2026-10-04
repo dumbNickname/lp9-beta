@@ -1,4 +1,4 @@
-import { createSignal, For, Show } from "solid-js";
+import { createMemo, createSignal, For, Show } from "solid-js";
 import { ClaimList } from "~/components/ClaimRow";
 import ComingUp from "~/components/ComingUp";
 import CouponCard from "~/components/CouponCard";
@@ -33,8 +33,8 @@ export default function MyWishes(props: Props) {
   const [showIdeas, setShowIdeas] = createSignal(false);
   const [showPast, setShowPast] = createSignal(false);
 
-  const mine = () => coupons().filter((c) => c.receiver_id === props.userId);
-  const couponMap = () => new Map(coupons().map((c) => [c.id, c]));
+  const mine = createMemo(() => coupons().filter((c) => c.receiver_id === props.userId));
+  const couponMap = createMemo(() => new Map(coupons().map((c) => [c.id, c])));
   const approvedFree = () => mine().filter((c) => c.status === "approved" && !openClaimFor(c.id));
   const ready = () =>
     approvedFree()
@@ -106,7 +106,7 @@ export default function MyWishes(props: Props) {
     </Show>
   );
 
-  const addButton = (
+  const AddButton = () => (
     <Show when={!adding()}>
       <button type="button" class="small" onClick={() => setAdding(true)}>
         + Add a wish
@@ -145,7 +145,7 @@ export default function MyWishes(props: Props) {
             count={ready().length}
             icon={<span>✦</span>}
             hint="You have enough hearts for these."
-            action={addButton}
+            action={<AddButton />}
           >
             <ul class="coupon-list">
               <For each={ready()}>{card}</For>
@@ -159,7 +159,7 @@ export default function MyWishes(props: Props) {
             title="Saving up"
             count={saving().length}
             icon={<span>◔</span>}
-            action={ready().length === 0 ? addButton : undefined}
+            action={ready().length === 0 ? <AddButton /> : undefined}
           >
             <ul class="coupon-list">
               <For each={saving()}>{card}</For>
@@ -173,7 +173,7 @@ export default function MyWishes(props: Props) {
             title={`Waiting for ${props.partnerName}'s yes`}
             count={waiting().length}
             icon={<span>…</span>}
-            action={ready().length === 0 && saving().length === 0 ? addButton : undefined}
+            action={ready().length === 0 && saving().length === 0 ? <AddButton /> : undefined}
           >
             <ul class="coupon-list">
               <For each={waiting()}>{card}</For>
@@ -190,7 +190,7 @@ export default function MyWishes(props: Props) {
         </Show>
 
         <Show when={ready().length + saving().length + waiting().length === 0}>
-          <div class="world-empty-action">{addButton}</div>
+          <div class="world-empty-action"><AddButton /></div>
         </Show>
 
         <div class="coupons-more">

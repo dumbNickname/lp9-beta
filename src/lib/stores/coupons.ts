@@ -15,18 +15,21 @@ const [couponsLoading, setCouponsLoading] = createSignal(false);
 const [couponsError, setCouponsError] = createSignal(false);
 
 let currentRel: string | null = null;
+let seq = 0;
 
 export async function refreshCoupons(relId: string): Promise<void> {
   currentRel = relId;
+  const my = ++seq;
   setCouponsLoading(true);
   try {
     const rows = await listCoupons(relId);
-    if (currentRel === relId) setCoupons(rows);
+    if (my !== seq) return;
+    setCoupons(rows);
     setCouponsError(false);
   } catch {
-    setCouponsError(true);
+    if (my === seq) setCouponsError(true);
   } finally {
-    setCouponsLoading(false);
+    if (my === seq) setCouponsLoading(false);
   }
 }
 
@@ -46,7 +49,10 @@ export const retire = (id: string) => after(retireCoupon(id));
 
 export function resetCoupons(): void {
   currentRel = null;
+  seq++;
   setCoupons([]);
+  setCouponsError(false);
+  setCouponsLoading(false);
 }
 
 export function refreshCurrentCoupons(): void {

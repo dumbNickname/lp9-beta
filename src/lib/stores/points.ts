@@ -1,4 +1,5 @@
-import { createSignal, onCleanup, onMount } from "solid-js";
+import { createSignal } from "solid-js";
+import { useFocusRefresh } from "~/lib/useFocusRefresh";
 import { getKey } from "~/lib/crypto/keystore";
 import { decryptComment, encryptComment } from "~/lib/crypto/comments";
 import {
@@ -27,6 +28,7 @@ const [pointsError, setPointsError] = createSignal(false);
 const [hasCommentKey, setHasCommentKey] = createSignal<boolean | null>(null);
 
 let current: { relId: string; userId: string } | null = null;
+let seq = 0;
 
 async function toFeedItem(p: Point, key: CryptoKey | null): Promise<FeedItem> {
   if (!p.comment_ciphertext || !p.comment_iv) {
@@ -38,24 +40,25 @@ async function toFeedItem(p: Point, key: CryptoKey | null): Promise<FeedItem> {
 
 export async function refreshPoints(relId: string, userId: string): Promise<void> {
   current = { relId, userId };
+  const my = ++seq;
   setPointsLoading(true);
   try {
     const key = await getKey(relId);
+    if (my !== seq) return;
     setHasCommentKey(key !== null);
     const [rows, amounts] = await Promise.all([
       listPoints(relId),
       listReceivedAmounts(relId, userId),
     ]);
     const items = await Promise.all(rows.map((p) => toFeedItem(p, key)));
-    // Drop stale responses after a relationship switch (PRD-43).
-    if (current?.relId !== relId) return;
+    if (my !== seq) return;
     setFeed(items);
     setReceivedAmounts(amounts);
     setPointsError(false);
   } catch {
-    setPointsError(true);
+    if (my === seq) setPointsError(true);
   } finally {
-    setPointsLoading(false);
+    if (my === seq) setPointsLoading(false);
   }
 }
 
@@ -96,25 +99,16 @@ export function mySpendable(userId: string): number {
 
 export function resetPoints(): void {
   current = null;
+  seq++;
   setFeed([]);
   setReceivedAmounts([]);
   setHasCommentKey(null);
+  setPointsError(false);
+  setPointsLoading(false);
 }
 
 export function usePointsFocusRefresh(): void {
-  onMount(() => {
-    const onFocus = () => {
-      if (document.visibilityState === "visible" && current) {
-        void refreshPoints(current.relId, current.userId);
-      }
-    };
-    document.addEventListener("visibilitychange", onFocus);
-    window.addEventListener("focus", onFocus);
-    onCleanup(() => {
-      document.removeEventListener("visibilitychange", onFocus);
-      window.removeEventListener("focus", onFocus);
-    });
-  });
+  useFocusRefresh(() => (current ? refreshPoints(current.relId, current.userId) : undefined));
 }
 
 export { feed, pointsLoading, pointsError, hasCommentKey };

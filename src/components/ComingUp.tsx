@@ -23,6 +23,11 @@ export default function ComingUp(props: Props) {
     accepted().filter((c) => !c.scheduled_date || c.scheduled_date < localDateString());
   const later = () => accepted().filter((c) => c.scheduled_date && c.scheduled_date > days().at(-1)!);
 
+  const undatedLabel = (c: Claim) => {
+    if (!c.scheduled_date) return "Some day soon";
+    return c.scheduled_date < localDateString() ? "Date passed" : "Later";
+  };
+
   const who = (c: Claim) => (c.claimer_id === props.userId ? "for you" : `for ${props.partnerName}`);
   const title = (c: Claim) => props.coupons.get(c.coupon_id)?.title ?? "a coupon";
   const emoji = (c: Claim) => props.coupons.get(c.coupon_id)?.emoji || "♡";
@@ -98,7 +103,7 @@ export default function ComingUp(props: Props) {
           <For each={[...undated(), ...later()]}>
             {(c) => (
               <li class="plan plan--undated" classList={{ "plan--mine": c.claimer_id === props.userId }}>
-                <span class="plan-date">{c.scheduled_date ? "Later" : "Some day soon"}</span>
+                <span class="plan-date">{undatedLabel(c)}</span>
                 <span aria-hidden="true">{emoji(c)}</span>
                 <span class="plan-title">{title(c)}</span>
                 <span class="plan-who">{who(c)}</span>

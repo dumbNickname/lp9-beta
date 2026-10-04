@@ -761,7 +761,6 @@ button.small,
 
 .invite-qr-link-field {
   inline-size: 100%;
-  font-size: var(--text-sm);
   word-break: break-all;
 }
 
@@ -831,7 +830,6 @@ button.small,
   block-size: 2.75rem;
   border-radius: 50%;
   font-family: var(--font-display);
-  font-size: var(--text-lg);
   font-weight: 500;
   border: 2px solid var(--color-bg);
 }
@@ -1047,11 +1045,6 @@ button.small,
   font-weight: 600;
   background-color: var(--color-muted-bg);
   color: var(--color-muted-fg);
-}
-
-.chip--approved {
-  background-color: var(--color-heart-soft);
-  color: var(--color-fg);
 }
 
 .chip--draft {
@@ -1346,10 +1339,6 @@ button.small,
   background-color: var(--color-heart-soft);
 }
 
-.cal-day.has-plan .cal-dot {
-  background-color: var(--color-heart);
-}
-
 .plan-list {
   list-style: none;
   margin: 0;
@@ -1446,7 +1435,7 @@ button.small,
   position: fixed;
   inset: 0;
   z-index: 50;
-  background-color: rgb(20 10 5 / 45%);
+  background-color: var(--color-scrim);
   animation: fade-in 160ms var(--ease);
 }
 
@@ -1461,7 +1450,7 @@ button.small,
   background-color: var(--color-surface);
   border-start-start-radius: var(--radius-lg);
   border-start-end-radius: var(--radius-lg);
-  box-shadow: 0 -12px 40px -10px rgb(20 10 5 / 40%);
+  box-shadow: var(--shadow-sheet);
   animation: sheet-up 220ms var(--ease);
 }
 
@@ -1624,7 +1613,6 @@ button.is-danger {
   border: var(--border-thin);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-soft);
-  padding: var(--space-4);
 }
 
 /* ======================================================================
@@ -1641,12 +1629,6 @@ button.is-danger {
   background-color: color-mix(in srgb, var(--color-bg) 90%, transparent);
   backdrop-filter: blur(12px);
   border-block-end: var(--border-thin);
-}
-
-.appbar-row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
 }
 
 .appbar-home,
@@ -1764,7 +1746,7 @@ button.is-danger {
   background-color: var(--color-surface);
   border: var(--border-thin);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-soft), 0 20px 40px -20px rgb(20 10 5 / 35%);
+  box-shadow: var(--shadow-pop);
   animation: fade-up 180ms var(--ease);
 }
 
@@ -3389,7 +3371,6 @@ button.composer-send {
   padding: 0.2rem 0.6rem;
   border-radius: 999px;
   background-color: var(--color-heart-soft);
-  color: var(--color-heart);
   font-weight: 700;
   font-size: var(--text-sm);
 }

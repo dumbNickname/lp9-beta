@@ -1,4 +1,5 @@
-import { createSignal, onCleanup, onMount } from "solid-js";
+import { createSignal } from "solid-js";
+import { useFocusRefresh } from "~/lib/useFocusRefresh";
 import { getMyProfile, updateMyProfile } from "~/lib/data/profile";
 import type { Profile, ProfileUpdate } from "~/lib/data/types";
 
@@ -32,19 +33,7 @@ export async function saveProfile(patch: ProfileUpdate): Promise<void> {
 }
 
 export function useProfileFocusRefresh(): void {
-  onMount(() => {
-    const onFocus = () => {
-      if (document.visibilityState === "visible") {
-        void refreshProfile();
-      }
-    };
-    document.addEventListener("visibilitychange", onFocus);
-    window.addEventListener("focus", onFocus);
-    onCleanup(() => {
-      document.removeEventListener("visibilitychange", onFocus);
-      window.removeEventListener("focus", onFocus);
-    });
-  });
+  useFocusRefresh(refreshProfile);
 }
 
 export { profile, profileLoading };

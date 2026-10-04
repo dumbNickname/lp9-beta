@@ -138,6 +138,25 @@ describe("ComingUp", () => {
     expect(getByText("Some day soon")).toBeInTheDocument();
     expect(container.querySelectorAll(".plan").length).toBe(2);
   });
+
+  it("labels an accepted claim whose date has passed honestly, not as Later", async () => {
+    const ComingUp = (await import("~/components/ComingUp")).default;
+    const { addDays, localDateString } = await import("~/lib/format/date");
+    const { queryByText, getByText } = render(() => (
+      <ComingUp
+        claims={[
+          claim({ id: "p", status: "accepted", scheduled_date: addDays(localDateString(), -2) }),
+          claim({ id: "f", status: "accepted", scheduled_date: addDays(localDateString(), 30), coupon_id: "c2" }),
+        ]}
+        coupons={new Map([["c1", coupon], ["c2", { ...coupon, id: "c2", title: "Walk" }]])}
+        userId="me"
+        partnerName="Bob"
+      />
+    ));
+    expect(getByText("Date passed")).toBeInTheDocument();
+    expect(queryByText("Some day soon")).toBeNull();
+    expect(getByText("Later")).toBeInTheDocument();
+  });
 });
 
 describe("CouponCard affordable + claim", () => {

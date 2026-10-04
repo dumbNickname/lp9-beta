@@ -1,4 +1,5 @@
 import { supabase } from "~/lib/supabase";
+import { friendlyFrom, type FriendlyTable } from "./errors";
 import type { Claim } from "./types";
 
 const COLUMNS =
@@ -42,7 +43,7 @@ export const cancelClaim = (id: string, note: string | null) =>
   call("cancel_claim", { p_claim_id: id, p_note: note });
 export const nudgeClaim = (id: string) => call("nudge_claim", { p_claim_id: id });
 
-const FRIENDLY: [string, string][] = [
+const FRIENDLY: FriendlyTable = [
   ["not enough hearts", "You don't have enough hearts for this one yet."],
   ["already claimed", "You've already claimed this — wait until it's delivered."],
   ["coupon not available", "This coupon isn't available right now."],
@@ -59,12 +60,5 @@ const FRIENDLY: [string, string][] = [
 ];
 
 export function friendlyClaimError(err: unknown): string {
-  const msg =
-    err && typeof err === "object" && "message" in err
-      ? String((err as { message: unknown }).message)
-      : String(err ?? "");
-  for (const [needle, text] of FRIENDLY) {
-    if (msg.includes(needle)) return text;
-  }
-  return "Something went wrong. Please try again.";
+  return friendlyFrom(err, FRIENDLY, "Something went wrong. Please try again.");
 }

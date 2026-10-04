@@ -48,6 +48,7 @@ export default function ConfirmHost() {
   });
 
   let confirmBtn: HTMLButtonElement | undefined;
+  let sheetEl: HTMLDivElement | undefined;
   let lastFocus: Element | null = null;
 
   const close = (choice: Choice) => {
@@ -65,41 +66,43 @@ export default function ConfirmHost() {
   };
 
   return (
-    <Show when={pending()}>
+    <Show when={pending()} keyed>
       {(p) => {
-        lastFocus = document.activeElement;
+        const active = document.activeElement;
+        if (!(active && sheetEl?.contains(active))) lastFocus = active;
         queueMicrotask(() => confirmBtn?.focus());
         return (
           <Portal>
             <div class="sheet-backdrop" onClick={() => close("cancel")} />
             <div
+              ref={sheetEl}
               class="sheet"
               role="alertdialog"
               aria-modal="true"
               aria-labelledby="sheet-title"
-              aria-describedby={p().body ? "sheet-body" : undefined}
+              aria-describedby={p.body ? "sheet-body" : undefined}
               onKeyDown={onKey}
             >
-              <h2 id="sheet-title" class="sheet-title">{p().title}</h2>
-              <Show when={p().body}>
-                <p id="sheet-body" class="sheet-body">{p().body}</p>
+              <h2 id="sheet-title" class="sheet-title">{p.title}</h2>
+              <Show when={p.body}>
+                <p id="sheet-body" class="sheet-body">{p.body}</p>
               </Show>
               <div class="sheet-actions">
                 <button
                   ref={confirmBtn}
                   type="button"
-                  classList={{ "is-danger": p().tone === "danger" }}
+                  classList={{ "is-danger": p.tone === "danger" }}
                   onClick={() => close("confirm")}
                 >
-                  {p().confirmLabel ?? "OK"}
+                  {p.confirmLabel ?? "OK"}
                 </button>
-                <Show when={p().altLabel}>
+                <Show when={p.altLabel}>
                   <button type="button" class="quiet" onClick={() => close("alt")}>
-                    {p().altLabel}
+                    {p.altLabel}
                   </button>
                 </Show>
                 <button type="button" class="quiet" onClick={() => close("cancel")}>
-                  {p().cancelLabel ?? "Cancel"}
+                  {p.cancelLabel ?? "Cancel"}
                 </button>
               </div>
             </div>

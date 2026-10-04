@@ -1,12 +1,20 @@
 import { supabase } from "~/lib/supabase";
 import { byteaToBytes, bytesToBytea } from "./bytea";
-import { errorMessage } from "./errors";
+import { InviteError, inviteErrorCode, friendlyPeekError, PEEK_FALLBACK } from "./pairErrors";
 import type {
   Archetype,
   PairInvitePeek,
   Relationship,
   RelationshipWrap,
 } from "./types";
+
+export {
+  friendlyPairError,
+  friendlyPeekError,
+  InviteError,
+  isUsedInvite,
+  type InviteErrorCode,
+} from "./pairErrors";
 
 const COLUMNS = "id, member_a, member_b, archetype, status, created_at, paired_at";
 const WRAP_COLUMNS = "wrapped_key_blob, wrap_salt, wrap_iterations, wrap_algo";
@@ -53,29 +61,16 @@ export async function redeemPairCode(code: string): Promise<string> {
   return data as string;
 }
 
-// Map a peek RPC exception message to a friendly, user-facing string. The
-// underlying messages match redeem_pair_code's, so the mapping is shared in
-// spirit; kept here so the data layer throws presentable errors.
-export function friendlyPeekError(err: unknown): string {
-  const msg = errorMessage(err);
-  if (msg.includes("invalid code")) return "That invite code is not valid.";
-  if (msg.includes("code already used")) return "That invite has already been used.";
-  if (msg.includes("code expired")) return "That invite has expired.";
-  return "Could not load this invite. Please try again.";
-}
-
 // Redeemer: read-only preview of an invite for the confirm view (PRD-25).
-// Does NOT consume the invite. Returns the inviter display_name + archetype.
-// `peek_pair_code` is `returns table(...)`, which Supabase JS surfaces as an
-// array, so we take the first row. Throws a friendly error on RPC failure or
-// an empty result.
+// Does NOT consume the invite. `peek_pair_code` is `returns table(...)`,
+// surfaced as an array, so we take the first row. Throws an InviteError.
 export async function peekPairCode(code: string): Promise<PairInvitePeek> {
   const { data, error } = await supabase.rpc("peek_pair_code", {
     p_code: code,
   });
-  if (error) throw new Error(friendlyPeekError(error));
+  if (error) throw new InviteError(inviteErrorCode(error), friendlyPeekError(error));
   const row = (data as PairInvitePeek[] | null)?.[0];
-  if (!row) throw new Error("Could not load this invite. Please try again.");
+  if (!row) throw new InviteError("unknown", PEEK_FALLBACK);
   return {
     display_name: row.display_name ?? null,
     archetype: row.archetype,

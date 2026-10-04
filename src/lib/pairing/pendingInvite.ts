@@ -1,4 +1,5 @@
 import { deleteKey, getKey, putKey } from "~/lib/crypto/keystore";
+import { readJson, removeLocal, writeLocal } from "~/lib/storage";
 
 // The inviter's outstanding invite (code + key) lives in localStorage so a
 // reload can restore the waiting screen; the AES key itself sits in
@@ -18,33 +19,19 @@ export function tempKeyId(code: string): string {
 }
 
 export function readPendingInvite(): PendingInvite | null {
-  try {
-    const raw = localStorage.getItem(PENDING_INVITE_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw) as PendingInvite;
-    if (parsed && typeof parsed.code === "string" && typeof parsed.keyBase64 === "string") {
-      return parsed;
-    }
-  } catch {
-    // storage unavailable or malformed
+  const parsed = readJson<PendingInvite>(PENDING_INVITE_KEY);
+  if (parsed && typeof parsed.code === "string" && typeof parsed.keyBase64 === "string") {
+    return parsed;
   }
   return null;
 }
 
 export function writePendingInvite(invite: PendingInvite): void {
-  try {
-    localStorage.setItem(PENDING_INVITE_KEY, JSON.stringify(invite));
-  } catch {
-    // storage unavailable; reload-safety degrades but pairing still works
-  }
+  writeLocal(PENDING_INVITE_KEY, JSON.stringify(invite));
 }
 
 export function clearPendingInvite(): void {
-  try {
-    localStorage.removeItem(PENDING_INVITE_KEY);
-  } catch {
-    // storage unavailable
-  }
+  removeLocal(PENDING_INVITE_KEY);
 }
 
 // Move the invite's temp key onto the pair it created. Safe to call from

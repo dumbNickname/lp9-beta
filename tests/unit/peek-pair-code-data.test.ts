@@ -73,6 +73,30 @@ describe("peekPairCode", () => {
     await expect(peekPairCode("X")).rejects.toThrow(/already been used/i);
   });
 
+  it("tags a used invite so callers need not match copy", async () => {
+    mockRpc.mockResolvedValue({ data: null, error: { message: "code already used", code: "P0001" } });
+    const { peekPairCode, isUsedInvite } = await import("~/lib/data/relationship");
+    const err: unknown = await peekPairCode("X").catch((e: unknown) => e);
+    expect(isUsedInvite(err)).toBe(true);
+    expect((err as { code: string }).code).toBe("used");
+  });
+
+  it("does not treat other errors as a used invite", async () => {
+    mockRpc.mockResolvedValue({ data: null, error: { message: "code expired" } });
+    const { peekPairCode, isUsedInvite } = await import("~/lib/data/relationship");
+    const err: unknown = await peekPairCode("X").catch((e: unknown) => e);
+    expect(isUsedInvite(err)).toBe(false);
+    expect(isUsedInvite(new Error("That invite has already been used."))).toBe(false);
+  });
+
+  it("friendlyPairError covers pairing-only failures", async () => {
+    const { friendlyPairError } = await import("~/lib/data/relationship");
+    expect(friendlyPairError({ message: "cannot pair with yourself" })).toMatch(/yourself/);
+    expect(friendlyPairError({ message: "relationship already exists" })).toMatch(/already paired/);
+    expect(friendlyPairError({ message: "code already used" })).toMatch(/already been used/);
+    expect(friendlyPairError({ message: "boom" })).toMatch(/could not pair/i);
+  });
+
   it("throws when the RPC returns an empty result set", async () => {
     mockRpc.mockResolvedValue({ data: [], error: null });
     const { peekPairCode } = await import("~/lib/data/relationship");

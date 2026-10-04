@@ -1,3 +1,5 @@
+import { readLocal, writeLocal } from "~/lib/storage";
+
 export type ThemeChoice = "light" | "dark" | "system";
 export type EffectiveTheme = "light" | "dark";
 
@@ -30,19 +32,11 @@ export function nextChoice(choice: ThemeChoice): ThemeChoice {
 // may be unavailable) ---
 
 export function readStoredChoice(): ThemeChoice {
-  try {
-    return normalizeChoice(localStorage.getItem(THEME_STORAGE_KEY));
-  } catch {
-    return "system";
-  }
+  return normalizeChoice(readLocal(THEME_STORAGE_KEY));
 }
 
 export function writeStoredChoice(choice: ThemeChoice): void {
-  try {
-    localStorage.setItem(THEME_STORAGE_KEY, choice);
-  } catch {
-    // Storage unavailable (private mode etc.) — degrade silently.
-  }
+  writeLocal(THEME_STORAGE_KEY, choice);
 }
 
 export function systemPrefersDark(): boolean {
@@ -92,7 +86,7 @@ export const THEME_INIT_SCRIPT = `
     document.documentElement.dataset.theme = dark ? "dark" : "light";
     var m = document.createElement("meta");
     m.name = "theme-color";
-    m.content = dark ? ${JSON.stringify("#3a1f19")} : ${JSON.stringify("#f4ebe0")};
+    m.content = dark ? ${JSON.stringify(THEME_COLORS.dark)} : ${JSON.stringify(THEME_COLORS.light)};
     document.head.appendChild(m);
   } catch (e) {
     document.documentElement.dataset.theme = "light";

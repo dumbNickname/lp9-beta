@@ -4,6 +4,7 @@ import { initial, type PairOption } from "~/components/PairBadge";
 import PrivacyToggle from "~/components/PrivacyToggle";
 import { HelpIcon } from "~/components/Icons";
 import { privateMode } from "~/lib/privacy";
+import { markPrivacyHintSeen, readPrivacyHintSeen } from "~/lib/privacyHint";
 
 interface Props {
   myName: string;
@@ -22,16 +23,6 @@ interface Props {
 }
 
 type Menu = null | "pair" | "balance" | "more";
-
-export const PRIVACY_HINT_KEY = "privacy_hint_seen";
-
-function readHintSeen(): boolean {
-  try {
-    return localStorage.getItem(PRIVACY_HINT_KEY) !== null;
-  } catch {
-    return true;
-  }
-}
 
 // Site root under the GH Pages sub-path. Plain <a> (not router <A>) so the
 // bar also renders outside a Route (tests); a full load of the static home
@@ -53,14 +44,10 @@ export default function AppBar(props: Props) {
       },
     ),
   );
-  const [hintSeen, setHintSeen] = createSignal(readHintSeen());
+  const [hintSeen, setHintSeen] = createSignal(readPrivacyHintSeen());
   const dismissHint = () => {
     setHintSeen(true);
-    try {
-      localStorage.setItem(PRIVACY_HINT_KEY, "1");
-    } catch {
-      // storage unavailable; hint may show again next load
-    }
+    markPrivacyHintSeen();
   };
   // Using the eye counts as having learned it.
   createEffect(on(privateMode, (on) => on && !hintSeen() && dismissHint(), { defer: true }));

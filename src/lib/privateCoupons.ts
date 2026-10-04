@@ -1,17 +1,13 @@
 import { createSignal } from "solid-js";
+import { readJson, writeLocal } from "~/lib/storage";
 
 // Per-device, per-user private coupon flags (DESIGN.md §15b, D-38.1).
 // Plain signal mirrored to localStorage; never synced to the server.
-const KEY = "private_coupons";
+export const PRIVATE_COUPONS_KEY = "private_coupons";
 
 function load(): Set<string> {
-  try {
-    const raw = localStorage.getItem(KEY);
-    const arr: unknown = raw ? JSON.parse(raw) : [];
-    return new Set(Array.isArray(arr) ? arr.filter((x): x is string => typeof x === "string") : []);
-  } catch {
-    return new Set();
-  }
+  const arr = readJson<unknown>(PRIVATE_COUPONS_KEY);
+  return new Set(Array.isArray(arr) ? arr.filter((x): x is string => typeof x === "string") : []);
 }
 
 const [privateIds, setPrivateIds] = createSignal<Set<string>>(
@@ -27,11 +23,7 @@ export function toggleCouponPrivate(id: string): void {
   if (next.has(id)) next.delete(id);
   else next.add(id);
   setPrivateIds(next);
-  try {
-    localStorage.setItem(KEY, JSON.stringify([...next]));
-  } catch {
-    // storage unavailable; flag lasts for this session only
-  }
+  writeLocal(PRIVATE_COUPONS_KEY, JSON.stringify([...next]));
 }
 
 export function reloadPrivateCoupons(): void {

@@ -26,28 +26,7 @@ import RecoveryPassword from "~/components/RecoveryPassword";
 import ConfirmHost from "~/components/ConfirmSheet";
 import Dashboard from "~/components/Dashboard";
 import DeviceSettings from "~/components/DeviceSettings";
-
-// One-time "set recovery password" prompt, tracked per relationship in
-// localStorage so it shows once and survives reloads (D-22.3).
-function recoveryPromptedKey(relId: string): string {
-  return `recovery_prompted:${relId}`;
-}
-
-function wasRecoveryPrompted(relId: string): boolean {
-  try {
-    return localStorage.getItem(recoveryPromptedKey(relId)) !== null;
-  } catch {
-    return false;
-  }
-}
-
-function markRecoveryPrompted(relId: string): void {
-  try {
-    localStorage.setItem(recoveryPromptedKey(relId), "1");
-  } catch {
-    // storage unavailable; prompt may reappear next session (acceptable).
-  }
-}
+import { markRecoveryPrompted, wasRecoveryPrompted } from "~/lib/recoveryPrompted";
 
 export default function AppShell() {
   // Grab a `#pair=` invite before anything else can drop it (onboarding,

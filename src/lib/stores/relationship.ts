@@ -1,4 +1,5 @@
-import { createSignal, onCleanup, onMount } from "solid-js";
+import { createSignal } from "solid-js";
+import { useFocusRefresh } from "~/lib/useFocusRefresh";
 import { getMyRelationships } from "~/lib/data/relationship";
 import { adoptPendingInvite, readPendingInvite } from "~/lib/pairing/pendingInvite";
 import { user } from "~/lib/session";
@@ -18,6 +19,7 @@ const [addingPartner, setAddingPartner] = createSignal(false);
 let lastFetchTime = 0;
 let loadedOnce = false;
 const THROTTLE_MS = 2000;
+let seq = 0;
 // Set when a pair was just made on this device; the shell shows the
 // "paired" moment until dismissed.
 const [justPaired, setJustPaired] = createSignal<string | null>(null);
@@ -78,15 +80,26 @@ export async function refreshRelationship(force = false): Promise<void> {
   lastFetchTime = now;
 
   // First load only (see stores/profile.ts).
+  const my = ++seq;
   if (!loadedOnce) setRelationshipLoading(true);
   try {
     const rels = (await getMyRelationships()).filter((r) => r.status === "active");
+    if (my !== seq) return;
     // Inviter whose tab was in the background while the partner joined:
     // PairFlow's poll never fired, so give the new pair its key here,
     // before anything renders it as "locked".
     let adopted: string | null = null;
     const me = user()?.id;
     if (me && readPendingInvite()) adopted = await adoptPendingInvite(rels, me);
+    if (my !== seq) {
+      if (adopted) {
+        setSelectedId(adopted);
+        remember(adopted);
+        setAddingPartner(false);
+        setJustPaired(adopted);
+      }
+      return;
+    }
     setRelationships(rels);
     const current = selectedId();
     const keep =
@@ -103,7 +116,7 @@ export async function refreshRelationship(force = false): Promise<void> {
     }
     loadedOnce = true;
   } finally {
-    setRelationshipLoading(false);
+    if (my === seq) setRelationshipLoading(false);
   }
 }
 
@@ -123,19 +136,7 @@ export async function onNewRelationship(id: string): Promise<void> {
 }
 
 export function useRelationshipFocusRefresh(): void {
-  onMount(() => {
-    const onFocus = () => {
-      if (document.visibilityState === "visible") {
-        void refreshRelationship();
-      }
-    };
-    document.addEventListener("visibilitychange", onFocus);
-    window.addEventListener("focus", onFocus);
-    onCleanup(() => {
-      document.removeEventListener("visibilitychange", onFocus);
-      window.removeEventListener("focus", onFocus);
-    });
-  });
+  useFocusRefresh(() => refreshRelationship());
 }
 
 export {

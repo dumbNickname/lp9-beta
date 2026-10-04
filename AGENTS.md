@@ -197,6 +197,9 @@ Docs describe ideas, contracts and where things live, not code lines.
 - Keep subagent tasks small (~10 min); big scopes time out.
 - Throwaway live smoke scripts stay outside the repo (they create real
   anonymous users).
+- Headless Chromium cannot subscribe to web push (fails with
+  "permission denied" even when permission is granted); push gets
+  tested by hand on real devices.
 - Rewriting pushed history only with owner OK and force-with-lease.
 
 ## User preferences (durable)

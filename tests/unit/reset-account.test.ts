@@ -45,4 +45,28 @@ describe("resetAccount", () => {
     expect(localStorage.getItem("recovery_prompted:r1")).toBeNull();
     expect(localStorage.getItem("theme")).toBe("dark");
   });
+
+  it("clears every registered device key and prefix, and nothing else", async () => {
+    const { resetAccount, resetStorageKeys } = await import("~/lib/session");
+    const { keys, prefixes } = resetStorageKeys();
+    expect(keys).toEqual(
+      expect.arrayContaining([
+        "pair_invite_pending",
+        "archetype_hint",
+        "private_coupons",
+        "active_relationship",
+        "privacy_mode",
+        "privacy_hint_seen",
+      ]),
+    );
+    expect(prefixes).toEqual(expect.arrayContaining(["recovery_prompted:", "last_seen:"]));
+    for (const k of keys) localStorage.setItem(k, "x");
+    for (const p of prefixes) localStorage.setItem(`${p}r1`, "x");
+    localStorage.setItem("theme", "dark");
+
+    await resetAccount();
+
+    expect(localStorage.length).toBe(1);
+    expect(localStorage.getItem("theme")).toBe("dark");
+  });
 });

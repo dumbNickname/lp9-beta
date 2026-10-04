@@ -34,11 +34,11 @@
 1. **"Us" visuals trial:** owner reviews garland, almanac (season /
    clock / words), milestone ribbon, wish stamps, week warmth on the
    live site and picks which stay (D-UX.7–10). Remove the rest.
-2. **Push: verify the web side.** Server side verified live (heart ->
-   trigger -> `notify` -> push sent). Builds lacked the public key: the
-   repo secret is named `VAPID_PUBLIC_KEY`; the workflow now accepts it.
-   Browser E2E: B turns on in Settings, A sends a heart, B's service
-   worker shows the notification. Then mark PRD-53 merged.
+2. **Push: owner tests by hand on real devices.** Server side verified
+   live (heart -> trigger -> `notify` -> push sent); live build has the
+   public key (Settings offers "Turn on"). Headless Chromium cannot
+   subscribe to push ("permission denied"), so no automated web E2E.
+   Mark PRD-53 merged after the owner's check.
 3. **Unfinished reviews:** the independent review subagents timed out
    (gateway) every time. `REVIEW.md` holds the orchestrator's own
    findings. Re-run in small scopes, one per call, each ~10 min of work:
