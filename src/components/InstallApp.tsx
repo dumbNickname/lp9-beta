@@ -53,7 +53,7 @@ export default function InstallApp() {
                   : "In your browser menu, choose \u201cInstall app\u201d or \u201cAdd to Home screen\u201d."
               }
             >
-              In Safari tap Share, then "Add to Home Screen". Needed for
+              Tap Share, then "Add to Home Screen". Needed for
               notifications on iPhone.
             </Show>
           </Show>
