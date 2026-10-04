@@ -1,6 +1,6 @@
 {
-  "name": "APP_NAME",
-  "short_name": "APP_NAME",
+  "name": "lp9",
+  "short_name": "lp9",
   "description": "Notice the small things. Give your person hearts with a short note.",
   "start_url": "./app",
   "scope": "./",

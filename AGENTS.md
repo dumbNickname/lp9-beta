@@ -85,8 +85,8 @@ short encrypted note; hearts become a balance spent on mutually-approved
 **wishes** (coupons). Principle: train people to notice and say
 appreciation; nothing transactional, no scoreboard.
 
-The product name is not chosen yet (placeholder `APP_NAME`, repo and
-sub-path `lp9-beta`; `DESIGN.md` §14i).
+The product name is not chosen yet (working title `lp9`, shown via the
+`APP_NAME` constant; repo and sub-path `lp9-beta`; `DESIGN.md` §14i).
 
 ## Source-of-truth docs
 

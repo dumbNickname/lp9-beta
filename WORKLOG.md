@@ -89,5 +89,6 @@ the owner's push setup; confirm the PRD-54 fix.
   workflow now accepts either; owner guide updated.
 - PRD-54 re-probed live: relationship UPDATE (archive, member swap,
   blob overwrite) changes 0 rows; outsider reads 0 rows; helpers denied.
-- README title is now `lp9`. The in-app `APP_NAME` constant is
-  unchanged (owner to decide).
+- Working title `lp9` now shown everywhere (README, app header, page
+  titles, home-screen name via manifest); owner found "APP_NAME" looked
+  like a broken template.

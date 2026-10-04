@@ -130,7 +130,7 @@ The GitHub repository
 [`dumbNickname/lp9-beta`](https://github.com/dumbNickname/lp9-beta) is
 the **single source repo** for this project, served via GitHub Pages.
 The `lp9` in that URL is a deferred-name placeholder — the same kind of
-placeholder as `APP_NAME` in code — and **is not a final product name**.
+working title shown in the app — and **is not a final product name**.
 It exists so the repo could be created before the naming question
 is settled (see [`DESIGN.md`](./DESIGN.md) §14i). The repo will be
 renamed in the GitHub dashboard once a real name is locked in; the

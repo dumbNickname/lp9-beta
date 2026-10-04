@@ -646,6 +646,9 @@ suggest the app is about optimizing, comparing, or earning.
 - **Until a name is chosen:** the repo / project remains generically
   named ("coupons"); placeholders in code/copy use `APP_NAME` constant
   so a global rename is trivial later.
+- **Amended 2026-10-04 (owner):** the displayed working title is `lp9`
+  (app header, page titles, home-screen name), because a literal
+  "APP_NAME" looked like a broken template. Still not the final name.
 
 ### 13. Data model
 
