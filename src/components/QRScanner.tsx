@@ -2,6 +2,7 @@ import { createSignal, createUniqueId, onCleanup, onMount, Show } from "solid-js
 import { normalizeScannedInput, parseInvitePayload } from "~/lib/pairing/qr";
 import { isNativeSupported, startScan, type Scanner } from "~/lib/pairing/scan";
 import { startFallbackScan } from "~/lib/pairing/scan-fallback";
+import { isIos } from "~/lib/pwa";
 
 interface QRScannerProps {
   // Called with the raw decoded string on a successful scan or a valid
@@ -103,13 +104,16 @@ export default function QRScanner(props: QRScannerProps) {
     }
   };
 
-  onMount(() => {
+  const startCamera = () => {
+    cleanup();
     if (isNativeSupported()) {
       void startNative();
     } else {
       void startFallback();
     }
-  });
+  };
+
+  onMount(startCamera);
 
   onCleanup(() => {
     disposed = true;
@@ -147,9 +151,20 @@ export default function QRScanner(props: QRScannerProps) {
       />
 
       <Show when={cameraState() === "denied"}>
-        <p class="qr-scanner-notice" role="status">
-          Camera access is unavailable. Paste the invite below instead.
-        </p>
+        <div class="qr-scanner-denied">
+          <p class="qr-scanner-notice" role="status">
+            Camera unavailable. Allow it, or paste the invite below.
+          </p>
+          <button type="button" class="quiet small" onClick={startCamera}>
+            Allow camera
+          </button>
+          <Show when={isIos()}>
+            <p class="qr-scanner-hint">
+              Still blocked? iPhone Settings → Apps → Safari → Camera → Ask,
+              then reopen this app.
+            </p>
+          </Show>
+        </div>
       </Show>
 
       <form class="qr-scanner-manual" onSubmit={submitManual}>

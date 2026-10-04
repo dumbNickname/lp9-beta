@@ -52,6 +52,39 @@ describe("QRScanner — fallback selection", () => {
   });
 });
 
+describe("QRScanner — camera retry", () => {
+  it("'Allow camera' retries after a failed start and clears the notice", async () => {
+    mockStartFallbackScan.mockRejectedValueOnce(
+      new DOMException("denied", "NotAllowedError"),
+    );
+    const { getByRole, queryByRole } = render(() => (
+      <QRScanner onDecode={vi.fn()} />
+    ));
+    await waitFor(() =>
+      expect(getByRole("status")).toHaveTextContent(/unavailable/i),
+    );
+    fireEvent.click(getByRole("button", { name: "Allow camera" }));
+    await waitFor(() => expect(mockStartFallbackScan).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(queryByRole("status")).toBeNull());
+  });
+
+  it("shows the iOS settings hint only on iOS", async () => {
+    mockStartFallbackScan.mockRejectedValue(new Error("denied"));
+    const ua = vi.spyOn(navigator, "userAgent", "get");
+    ua.mockReturnValue("Mozilla/5.0 (Linux; Android 14)");
+    const first = render(() => <QRScanner onDecode={vi.fn()} />);
+    await waitFor(() => expect(first.getByRole("status")).toBeInTheDocument());
+    expect(first.queryByText(/iPhone Settings/)).toBeNull();
+    first.unmount();
+
+    ua.mockReturnValue("Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)");
+    const second = render(() => <QRScanner onDecode={vi.fn()} />);
+    await waitFor(() =>
+      expect(second.getByText(/iPhone Settings/)).toBeInTheDocument(),
+    );
+  });
+});
+
 describe("QRScanner — manual entry", () => {
   it("fires onDecode when a bare payload is pasted", async () => {
     const onDecode = vi.fn();

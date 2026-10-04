@@ -92,3 +92,13 @@ the owner's push setup; confirm the PRD-54 fix.
 - Working title `lp9` now shown everywhere (README, app header, page
   titles, home-screen name via manifest); owner found "APP_NAME" looked
   like a broken template.
+
+## Session: iOS install + camera
+
+- Install hint no longer names Safari: Chrome/Edge on iOS 16.4+ also
+  add to home screen via Share.
+- Owner: camera failed in the installed iOS app (worked in browser).
+  The scanner starts the camera without a tap and had no retry. Now a
+  failed start shows "Allow camera" (retry from a tap) plus, on iOS,
+  where to re-enable it (Settings -> Apps -> Safari -> Camera). Owner
+  to verify on device.

@@ -61,7 +61,8 @@ select vault.update_secret(
 
 ## 5. Try it
 1. Open the app, ⋯ → Settings → Notifications → **Turn on** and allow.
-   On iPhone: first Safari → Share → **Add to Home Screen**, open the
+   On iPhone: first Share → **Add to Home Screen** (Safari, or Chrome/Edge
+   on iOS 16.4+), open the
    app from the icon, then turn it on there (iOS 16.4+).
 2. From your partner's device, send a heart. You should get "Someone
    appreciated you" (at most once per ~20 h per receiver). Coupon
