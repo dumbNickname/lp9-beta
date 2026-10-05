@@ -46,3 +46,5 @@ withdraw while pending and nudge after 7 days.
 
 - Notes/Coupons tabs replaced by three worlds Give / My wishes / For
   partner (PRD-49); claim sections moved with their lists.
+- "Mark delivered" (giver only) became "We did it" for either partner;
+  status shows "Done" (PRD-56).

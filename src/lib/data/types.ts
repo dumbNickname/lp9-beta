@@ -122,6 +122,7 @@ export interface Claim {
   accepted_at: string | null;
   declined_at: string | null;
   delivered_at: string | null;
+  delivered_by: string | null;
   withdrawn_at: string | null;
   cancelled_at: string | null;
   auto_refunded_at: string | null;

@@ -13,7 +13,7 @@ export function claimStatusText(c: Claim, mine: boolean, partner: string): strin
     case "accepted":
       return mine ? `${partner} said yes` : "You said yes";
     case "delivered":
-      return "Delivered";
+      return "Done";
     case "declined":
       return mine ? `${partner} can't right now — hearts returned` : "You passed — hearts returned";
     case "withdrawn":

@@ -136,6 +136,7 @@ its own end-to-end PRD per `DESIGN.md` §16a.
 |----|-------------------------------------------------------|-----|--------|
 | 41 | `coupon_claims` table + RLS + escrow RPCs             | `prds/PRD-41-claims-table-rpcs.md`             | merged |
 | 42 | Claims UI: claim, respond, deliver, coming up, history | `prds/PRD-42-claims-ui.md`                    | dev-done |
+| 56 | Either partner marks a wish done                      | `prds/PRD-56-either-marks-done.md`             | dev-done |
 
 ### Phase 6 — Email notifications
 

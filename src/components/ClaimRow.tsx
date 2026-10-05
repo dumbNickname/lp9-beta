@@ -34,7 +34,8 @@ export default function ClaimRow(props: Props) {
       ["Claimed", fmtStamp(c.claimed_at)],
       ["Accepted", fmtStamp(c.accepted_at)],
       ["Planned for", c.scheduled_date ? scheduleLabel(c.scheduled_date) : null],
-      ["Delivered", fmtStamp(c.delivered_at)],
+      ["Done", fmtStamp(c.delivered_at)],
+      ["Marked done by", c.delivered_by ? (c.delivered_by === props.userId ? "You" : props.partnerName) : null],
       ["Declined", fmtStamp(c.declined_at)],
       ["Withdrawn", fmtStamp(c.withdrawn_at)],
       ["Cancelled", fmtStamp(c.cancelled_at)],
@@ -133,9 +134,9 @@ export default function ClaimRow(props: Props) {
               Not right now
             </button>
           </Show>
-          <Show when={deliverer() && props.claim.status === "accepted"}>
+          <Show when={props.claim.status === "accepted"}>
             <button type="button" class="small" onClick={() => void run("deliver")} disabled={busy()}>
-              Mark delivered
+              We did it
             </button>
           </Show>
           <Show when={props.claim.status === "accepted"}>

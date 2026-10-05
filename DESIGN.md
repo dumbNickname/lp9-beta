@@ -135,6 +135,9 @@ the partner missed it (because they didn't have their phone, etc.).
 - **14-day auto-refund:** a lazy sweep RPC (`sweep_expired_claims`) runs
   whenever either partner loads claims; no cron infra. Same outcome.
 - Templates schema: resolved as a hardcoded TS file (§6c, PRD-37).
+- **Amended 2026-10-05 (owner):** either partner may mark an accepted
+  claim done ("We did it"); trust over ceremony. `delivered_by` records
+  who; the other partner is notified (PRD-56).
 
 ### Not yet discussed
 ### 6. Coupons — definition, agreement, and templates
@@ -731,6 +734,7 @@ suggest the app is about optimizing, comparing, or earning.
 - `decline_reason` text nullable
 - `claimed_at`, `accepted_at`, `declined_at`, `delivered_at`,
   `nudged_at` timestamptz (last four nullable)
+- `delivered_by` uuid nullable (who marked it done, 2026-10-05)
 
 **`points`** — heart events.
 - `id` uuid PK
@@ -813,7 +817,7 @@ inserts/updates for state-changing actions.
 - `claim_coupon(coupon_id)` — escrow, validates spendable balance.
 - `accept_claim(claim_id, scheduled_date?, note?)` — deliverer only (§5f).
 - `decline_claim(claim_id, reason)` — deliverer only; refunds.
-- `deliver_claim(claim_id)` — deliverer only; finalizes spend.
+- `deliver_claim(claim_id)` — either member (amended 2026-10-05, §5f); finalizes spend.
 - `nudge_claim(claim_id)` — claimer only; rate-limited (>= 24h between
   nudges, only after 7 days from claim).
 - `withdraw_claim(claim_id)` — claimer, pending only; refunds (§5f).

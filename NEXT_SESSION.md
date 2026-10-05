@@ -11,7 +11,7 @@
   - hearts: composer, timeline, edit 24 h / undo 5 min, balance;
   - wishes (coupons): add / approve / gently decline / retire, starter
     ideas, per-device private flag;
-  - claims (escrow): claim → yes (+ date/note) → delivered; decline /
+  - claims (escrow): claim → yes (+ date/note) → done (either partner taps "We did it"); decline /
     withdraw / cancel refund, 14-day lazy auto-refund, reminders;
   - several pairs per account (switcher, `?rel=`);
   - app shell: app bar (home, pair switcher, balance pill, ⋯ menu),

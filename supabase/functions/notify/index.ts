@@ -13,7 +13,7 @@ const COPY: Record<string, { title: string; body: string; path: string; tag: str
   claimed: { title: "A coupon was claimed", body: "Time to plan something nice.", path: "app#theirs", tag: "claim" },
   accepted: { title: "Good news", body: "Your coupon got a yes.", path: "app#mine", tag: "claim" },
   declined: { title: "Not right now", body: "Your hearts were returned.", path: "app#mine", tag: "claim" },
-  delivered: { title: "Delivered", body: "Hope it was lovely.", path: "app#mine", tag: "claim" },
+  delivered: { title: "Done together", body: "A wish was marked done. Hope it was lovely.", path: "app", tag: "claim" },
   cancelled: { title: "A plan was cancelled", body: "Hearts were returned.", path: "app", tag: "claim" },
   auto_refunded: { title: "Hearts returned", body: "A claim waited 14 days with no answer.", path: "app#mine", tag: "claim" },
   nudge: { title: "A gentle reminder", body: "A coupon is waiting for your answer.", path: "app#theirs", tag: "claim" },

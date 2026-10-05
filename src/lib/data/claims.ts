@@ -3,7 +3,7 @@ import { friendlyFrom, type FriendlyTable } from "./errors";
 import type { Claim } from "./types";
 
 const COLUMNS =
-  "id, coupon_id, relationship_id, claimer_id, deliverer_id, price_at_claim, status, scheduled_date, accept_note, decline_reason, cancel_note, cancelled_by, claimed_at, accepted_at, declined_at, delivered_at, withdrawn_at, cancelled_at, auto_refunded_at, nudged_at";
+  "id, coupon_id, relationship_id, claimer_id, deliverer_id, price_at_claim, status, scheduled_date, accept_note, decline_reason, cancel_note, cancelled_by, claimed_at, accepted_at, declined_at, delivered_at, delivered_by, withdrawn_at, cancelled_at, auto_refunded_at, nudged_at";
 
 export async function listClaims(relId: string): Promise<Claim[]> {
   const { data, error } = await supabase
@@ -45,7 +45,7 @@ export const nudgeClaim = (id: string) => call("nudge_claim", { p_claim_id: id }
 
 const FRIENDLY: FriendlyTable = [
   ["not enough hearts", "You don't have enough hearts for this one yet."],
-  ["already claimed", "You've already claimed this — wait until it's delivered."],
+  ["already claimed", "You've already claimed this — wait until it's done."],
   ["coupon not available", "This coupon isn't available right now."],
   ["too early to nudge", "You can send a gentle reminder after 7 days."],
   ["already nudged", "You already sent a reminder today."],

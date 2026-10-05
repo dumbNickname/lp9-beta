@@ -27,6 +27,7 @@ function claim(over: Partial<Claim> = {}): Claim {
     accepted_at: null,
     declined_at: null,
     delivered_at: null,
+    delivered_by: null,
     withdrawn_at: null,
     cancelled_at: null,
     auto_refunded_at: null,
@@ -70,7 +71,7 @@ describe("ClaimRow", () => {
     );
   });
 
-  it("deliverer declines; accepted shows Mark delivered + Cancel", async () => {
+  it("deliverer declines; accepted shows We did it + Cancel", async () => {
     const ClaimRow = (await import("~/components/ClaimRow")).default;
     const r = render(() => <ClaimRow claim={claim()} coupon={coupon} userId="me" partnerName="Bob" />);
     fireEvent.click(r.getByRole("button", { name: /not right now/i }));
@@ -80,9 +81,40 @@ describe("ClaimRow", () => {
     const r2 = render(() => (
       <ClaimRow claim={claim({ status: "accepted", scheduled_date: null })} coupon={coupon} userId="me" partnerName="Bob" />
     ));
-    fireEvent.click(r2.getByRole("button", { name: "Mark delivered" }));
+    fireEvent.click(r2.getByRole("button", { name: "We did it" }));
     await waitFor(() => expect(rpc).toHaveBeenCalledWith("deliver_claim", { p_claim_id: "k1" }));
     expect(r2.getByRole("button", { name: "Cancel" })).toBeInTheDocument();
+  });
+
+  it("claimer can also mark an accepted claim done", async () => {
+    const ClaimRow = (await import("~/components/ClaimRow")).default;
+    const r = render(() => (
+      <ClaimRow
+        claim={claim({ claimer_id: "me", deliverer_id: "bob", status: "accepted" })}
+        coupon={coupon}
+        userId="me"
+        partnerName="Bob"
+      />
+    ));
+    fireEvent.click(r.getByRole("button", { name: "We did it" }));
+    await waitFor(() => expect(rpc).toHaveBeenCalledWith("deliver_claim", { p_claim_id: "k1" }));
+  });
+
+  it("done claim shows Done and who marked it in details", async () => {
+    const ClaimRow = (await import("~/components/ClaimRow")).default;
+    const r = render(() => (
+      <ClaimRow
+        claim={claim({ status: "delivered", delivered_at: new Date().toISOString(), delivered_by: "bob" })}
+        coupon={coupon}
+        userId="me"
+        partnerName="Bob"
+      />
+    ));
+    expect(r.getByText("Done")).toBeInTheDocument();
+    expect(r.queryByRole("button", { name: "We did it" })).toBeNull();
+    fireEvent.click(r.getByRole("button", { name: "Details" }));
+    expect(r.getByText("Marked done by")).toBeInTheDocument();
+    expect(r.getAllByText("Bob").length).toBeGreaterThan(0);
   });
 
   it("claimer: withdraw when pending, no deliverer actions, nudge only after 7 days", async () => {

@@ -49,7 +49,7 @@ export default function ForPartner(props: Props) {
             title="To give"
             count={toGive().length}
             icon={<span>♥</span>}
-            hint={`${props.partnerName} spent hearts on these — plan them, then mark delivered.`}
+            hint={`${props.partnerName} spent hearts on these — plan them, then mark them done.`}
           >
             <ClaimList claims={toGive()} coupons={couponMap()} userId={props.userId} partnerName={props.partnerName} />
           </Section>

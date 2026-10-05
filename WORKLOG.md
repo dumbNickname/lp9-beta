@@ -120,3 +120,15 @@ fix in loops, then merge, deploy migrations and run E2E.
   to real push services, 10 devices per user.
 - Push can't be E2E-tested headless (Chromium refuses the subscription);
   owner tests on devices.
+
+## Session: either partner marks done
+
+**Brief:** the wisher should also be able to finish a claim; trust is
+key. Asked whether there is history of completed items.
+
+- **Owner answers:** either side marks done; copy "We did it" / "Done";
+  history stays as is (Past claims / Given before, last 20 each).
+- **Done (PRD-56):** `deliver_claim` open to both members, records
+  `delivered_by`, push goes to the other partner.
+- **Owner look:** accepted claim on the wisher's side now has "We did
+  it"; Details show who marked it.

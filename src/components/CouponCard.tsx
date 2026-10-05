@@ -81,7 +81,7 @@ export default function CouponCard(props: Props) {
       delete: { title: "Delete this coupon?", confirmLabel: "Delete", tone: "danger" as const },
       claim: {
         title: `Claim "${props.coupon.title}"?`,
-        body: `${props.coupon.price} hearts are set aside until ${props.partnerName} delivers — and returned if it doesn't happen.`,
+        body: `${props.coupon.price} hearts are set aside until it happens — and returned if it doesn't happen.`,
         confirmLabel: `Claim for ${props.coupon.price}`,
       },
     };

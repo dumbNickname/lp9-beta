@@ -108,7 +108,7 @@ Thinking so far, to pick up when Phase 6 resumes:
 
 - **Coming up -> .ics export** ("add to my calendar") for accepted
   claims with a date.
-- **Delivered moment**: after "Mark delivered", prompt the claimer to
+- **Delivered moment**: after "We did it", prompt the claimer to
   send hearts back ("How was it?") — closes the loop without scoring.
 - **Coupon "claimed N times"** stays hidden (no scoreboard); maybe show
   "last enjoyed 3 weeks ago" instead.

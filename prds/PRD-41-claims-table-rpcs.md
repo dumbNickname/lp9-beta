@@ -58,3 +58,7 @@ date + note) -> deliver, plus decline, withdraw, cancel, nudge, a lazy
 - Not live-tested (needs time travel; `claimed_at` can't be forged):
   nudge after 7 days and sweep after 14 days. Checked by SQL review;
   sweep returns 0 live.
+
+## Later changes
+
+- `deliver_claim` open to either member, records `delivered_by` (PRD-56).
