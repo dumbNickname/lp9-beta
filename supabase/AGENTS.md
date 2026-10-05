@@ -16,9 +16,11 @@ the branch-driven link between this repo and the Supabase project.
 - The Supabase GitHub integration applies migrations on push to
   `master` (or to a preview branch on PR). Never `db push`/`link`
   locally; no PAT or DB password needed.
-- RPCs: security definer with an empty search path. Helpers: revoke
-  execute from public/anon/authenticated (Postgres grants PUBLIC by
-  default). No write RLS policies; writes go through RPCs.
+- RPCs: security definer with an empty search path, EXECUTE granted to
+  `authenticated` only (revoke from public/anon; default privileges no
+  longer grant PUBLIC). Helpers: revoke from public/anon/authenticated.
+  No write RLS policies; writes go through RPCs. Exception: `profiles`
+  UPDATE, column-granted on display name, locale and theme only.
 - Verify live after a migration with a throwaway two-client smoke
   script kept outside the repo.
 - Region is EU Frankfurt; do not move (§12d).

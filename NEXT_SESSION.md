@@ -18,8 +18,8 @@
     worlds Give / My wishes / For partner, ticket cards, Coming-up
     calendar, desktop 2 columns, settings page (`#settings`);
   - installable PWA (manifest, icons, theme-colour, offline shell SW);
-  - web push (opt-in, content-free): server side live; web build
-    needs a redeploy with the public key.
+  - web push (opt-in, content-free): server side live; web build has
+    the public key; owner device test pending.
 - Status per PRD: `PROGRESS.md`. Most PRDs from 28 on are `dev-done`
   (no separate QA pass yet); SQL PRDs 27/35/41 are merged + live-smoked.
 
@@ -42,8 +42,9 @@
 3. **Unfinished reviews:** the independent review subagents timed out
    (gateway) every time. `REVIEW.md` holds the orchestrator's own
    findings. Re-run in small scopes, one per call, each ~10 min of work:
-   (a) SQL/security, (b) the app's shared lib, (c) stylesheet dedupe
-   (~3k lines), (d) UX with Playwright DOM probing on the live site.
+   (a) SQL/security and (b) shared lib done as review loops 1-2
+   (PRD-55); still open: (c) stylesheet split (~2.4k lines), (d) UX with
+   Playwright DOM probing on the live site.
 4. **QA pass** on dev-done PRDs (QA agent → `tests/qa/`), then mark merged.
 5. Pick polish with the owner from `REVIEW.md` UX list + `IDEAS.md`
    ("Seen while testing", watch rings, delight).

@@ -102,3 +102,21 @@ the owner's push setup; confirm the PRD-54 fix.
   failed start shows "Allow camera" (retry from a tap) plus, on iOS,
   where to re-enable it (Settings -> Apps -> Safari -> Camera). Owner
   to verify on device.
+
+## Session: architecture + security review loops
+
+**Brief:** review the code for architecture/UX debt and security gaps,
+fix in loops, then merge, deploy migrations and run E2E.
+
+- **Code:** stores drop stale responses by request sequence (not just
+  pair id) and reset error/loading flags; one focus-refresh helper; all
+  browser storage through one wrapper; Reset account wipes keys listed
+  by their owning modules; pairing poll can't overlap; "invite already
+  used" detected by error code; pure claim/date/relationship helpers;
+  icons in one module; heart-note timer only inside the edit window;
+  dead CSS duplicates removed.
+- **Security (PRD-55):** RPCs signed-in only; no direct invite inserts;
+  profile writes limited to name/locale/theme; push endpoints limited
+  to real push services, 10 devices per user.
+- Push can't be E2E-tested headless (Chromium refuses the subscription);
+  owner tests on devices.

@@ -4,6 +4,7 @@
 > (technical + UX subagents) did NOT complete (gateway time-outs); re-run
 > them in small scopes (see `NEXT_SESSION.md`). Nothing below is fixed
 > yet unless marked FIXED. Promote items to PRDs to fix; strike them here when done.
+> Review loops 1-2 (architecture + security) fixed the items marked below.
 
 ## Technical — security (verified live)
 
@@ -56,20 +57,34 @@
    and `accept_claim` (-1 tolerated) accept this. OK, but documented only
    in no-human-decisions.
 
+## Technical — security review loop (migrations 0011/0012)
+
+- **FIXED — API RPCs callable by `anon`:** every RPC now executes for
+  `authenticated` only (anonymous sign-in users keep access); default
+  privileges no longer grant new functions to PUBLIC/anon.
+- **FIXED — direct invite INSERT policy** let a client pick its own code
+  and expiry; dropped (invites only via `create_pair_invite`).
+- **FIXED — profiles writable on any column:** UPDATE limited to
+  `display_name`, `locale`, `theme`; name capped at 50 chars.
+- **FIXED — push as request amplifier:** `save_push_subscription`
+  accepts only known push-service endpoints, max 10 devices per user.
+
 ## Technical — correctness / code quality
 
 8. **MEDIUM — `retire_coupon` lets either member cancel the partner's
    accepted claim** by retiring (D-35.1 allows either member to retire).
    Probably fine (refunds), but surprising for the claimer; show who
    retired, or restrict retire to "no open claims" + a confirm.
-9. **MEDIUM — duplicate refetches**: Dashboard mounts and refreshes
+9. **PARTLY FIXED — MEDIUM — duplicate refetches** (one shared
+   `useFocusRefresh` helper, Dashboard focus handlers merged, stale
+   responses dropped; still no per-relationship throttle): Dashboard mounts and refreshes
    points + claims + coupons; tab switch refetches coupons + claims;
    focus handlers in Dashboard (x2) + `usePointsFocusRefresh` +
    profile/relationship focus refreshes all fire on every focus. ~6
    requests per focus. Consolidate into one `useFocusRefresh` per
    relationship with throttling (IDEAS tech-debt already lists it).
-10. **MEDIUM — per-note `setInterval` (15s)** in `HeartNote` — 50 notes
-    = 50 timers. Use one shared clock signal.
+10. **FIXED — per-note `setInterval` (15s)** in `HeartNote`: now ticks
+    only for my own notes inside the 24 h edit window.
 11. **LOW — `MyWishes` `matchMedia` read once at mount** (not reactive to
     rotate/resize).
 12. **LOW — dead/legacy code**: PairBadge still carries the old switch
@@ -78,13 +93,16 @@
     `DeviceSettings.onKeyRestored` unused; CSS `.balance*`,
     `.dashboard-head`, `.tabs/.tab`, `.pair-badge` switcher styles and
     old `.coupon-main` grid definitions superseded.
-13. **LOW — `global.css` is 2.4k lines appended in chunks** with
+13. **PARTLY FIXED (dead duplicates removed, scrim tokens) — LOW —
+    `global.css` is 2.4k lines appended in chunks** with
     duplicate selectors: `.chip--approved` (x2), `.cal-dot`, `.pair-menu`,
     `.coupon-main` (plain + `.ticket` overrides), `.coming-up` margins.
     Split into files per area (tokens, base, controls, appbar, worlds,
     tickets, claims, calendar, pairing) and dedupe.
-14. **LOW — PairFlow.tsx ~450 lines**; Dashboard ~300; split views.
-15. **LOW — `friendly*Error` mappers x4** with identical shape; one helper.
+14. **LOW — PairFlow.tsx ~450 lines**; Dashboard ~270; split views
+    (pure helpers and icons already pulled out).
+15. **FIXED — `friendly*Error` mappers x4:** one table-driven helper;
+    "invite already used" detected by error code, not copy.
 
 ## Testing / CI
 

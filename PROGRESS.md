@@ -121,13 +121,14 @@ its own end-to-end PRD per `DESIGN.md` §16a.
 | 50 | Layering, alignment, calendar whose-wish, claim chips | `prds/PRD-50-layout-polish.md`                 | dev-done |
 | 51 | Settings as its own page (`#settings`)                | `prds/PRD-51-settings-page.md`                 | dev-done |
 | 52 | Installable PWA + browser colour                      | `prds/PRD-52-pwa-install.md`                   | dev-done |
-| 53 | Web push notifications (opt-in, content-free)         | `prds/PRD-53-web-push.md`                      | dev-done (server live; web redeploy pending) |
+| 53 | Web push notifications (opt-in, content-free)         | `prds/PRD-53-web-push.md`                      | dev-done (live; owner device test pending) |
 
 ### Security (from `REVIEW.md`)
 
 | #  | Title                                                 | PRD                                            | Status |
 |----|-------------------------------------------------------|------------------------------------------------|--------|
 | 54 | Lock relationship writes + helper grants (HIGH)       | `prds/PRD-54-lock-relationship-writes.md`      | merged (live-probed) |
+| 55 | Signed-in RPCs, invite/profile/push lockdown          | `prds/PRD-55-security-followups.md`            | dev-done |
 
 ### Phase 5 — Coupon claim/escrow flow
 
