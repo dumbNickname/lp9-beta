@@ -131,4 +131,6 @@ key. Asked whether there is history of completed items.
 - **Done (PRD-56):** `deliver_claim` open to both members, records
   `delivered_by`, push goes to the other partner.
 - **Owner look:** accepted claim on the wisher's side now has "We did
-  it"; Details show who marked it.
+  it"; Details show who marked it. Live-verified: API smoke (pending,
+  outsider and double tap rejected) + browser E2E (claimer taps, Past
+  claims shows Done, "Marked done by You").
