@@ -60,29 +60,100 @@ select vault.update_secret(
 ```
 
 ## 5. Try it
-1. Open the app, ⋯ → Settings → Notifications → **Turn on** and allow.
-   On iPhone: first Share → **Add to Home Screen** (Safari, or Chrome/Edge
-   on iOS 16.4+), open the
-   app from the icon, then turn it on there (iOS 16.4+).
-2. From your partner's device, send a heart. You should get "Someone
+1. Open the app, ⋯ → Settings → **Notifications** card → **Turn on** and
+   allow. On iPhone: first Share → **Add to Home Screen** (Safari, or
+   Chrome/Edge on iOS 16.4+), open the app from the icon, then turn it
+   on there.
+2. Quick check on your own device: open the app with `?debug=true`
+   (e.g. `…/lp9-beta/app?debug=true#settings`) → **Send test** (see
+   "Debug test button" below).
+3. From your partner's device, send a heart. You should get "Someone
    appreciated you" (at most once per ~20 h per receiver). Coupon
-   events (claim / yes / delivered) arrive right away.
+   events (claim / yes / done) arrive right away.
 
-## Troubleshooting
-- Dashboard → Edge Functions → notify → **Logs**: 401 = secret
-  mismatch between Vault and function secret; 500 = missing VAPID keys.
-- Calls the database made to the function:
+## How it flows (where things can break)
+There is no app server. The chain is:
 
-  ```sql
-  select id, status_code, left(content, 120) as body, created
-  from net._http_response order by created desc limit 10;
-  ```
-- Registered devices:
+1. **Browser** subscribes with the VAPID public key and saves the
+   subscription via an RPC → row in `public.push_subscriptions`.
+2. **Database trigger** (heart, wish, claim event) calls the `notify`
+   Edge Function over HTTP via `pg_net`, with the URL + secret from
+   Vault. It never blocks or fails the user's action.
+3. **Edge Function `notify`** (Deno, runs on Supabase) checks the
+   secret, loads the user's devices and sends the push to Google /
+   Apple / Mozilla / Microsoft.
+4. **Service worker** on the device shows the notification.
+
+Hearts are throttled: one push per receiver per 20 h. The window only
+starts when a push can really go out (device saved and Vault secrets
+present), so hearts sent before setup do not silence later ones.
+
+## Where the logs are
+| Where | What | How to see |
+|---|---|---|
+| Edge Function `notify` | `push failed <kind> <status> <error>` lines, VAPID config errors | Dashboard → Edge Functions → notify → **Logs** |
+| Database (`pg_net`) | The function's answer to every call (kept ~6 h) | SQL below (`net._http_response`) |
+| Browser | Nothing stored. With `?debug=true` the Notifications card shows the last test answer | Settings → Notifications |
+
+The function answers each call with
+`{"sent": n, "devices": n, "failed": [{"status": ..., "body": ...}]}`.
+
+## Debug test button
+Add `?debug=true` to the app URL. Settings → Notifications then shows
+**Send test**. It pushes "Notifications are on" to **your own** devices
+only (max once per 30 s) and prints the function's answer:
+
+| Shown | Meaning / fix |
+|---|---|
+| `HTTP 200 … "sent":1` but nothing appears | Push left the server; blocked on the device (OS notification settings, focus mode, battery saver; iPhone: open from Home Screen icon) |
+| `HTTP 200 … "sent":0, "failed":[…]` | Push service refused. `403`/`401` in failed = VAPID key pair mismatch (GitHub public key ≠ Supabase keys) or bad `VAPID_SUBJECT`; `404`/`410` = expired device, row deleted, turn off and on again |
+| `HTTP 401` | `PUSH_WEBHOOK_SECRET` (function) ≠ Vault `push_webhook_secret` |
+| `HTTP 500 … "vapid"` | VAPID secrets missing or malformed in the function |
+| `HTTP 404` | Function not deployed or Vault `push_webhook_url` wrong (step 3/4) |
+| "Server not set up: Vault secrets …" | Step 4 missing |
+| "No device saved on the server" | Turn notifications off and on |
+| "No answer … after 10 s" | `pg_net` slow or failed; run the `net._http_response` query |
+
+## SQL checks (SQL editor)
+- Vault secrets present: see step 4.
+- Registered devices (note your `user_id`):
 
   ```sql
   select user_id, left(endpoint, 60) as endpoint, created_at, last_used_at
   from public.push_subscriptions order by created_at desc limit 20;
   ```
+  `last_used_at` set = a push to that device was accepted by the push
+  service.
+- What the function answered to recent calls:
+
+  ```sql
+  select id, status_code, left(content, 300) as body, error_msg, created
+  from net._http_response order by created desc limit 10;
+  ```
+  No rows after an event = the trigger did not call (no device saved or
+  Vault secrets missing).
+- Throttle state (reset to test hearts again right away):
+
+  ```sql
+  select * from public.push_state;
+  delete from public.push_state where user_id = '<user_id>';
+  ```
+- Send a push without the app (any kind, e.g. `test`, `hearts`):
+
+  ```sql
+  select public.push_event('<user_id>', 'test', null);
+  ```
+  Then check `net._http_response` a few seconds later.
+
+## Troubleshooting
 - Settings shows "Notifications aren't set up on this site yet" → step 1
   missing or misnamed (public key not baked into the build), or the
   last deploy ran before the secret was added: re-run it.
+- Settings shows "Blocked in your browser" → follow the steps shown in
+  the card (pages cannot re-ask once blocked), then **Check again**.
+- After changing the VAPID keys: every device must turn notifications
+  off and on again (old subscriptions belong to the old key). The card
+  shows "off" when the saved subscription has a different key, and
+  **Turn on** replaces it.
+- Free tier: a paused project (≈1 week idle) drops calls; restore it in
+  the dashboard.

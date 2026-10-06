@@ -134,3 +134,23 @@ key. Asked whether there is history of completed items.
   it"; Details show who marked it. Live-verified: API smoke (pending,
   outsider and double tap rejected) + browser E2E (claimer taps, Past
   claims shows Done, "Marked done by You").
+
+## Session: push not arriving
+
+**Brief:** owner ran the push setup, notifications still do not arrive;
+review code (headless browsers cannot test push).
+
+- **Found live:** `notify` deployed (401 without secret), VAPID public
+  key in the bundle. Wiring correct end to end.
+- **Bug:** the hearts trigger stamped the 20 h throttle before knowing
+  a push could go out (no device yet / Vault not set), silencing the
+  next real heart. Regression test added.
+- **Invisible failures:** `notify` swallowed push-service errors and
+  answered `sent: 0`. Now logs them and returns `devices` + `failed`.
+- **Done:** own Notifications card in Settings (ask button, per-browser
+  unblock steps, Check again, refresh on focus); `?debug=true` Send
+  test (own devices, max 1 per 30 s) showing the function's answer;
+  re-subscribe when the VAPID key changed; verification guide in
+  `docs/push-setup.md`.
+- **Owner to do:** open `app?debug=true#settings` on the phone, Send
+  test, read the answer against the table in `docs/push-setup.md`.
