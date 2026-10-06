@@ -70,15 +70,24 @@ self.addEventListener("push", (event) => {
     data = { body: event.data ? event.data.text() : "" };
   }
   const title = data.title || "Something new for you";
+  const report = (ok, error) =>
+    self.clients
+      .matchAll({ type: "window", includeUncontrolled: true })
+      .then((list) => list.forEach((c) => c.postMessage({ type: "push-received", tag: data.tag, ok, error })));
   event.waitUntil(
-    self.registration.showNotification(title, {
-      body: data.body || "Open the app to see.",
-      icon: BASE + "icons/icon-192.png",
-      badge: BASE + "icons/icon-192.png",
-      tag: data.tag || "update",
-      renotify: false,
-      data: { url: BASE + (data.path || "app") },
-    }),
+    self.registration
+      .showNotification(title, {
+        body: data.body || "Open the app to see.",
+        icon: BASE + "icons/icon-192.png",
+        badge: BASE + "icons/icon-192.png",
+        tag: data.tag || "update",
+        renotify: false,
+        data: { url: BASE + (data.path || "app") },
+      })
+      .then(
+        () => report(true, null),
+        (e) => report(false, String((e && e.message) || e)),
+      ),
   );
 });
 

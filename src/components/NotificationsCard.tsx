@@ -1,7 +1,7 @@
-import { createSignal, For, onMount, Show } from "solid-js";
+import { createSignal, For, onCleanup, onMount, Show } from "solid-js";
 import { sendTestPush, testPushResult } from "~/lib/data/push";
 import { errorMessage } from "~/lib/data/errors";
-import { isIos, isStandalone } from "~/lib/pwa";
+import { isIos, isStandalone, SW_URL } from "~/lib/pwa";
 import { currentPushState, disablePush, enablePush, unblockSteps, type PushState } from "~/lib/push";
 import { useFocusRefresh } from "~/lib/useFocusRefresh";
 
@@ -35,9 +35,44 @@ export default function NotificationsCard() {
     setState(await currentPushState());
   };
 
+  const [swLog, setSwLog] = createSignal("");
+  const [info, setInfo] = createSignal("");
+
+  const loadInfo = async () => {
+    try {
+      const reg = await navigator.serviceWorker.getRegistration(SW_URL);
+      const sub = await reg?.pushManager.getSubscription();
+      const sw = reg?.active?.state ?? "none";
+      const host = sub ? new URL(sub.endpoint).host : "no subscription";
+      setInfo(`Permission: ${Notification.permission}. Worker: ${sw}. Push service: ${host}.`);
+    } catch (e) {
+      setInfo(`Info failed: ${errorMessage(e)}`);
+    }
+  };
+
+  const showLocal = async () => {
+    try {
+      const reg = await navigator.serviceWorker.getRegistration(SW_URL);
+      if (!reg) throw new Error("no service worker");
+      await reg.showNotification("Local test", { body: "Shown by this page, no server involved.", tag: "local" });
+      setSwLog("Local notification requested. Not visible = blocked by the OS or browser app settings.");
+    } catch (e) {
+      setSwLog(`Local notification failed: ${errorMessage(e)}`);
+    }
+  };
+
   onMount(() => {
     setDebug(debugEnabled());
     void check();
+    if (!debugEnabled() || !("serviceWorker" in navigator)) return;
+    void loadInfo();
+    const onMsg = (e: MessageEvent) => {
+      const d = e.data as { type?: string; ok?: boolean; error?: string | null } | null;
+      if (d?.type !== "push-received") return;
+      setSwLog(d.ok ? "Device received the push and showed it." : `Device received the push, show failed: ${d.error}`);
+    };
+    navigator.serviceWorker.addEventListener("message", onMsg);
+    onCleanup(() => navigator.serviceWorker.removeEventListener("message", onMsg));
   });
   useFocusRefresh(check);
 
@@ -57,6 +92,7 @@ export default function NotificationsCard() {
   const test = async () => {
     setTesting(true);
     setTestLog("Sending...");
+    setSwLog("Waiting for the device...");
     try {
       const status = await sendTestPush();
       if (status !== "queued") {
@@ -143,6 +179,17 @@ export default function NotificationsCard() {
           </div>
           <button type="button" class="quiet small" onClick={() => void test()} disabled={testing()}>
             {testing() ? "..." : "Send test"}
+          </button>
+        </div>
+        <div class="settings-row">
+          <div>
+            <p class="settings-label">This device (debug)</p>
+            <p class="settings-value notify-log" aria-live="polite">
+              {swLog() || info() || "No push seen yet."}
+            </p>
+          </div>
+          <button type="button" class="quiet small" onClick={() => void showLocal()}>
+            Local test
           </button>
         </div>
       </Show>

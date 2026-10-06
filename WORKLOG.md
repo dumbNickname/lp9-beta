@@ -154,3 +154,8 @@ review code (headless browsers cannot test push).
   `docs/push-setup.md`.
 - **Owner to do:** open `app?debug=true#settings` on the phone, Send
   test, read the answer against the table in `docs/push-setup.md`.
+- **Owner test:** Send test answered `sent:1` but nothing showed. Added
+  debug device diagnostics: service worker reports back to the page
+  when a push arrives (shown / failed / never arrived), a Local test
+  notification without the server, and permission / worker / push
+  service info. Table in `docs/push-setup.md`.

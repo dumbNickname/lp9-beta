@@ -33,6 +33,7 @@ describe("NotificationsCard", () => {
     expect(await screen.findByRole("heading", { name: "Notifications" })).toBeInTheDocument();
     expect(await screen.findByRole("button", { name: "Turn on" })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Send test" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Local test" })).toBeNull();
   });
 
   it("denied: shows unblock steps and re-checks", async () => {
@@ -55,6 +56,7 @@ describe("NotificationsCard", () => {
     fireEvent.click(await screen.findByRole("button", { name: "Send test" }));
     await waitFor(() => expect(screen.getByText(/HTTP 200/)).toBeInTheDocument(), { timeout: 3000 });
     expect(screen.getByText(/"sent":1/)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Local test" })).toBeInTheDocument();
   });
 
   it("?debug=true: reports a missing server setup", async () => {

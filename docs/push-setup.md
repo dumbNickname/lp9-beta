@@ -105,7 +105,7 @@ only (max once per 30 s) and prints the function's answer:
 
 | Shown | Meaning / fix |
 |---|---|
-| `HTTP 200 … "sent":1` but nothing appears | Push left the server; blocked on the device (OS notification settings, focus mode, battery saver; iPhone: open from Home Screen icon) |
+| `HTTP 200 … "sent":1` but nothing appears | Push left the server; look at the "This device (debug)" row below |
 | `HTTP 200 … "sent":0, "failed":[…]` | Push service refused. `403`/`401` in failed = VAPID key pair mismatch (GitHub public key ≠ Supabase keys) or bad `VAPID_SUBJECT`; `404`/`410` = expired device, row deleted, turn off and on again |
 | `HTTP 401` | `PUSH_WEBHOOK_SECRET` (function) ≠ Vault `push_webhook_secret` |
 | `HTTP 500 … "vapid"` | VAPID secrets missing or malformed in the function |
@@ -113,6 +113,23 @@ only (max once per 30 s) and prints the function's answer:
 | "Server not set up: Vault secrets …" | Step 4 missing |
 | "No device saved on the server" | Turn notifications off and on |
 | "No answer … after 10 s" | `pg_net` slow or failed; run the `net._http_response` query |
+
+The **This device (debug)** row narrows down a `"sent":1` with no
+notification:
+
+| Shown after Send test | Meaning / fix |
+|---|---|
+| "Device received the push and showed it." but nothing visible | OS hides it: phone Settings → Apps → the browser (or the installed app) → Notifications on; Do Not Disturb / Focus off; on Android also the notification channel for this site |
+| "show failed: …" | Browser refused to show it; the error text says why |
+| Stays "Waiting for the device..." | Push never reached the device: the browser was killed / in battery saver, or the push service drops it. Keep the app open and retry; on Android check the browser has no battery restriction |
+
+**Local test** shows a notification from the page itself, no server
+involved. Not visible = the device blocks notifications for this
+browser/app (fix in OS settings); visible = the device side works and
+the problem is delivery.
+
+The row also shows permission, service-worker state and which push
+service the subscription uses (e.g. `fcm.googleapis.com`).
 
 ## SQL checks (SQL editor)
 - Vault secrets present: see step 4.
