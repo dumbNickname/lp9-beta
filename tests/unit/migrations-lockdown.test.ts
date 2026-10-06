@@ -76,3 +76,31 @@ describe("security follow-ups (0012)", () => {
     expect(/^https:\/\/([a-z0-9-]+\.)*(googleapis\.com|mozilla\.com|push\.apple\.com|notify\.windows\.com)\//.test("https://evil.example/googleapis.com/")).toBe(false);
   });
 });
+
+describe("push fixes (0014)", () => {
+  const lastDef = (name: string) => {
+    const at = all.lastIndexOf(`create or replace function public.${name}(`);
+    return all.slice(at, all.indexOf("$$;", at));
+  };
+  it("hearts throttle is stamped only after push_ready passes (regression)", () => {
+    const fn = lastDef("on_point_push");
+    const ready = fn.indexOf("if not public.push_ready(new.receiver_id) then return new;");
+    expect(ready).toBeGreaterThan(-1);
+    expect(fn.indexOf("insert into public.push_state")).toBeGreaterThan(ready);
+  });
+  it("push_ready checks device and both vault secrets, and is a locked helper", () => {
+    const fn = lastDef("push_ready");
+    expect(fn).toContain("public.push_subscriptions where user_id = p_user");
+    expect(fn).toContain("'push_webhook_url'");
+    expect(fn).toContain("'push_webhook_secret'");
+    expect(all).toContain("revoke execute on function public.push_ready(uuid) from public, anon, authenticated");
+  });
+  it("send_test_push targets only the caller, throttled to 30s, authenticated only", () => {
+    const fn = lastDef("send_test_push");
+    expect(fn).toContain("v_uid uuid := auth.uid()");
+    expect(fn).toContain("'user_id', v_uid, 'kind', 'test'");
+    expect(fn).toContain("interval '30 seconds'");
+    expect(all).toContain("grant execute on function public.send_test_push() to authenticated");
+    expect(all).toContain("grant execute on function public.test_push_result() to authenticated");
+  });
+});

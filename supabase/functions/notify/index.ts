@@ -37,11 +37,16 @@ Deno.serve(async (req) => {
   const copy = payload.kind ? COPY[payload.kind] : undefined;
   if (!payload.user_id || !copy) return json(400, { error: "bad payload" });
 
-  webpush.setVapidDetails(
-    Deno.env.get("VAPID_SUBJECT") ?? "mailto:admin@example.com",
-    Deno.env.get("VAPID_PUBLIC_KEY")!,
-    Deno.env.get("VAPID_PRIVATE_KEY")!,
-  );
+  try {
+    webpush.setVapidDetails(
+      Deno.env.get("VAPID_SUBJECT") ?? "mailto:admin@example.com",
+      Deno.env.get("VAPID_PUBLIC_KEY")!,
+      Deno.env.get("VAPID_PRIVATE_KEY")!,
+    );
+  } catch (e) {
+    console.error("vapid config", e);
+    return json(500, { error: "vapid", detail: String((e as Error).message ?? e).slice(0, 200) });
+  }
   const db = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, {
     auth: { persistSession: false },
   });
@@ -52,6 +57,7 @@ Deno.serve(async (req) => {
   if (error) return json(500, { error: "db" });
 
   let sent = 0;
+  const failed: { status: number | null; body: string }[] = [];
   for (const s of subs ?? []) {
     try {
       await webpush.sendNotification(
@@ -62,9 +68,13 @@ Deno.serve(async (req) => {
       sent++;
       await db.from("push_subscriptions").update({ last_used_at: new Date().toISOString() }).eq("id", s.id);
     } catch (e) {
-      const code = (e as { statusCode?: number }).statusCode;
+      const err = e as { statusCode?: number; body?: string; message?: string };
+      const code = err.statusCode;
+      const body = String(err.body || err.message || e).slice(0, 300);
+      failed.push({ status: code ?? null, body });
+      console.error("push failed", payload.kind, code ?? "-", body);
       if (code === 404 || code === 410) await db.from("push_subscriptions").delete().eq("id", s.id);
     }
   }
-  return json(200, { sent });
+  return json(200, { sent, devices: subs?.length ?? 0, failed });
 });
