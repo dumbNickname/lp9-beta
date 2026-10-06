@@ -79,6 +79,8 @@ page shell where pairs give hearts, wish and claim.
   sheets < paired moment. Hints/coachmarks sit in the page flow and
   never cover controls.
 - Every device-local storage key must also be cleared by Reset account.
+- `?debug=true` reveals owner diagnostics (Settings → Notifications:
+  test push, device report, local test). Never shown without it.
 
 **Money rules**
 - Balance is computed, never stored, and only your own is shown (§13b).

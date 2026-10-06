@@ -68,6 +68,9 @@
   `display_name`, `locale`, `theme`; name capped at 50 chars.
 - **FIXED — push as request amplifier:** `save_push_subscription`
   accepts only known push-service endpoints, max 10 devices per user.
+- **FIXED — hearts push throttle burned without a send** (no device or
+  Vault yet silenced the next 20 h); `notify` swallowed push-service
+  errors. Migration 0014; failures now logged and returned.
 
 ## Technical — correctness / code quality
 

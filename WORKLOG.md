@@ -159,3 +159,9 @@ review code (headless browsers cannot test push).
   when a push arrives (shown / failed / never arrived), a Local test
   notification without the server, and permission / worker / push
   service info. Table in `docs/push-setup.md`.
+- **Result:** with the diagnostics the owner saw permission granted,
+  worker active, FCM endpoint, `sent:1`, and "received and showed it".
+  The app chain works end to end; the owner had Do Not Disturb on.
+  Pending: re-test with DND off.
+- **Known flake:** the dashboard tabs test times out (5 s) in the full
+  suite on this machine, also without these changes; passes alone.

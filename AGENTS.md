@@ -199,7 +199,11 @@ Docs describe ideas, contracts and where things live, not code lines.
   anonymous users).
 - Headless Chromium cannot subscribe to web push (fails with
   "permission denied" even when permission is granted); push gets
-  tested by hand on real devices.
+  tested by hand on real devices with `?debug=true` (see
+  `docs/push-setup.md`). "Shown" by the service worker can still be
+  hidden by the OS (Do Not Disturb, app notification settings).
+- Full test suite: the dashboard tabs test can time out under load on
+  this machine; it passes when run alone.
 - Rewriting pushed history only with owner OK and force-with-lease.
 
 ## User preferences (durable)
