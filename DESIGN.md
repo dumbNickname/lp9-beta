@@ -235,7 +235,9 @@ the partner missed it (because they didn't have their phone, etc.).
   request.~~ **Amended 2026-09-29 (owner):** installable PWA (PRD-52) and
   opt-in **web push** (PRD-53) are in; email stays parked. Push follows
   §8b rules: content-free text, max 1 hearts push per day per receiver,
-  coupon-flow events immediate, user-toggleable.
+  coupon-flow events immediate, user-toggleable. **Amended 2026-10-16
+  (owner):** hearts push on every heart, no daily cap (users expect it
+  right away; easier to verify). Email throttle below unchanged.
 - Rationale: keeps tech setup minimal; web push (especially iOS PWA
   requirement) is a rabbit hole for a side project.
 

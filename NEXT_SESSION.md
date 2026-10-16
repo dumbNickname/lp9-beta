@@ -35,10 +35,15 @@
    clock / words), milestone ribbon, wish stamps, week warmth on the
    live site and picks which stay (D-UX.7–10). Remove the rest.
 2. **Push: confirm visible on screen.** Whole chain verified on the
-   owner's device (Chrome, FCM): Send test -> `sent:1`, service worker
-   reports "received and showed it". Owner had Do Not Disturb on, so
-   nothing appeared. Next: owner re-tests with DND off (and a real
-   heart from the partner); if visible, mark PRD-53 merged. If not,
+   owner's device (Chrome on macOS, FCM): Send test -> `sent:1`, but
+   even the Local test (no server) stays invisible, so macOS hides
+   Chrome notifications (System Settings -> Notifications -> Google
+   Chrome, Focus). Hearts now push on every heart (no 20 h cap,
+   migration 0015). Next: owner fixes macOS settings and re-tests with
+   a real heart from the partner; if visible, mark PRD-53 merged. Open
+   proposals (not built): `urgency: high` in `notify` for idle Android,
+   in-flow "Turn on" card, `pushsubscriptionchange` + re-save on app
+   start. If still not visible,
    follow the "This device (debug)" table in `docs/push-setup.md` (OS
    notification settings for the browser). Headless Chromium cannot
    subscribe to push, so no automated web E2E.

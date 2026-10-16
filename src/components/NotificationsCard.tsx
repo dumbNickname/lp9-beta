@@ -128,7 +128,7 @@ export default function NotificationsCard() {
       case "denied":
         return "Blocked in your browser. Allow them for this site, then check again.";
       case "on":
-        return "On for this device. At most one a day for hearts; coupon news right away. Never the note itself.";
+        return "On for this device. Hearts and coupon news right away. Never the note itself.";
       case "off":
         return "Get a gentle nudge when your person appreciates you or answers a coupon.";
     }

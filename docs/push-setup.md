@@ -68,8 +68,8 @@ select vault.update_secret(
    (e.g. `…/lp9-beta/app?debug=true#settings`) → **Send test** (see
    "Debug test button" below).
 3. From your partner's device, send a heart. You should get "Someone
-   appreciated you" (at most once per ~20 h per receiver). Coupon
-   events (claim / yes / done) arrive right away.
+   appreciated you" right away, for every heart. Coupon events (claim /
+   yes / done) arrive right away too. Your own hearts never notify you.
 
 ## How it flows (where things can break)
 There is no app server. The chain is:
@@ -84,9 +84,7 @@ There is no app server. The chain is:
    Apple / Mozilla / Microsoft.
 4. **Service worker** on the device shows the notification.
 
-Hearts are throttled: one push per receiver per 20 h. The window only
-starts when a push can really go out (device saved and Vault secrets
-present), so hearts sent before setup do not silence later ones.
+Every heart sends a push; there is no daily cap.
 
 ## Where the logs are
 | Where | What | How to see |
@@ -149,12 +147,6 @@ service the subscription uses (e.g. `fcm.googleapis.com`).
   ```
   No rows after an event = the trigger did not call (no device saved or
   Vault secrets missing).
-- Throttle state (reset to test hearts again right away):
-
-  ```sql
-  select * from public.push_state;
-  delete from public.push_state where user_id = '<user_id>';
-  ```
 - Send a push without the app (any kind, e.g. `test`, `hearts`):
 
   ```sql

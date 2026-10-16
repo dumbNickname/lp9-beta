@@ -165,3 +165,17 @@ review code (headless browsers cannot test push).
   Pending: re-test with DND off.
 - **Known flake:** the dashboard tabs test times out (5 s) in the full
   suite on this machine, also without these changes; passes alone.
+
+## Session: push review, hearts uncapped
+
+**Brief:** push still not visible; review as Supabase/web-platform
+expert; then drop the 20 h hearts cap.
+
+- **Review:** chain correct live (SW served, VAPID key in bundle,
+  `notify` deployed). Owner on Chrome/macOS: Send test `sent:1`, Local
+  test (no server) also invisible -> macOS notification settings for
+  Chrome. Permission prompt only appears on Turn on (opt-in by design).
+- **Done:** hearts push on every heart (migration 0015, DESIGN §8a
+  amended 2026-10-16), copy and docs updated, test adjusted.
+- **Proposed, not built:** `urgency: high`, in-flow Turn on card,
+  `pushsubscriptionchange` handling + re-save on app start.

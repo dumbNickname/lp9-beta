@@ -82,11 +82,12 @@ describe("push fixes (0014)", () => {
     const at = all.lastIndexOf(`create or replace function public.${name}(`);
     return all.slice(at, all.indexOf("$$;", at));
   };
-  it("hearts throttle is stamped only after push_ready passes (regression)", () => {
+  it("hearts push on every heart, no throttle, never fails the insert (0015)", () => {
     const fn = lastDef("on_point_push");
-    const ready = fn.indexOf("if not public.push_ready(new.receiver_id) then return new;");
-    expect(ready).toBeGreaterThan(-1);
-    expect(fn.indexOf("insert into public.push_state")).toBeGreaterThan(ready);
+    expect(fn).toContain("perform public.push_event(new.receiver_id, 'hearts', new.relationship_id)");
+    expect(fn).not.toContain("interval");
+    expect(fn).not.toContain("push_state");
+    expect(fn).toContain("exception when others then return new;");
   });
   it("push_ready checks device and both vault secrets, and is a locked helper", () => {
     const fn = lastDef("push_ready");
