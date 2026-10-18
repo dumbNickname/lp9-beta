@@ -459,7 +459,7 @@ All non-optional; ship with MVP:
 
 **Status:** name not chosen yet. Top candidate "Kindling" rejected (existing
 dating app — too close in product space). Owner will revisit; branding
-depends on the chosen name.
+depends on the chosen name. Current domain-led shortlist: §14j.
 
 #### 14a. Direction chosen
 - **Direction E: metaphorical object / single-noun.** Picked over invented
@@ -654,6 +654,38 @@ suggest the app is about optimizing, comparing, or earning.
 - **Amended 2026-10-04 (owner):** the displayed working title is `lp9`
   (app header, page titles, home-screen name), because a literal
   "APP_NAME" looked like a broken template. Still not the final name.
+
+#### 14j. Session 3 — domain-led shortlist (2026-10-18)
+
+Owner started from domains. Registry lookups on 2026-10-18 (snapshot;
+re-check before buying). Prices: OVH PL list, PLN/year, first / renewal.
+Buying how-to: `docs/buying-a-domain.md`.
+
+**Ranking (assistant's advice, owner not decided):**
+
+| # | Name + domains | Why | Risk |
+|---|---|---|---|
+| 1 | **Endeary** — `endeary.com` + `endeary.pl` | Coined from "endear"; every TLD free incl. `.com`; ownable mark | Slightly cute "-y"; not a dictionary word |
+| 2 | **Hearten** — `hearten.love` + `hearten.pl` | Real word, "heart" (our currency) inside; `.love` says couples | `.com/.app` taken; `.love` ~111/123; weak trademark |
+| 3 | **Heartenjar** — `heartenjar.com` | Clear image (jar of hearts), `.com` free | Long |
+| 4 | **Endears** — `endears.app` / `.eu` | Real word, `.app` free | Awkward to say |
+| 5 | **Hearten** — `hearten.page` | Cheap (~48/62) | `.page` reads as site builder |
+| 6 | **Boonjar** / **Boonly** — `.app` / `.eu` / `.pl` | "Boon" = gift freely given, fits wishes | `.com` taken; Boonly is generic "-ly" |
+
+**Rejected:**
+- Situationship (`.pl`): means uncommitted non-relationship; dating
+  connotation; `.com` is a fresh dating-app project. Fights §14h.
+- `endearly.com`: held by a domain broker (Afternic), sold as premium
+  (price on request), not a normal registration. Use `endeary` instead.
+- Smitten, Swoon: pull toward dating. Dotes: misread as "dot-es".
+  Fondlet: reads "fondle". `hearten.cc`: spammy TLD.
+  `heartsfor2` / `boonfor2`: digit looks cheap, spelled two ways.
+- Weak coinages: heartn, heartenly, noticly, hearto, heartee, boonie,
+  boonsy, endeara, endearo, doteful, dotey, kindlet, boonary, endearie.
+
+**Note:** §14b said skip `.com`; a coined name makes `.com` reachable,
+so it is preferred when free. Next gate for the pick: §14d checks
+(trademark EUIPO, app stores, PL/DE sanity).
 
 ### 13. Data model
 

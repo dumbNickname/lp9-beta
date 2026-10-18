@@ -76,7 +76,9 @@
 
 - Push: none (steps 1–4 done).
 - Branch protection on `master`; sign Supabase DPA before launch; pick
-  the final app name (blocks Phase 9 + brand icon).
+  the final app name (blocks Phase 9 + brand icon). Shortlist and
+  ranking: `DESIGN.md` §14j (top: Endeary, `.com` free); buying steps:
+  `docs/buying-a-domain.md`.
 
 ## Read order on resume
 
