@@ -47,8 +47,9 @@ page shell where pairs give hearts, wish and claim.
 - The inviter's key is moved onto the new pair by whichever notices the
   pair first: the waiting-screen poll or any later refresh. Background
   tabs freeze the poll, so the refresh path is required.
-- Both sides see a full-screen "paired" moment, then the optional
-  recovery-password prompt.
+- Both sides see a full-screen "paired" moment (with a one-tap
+  notifications ask that opens the browser prompt), then the optional
+  recovery-password prompt. Permission is never requested on load.
 
 **Shell stability**
 - Loading gates apply to the first load only; later refreshes update

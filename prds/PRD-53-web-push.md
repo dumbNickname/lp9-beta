@@ -62,3 +62,5 @@ DESIGN §8 (amended 2026-09-29).
 - 2026-10-18: pushes re-alert when replacing a same-tag notification
   (`renotify`); debug adds Page test, Clear held, held count; Local
   test uses unique tags; Sticky test.
+- 2026-10-18 (owner, DESIGN §8a): paired moment has a one-tap ask that
+  triggers the native permission prompt (shown only while state is off).

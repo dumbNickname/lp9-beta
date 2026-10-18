@@ -2588,6 +2588,20 @@ a.pair-menu-item {
 .paired-step-icon--mine { background-color: var(--world-mine-soft); color: var(--world-mine); }
 .paired-step-icon--theirs { background-color: var(--world-theirs-soft); color: var(--world-theirs); }
 
+.paired-push {
+  margin-block-end: var(--space-3);
+  animation: fade-up 400ms var(--ease) 1350ms both;
+}
+
+.paired-push-btn {
+  min-inline-size: 14rem;
+}
+
+.paired-push-note {
+  margin: 0;
+  font-size: var(--text-sm);
+}
+
 .paired-go {
   min-inline-size: 14rem;
   font-size: var(--text-md);

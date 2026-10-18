@@ -45,7 +45,8 @@
    + Clear held + held count in debug). cleverpush.com shows on the
    same Chrome, app not installed. Root cause found: both macOS
    "Google Chrome" notification entries were off; owner to enable
-   and re-test, then test on the phone. Hearts now push on every heart (no 20 h cap,
+   and re-test, then test on the phone. Paired moment now has a
+   one-tap notifications ask (owner choice). Hearts now push on every heart (no 20 h cap,
    migration 0015). Next: owner fixes macOS settings and re-tests with
    a real heart from the partner; if visible, mark PRD-53 merged. Open
    proposals (not built): `urgency: high` in `notify` for idle Android,

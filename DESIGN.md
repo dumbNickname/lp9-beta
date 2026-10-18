@@ -238,6 +238,9 @@ the partner missed it (because they didn't have their phone, etc.).
   coupon-flow events immediate, user-toggleable. **Amended 2026-10-16
   (owner):** hearts push on every heart, no daily cap (users expect it
   right away; easier to verify). Email throttle below unchanged.
+  **Amended 2026-10-18 (owner):** the paired moment offers a one-tap
+  "Tell me when <name> appreciates me" that triggers the browser's own
+  permission prompt; still never asked on load.
 - Rationale: keeps tech setup minimal; web push (especially iOS PWA
   requirement) is a rabbit hole for a side project.
 

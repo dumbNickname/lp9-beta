@@ -3,6 +3,7 @@ import { Portal } from "solid-js/web";
 import HeartIcon from "~/components/HeartIcon";
 import { SparkIcon, TicketIcon } from "~/components/Icons";
 import { initial } from "~/components/PairBadge";
+import PairedPushAsk from "~/components/PairedPushAsk";
 import { getDisplayName } from "~/lib/data/profile";
 import type { Relationship } from "~/lib/data/types";
 import { otherMember } from "~/lib/relationship";
@@ -66,6 +67,7 @@ export default function PairedMoment(props: Props) {
             <span>Spend hearts on them</span>
           </li>
         </ol>
+        <PairedPushAsk partnerName={partnerName()} />
         <button ref={btn} type="button" class="paired-go" onClick={() => props.onDone()}>
           Let's start
         </button>

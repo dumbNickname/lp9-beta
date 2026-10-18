@@ -215,3 +215,8 @@ ours (server and Local test) do not. App not installed.
   Notifications were off; Chrome reports shown, macOS drops them. No
   app bug. Added debug Sticky test (`requireInteraction`). Pending:
   owner turns both on, re-tests; then phone.
+- **Owner ask:** "native integration" like cleverpush's address-bar
+  bell. That bell only appears while a site requests permission (state
+  "default", or Chrome warning that macOS blocks it); ours is already
+  granted, and Turn off/on cannot reset permission, so it never shows.
+  Owner chose: one-tap ask on the paired moment (no ask on load).
