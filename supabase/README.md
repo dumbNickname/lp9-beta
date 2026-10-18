@@ -1,14 +1,14 @@
 # Supabase — database workflow
 
 This directory is the source of truth for the project's database schema.
-It is connected to the Supabase project via Supabase's **GitHub
-Integration** (working directory `.`, matching what the owner configured
-in the Supabase dashboard). See `DESIGN.md` §16e and §16f for the full
-model.
+Two Supabase projects read it through Supabase's **GitHub Integration**
+(working directory `.`): **beta** follows `master` (previews on PRs),
+**production** follows `release`. See `DESIGN.md` §16e and §16f and
+`docs/production-setup.md`.
 
 ## Region
 
-The connected Supabase project is in **`eu-central-1` (Frankfurt)** —
+Both Supabase projects are in **`eu-central-1` (Frankfurt)** —
 meets the EU-region requirement in `DESIGN.md` §12d.
 
 ## The one rule
@@ -33,7 +33,8 @@ the GitHub integration — **not** from your local machine.
    migrations to it. A status check appears on the PR.
 5. QA verifies the behavior on the preview environment.
 6. Merge to `master`. Supabase applies the new migrations to the
-   **production** database automatically.
+   **beta** database; they reach **production** when `release` is
+   fast-forwarded to `master`.
 7. Delete the feature branch; the preview environment is torn down.
 
 `supabase/seed.sql` populates preview-branch databases (per Supabase

@@ -342,7 +342,7 @@ the partner missed it (because they didn't have their phone, etc.).
     /app/settings       → account, link Google, notifications, etc.
 ```
 
-#### 11b. `/app/*` on GitHub Pages
+#### 11b. `/app/*` on a static host
 - **Decision:** Prerender `/app` as a **single shell HTML**; all `/app/*`
   sub-routes are client-side routing within that shell.
 - **Deep-link handling on GH Pages:** use the standard 404.html fallback
@@ -463,8 +463,8 @@ All non-optional; ship with MVP:
 #### 14a. Name — locked 2026-10-18 (owner)
 - **Name: Endeary** (coined from "endear"). Domains owned:
   `endeary.com` and `endeary.pl` (OVH, renew yearly).
-- Builds show "Endeary" (prod) and "Endeary beta" (beta) once PRD-57
-  ships; until then the beta shows `lp9`.
+- Builds show "Endeary" (prod) and "Endeary beta" (beta) via
+  `VITE_APP_NAME`; an unset build falls back to `lp9`.
 
 #### 14b. Naming principle (keeps guiding copy and brand)
 A name or slogan must not fight the product: *noticing without
@@ -683,9 +683,9 @@ A scheduled job (Supabase Edge Function or pg_cron) runs daily to:
 - **Build:** Static site generation where possible (SEO homepage), SPA for
   authenticated app area
 - **Package manager:** pnpm
-- **Hosting:** GitHub Pages with `BASE_PATH` env-var handling
-  (build-time prefix for asset URLs; needed when GH Pages serves the
-  site from a sub-path like `/lp9-beta/`)
+- **Hosting (amended 2026-10-18):** beta on a Cloudflare Worker
+  (`workers.dev`), production on GitHub Pages at `endeary.com`; both
+  built at `/`. `BASE_PATH` stays supported for sub-path hosting.
 - **Backend:** Supabase
 - **Styling:** TBD — pick at PRD-10 / PRD-08 execution time
 - **TypeScript:** strict
@@ -855,7 +855,12 @@ agent starts cold from the PRD, not from the implementation choices.
   - **Deploy to production: ON.** Pushes/merges to the production
     branch (`master`) cause Supabase to apply new migrations to the
     real production DB.
-- **Why one project, not two:** Supabase's branching is the
+- **Amended 2026-10-18 (owner):** two projects. The current one is
+  **beta** (production branch `master`, previews on PRs); a new one is
+  **production** (production branch `release`, no previews). Data
+  isolation between testers and real couples outweighs the duplicated
+  config. Owner steps: `docs/production-setup.md`.
+- **Why one project, not two (original, superseded):** Supabase's branching is the
   isolation mechanism. A second separate Supabase project would
   duplicate config, require its own GitHub integration, and defeat
   the purpose. Branching gives us per-PRD isolation for free.
@@ -921,10 +926,11 @@ agent starts cold from the PRD, not from the implementation choices.
   shared backend state, but it's the wrong pattern for a
   Supabase-backed app.
 - **Amended 2026-10-18 (owner): two environments, one repo.** Beta =
-  `master` -> Cloudflare Worker (`workers.dev`) + current Supabase
-  project. Prod = `release` -> GitHub Pages at `endeary.com` + a new
-  Supabase project. Supersedes "one Supabase project" in §16e and the
-  "`master` = production" model above once built. Details: PRD-57.
+  `master` -> Cloudflare Worker (`workers.dev`) + beta Supabase
+  project. Prod = `release` (fast-forwarded from `master`) -> GitHub
+  Pages at `endeary.com` + prod Supabase project. Supersedes the
+  "`master` = production" model above. Free tier kept alive by a daily
+  cron on the beta Worker; backups are a later PRD. Details: PRD-57.
 
 #### 16g. Secret hygiene — layered defense
 

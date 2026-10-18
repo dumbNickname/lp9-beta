@@ -13,10 +13,12 @@ page shell where pairs give hearts, wish and claim.
 ## Local Contracts
 
 **Platform**
-- Product name comes from one constant; never hard-code it (§14a).
-- GitHub Pages sub-path: the router must be given the base path, and
-  `<base href>` is set, so history URLs must always be absolute
+- Product name comes from one constant, set per build (§14a); never
+  hard-code it.
+- Base path: builds now use `/`, but the router still takes the base
+  path and `<base href>` is set, so history URLs must always be absolute
   (path + query + hash). A bare `#x` drops `/app`.
+- Pages are `noindex` until launch (PRD-57, D-57.8).
 - `/app` deep links rely on the 404 → shell fallback; keep it client-
   routed.
 - Supabase client is created lazily (prerender has no `VITE_*` env).

@@ -2,42 +2,36 @@
 
 ## Purpose
 
-CI/CD: secret scan, build and GitHub Pages deploy.
+CI/CD: secret scan, checks, beta and production deploys.
 
 ## Ownership
 
-Owns the GitHub workflows (currently one deploy workflow).
+Owns the GitHub workflows (one deploy workflow).
 
 ## Local Contracts
 
-- Runs on push and PR to `master`: gitleaks scan → install (frozen
-  lockfile) → typecheck → lint → test (no `.env` needed) → build with
-  the sub-path → SPA 404 fallback → Pages artifact. Deploy runs on push
-  to `master` only.
-- Node 22 (pnpm 11 needs ≥ 22.13). Do not lower.
-- The sub-path env must match the Pages project path; change it if the
-  repo is renamed (§16f).
+- Every run: gitleaks -> install (frozen lockfile) -> typecheck -> lint
+  -> test (no `.env` needed).
+- Push to `master` (and PRs, build only): beta build with name
+  "Endeary beta" and deploy to the Cloudflare Worker via the beta
+  deploy script. Without the Cloudflare token it builds and warns.
+- Push to `release`: production build in the `production` environment
+  with name "Endeary" -> GitHub Pages (`endeary.com`). Prod values use
+  `PROD_*` names and the job fails if they are missing or equal beta.
+- Both builds at base `/`; post-build adds SPA fallback, `robots.txt`
+  disallow and the manifest name.
+- Node 22 (pnpm 11 needs >= 22.13). Do not lower.
 
 ## Work Guidance
 
 - No tokens or private values in workflow files. Public build values
-  (Supabase URL, publishable key, VAPID public key) come from Actions
-  secrets (§16g).
+  come from secrets (§16g). Owner setup: `docs/production-setup.md`.
 
 ## Verification
 
-- PR runs green before merge. After a push, the Pages site serves `/`,
+- PR runs green before merge. After a push, the target site serves `/`,
   `/privacy`, `/terms`, `/app`, and `/app/*` deep links reach the
   shell.
-
-## One-time owner setup
-
-- Pages source = GitHub Actions.
-- Branch protection on `master` (PR required, Supabase preview +
-  gitleaks checks, linear history).
-- Actions secrets (repository secrets): Supabase URL, publishable key,
-  VAPID public key (named `VAPID_PUBLIC_KEY` or `VITE_VAPID_PUBLIC_KEY`;
-  without it, Settings reports notifications as not set up).
 
 ## Child DOX Index
 

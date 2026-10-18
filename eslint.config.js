@@ -10,6 +10,7 @@ export default tseslint.config(
       ".vinxi/**",
       "dist/**",
       "supabase/functions/**",
+      "cloudflare/**",
       ".git/**",
     ],
   },

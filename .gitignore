@@ -10,6 +10,8 @@ dist/
 .env
 .env.local
 .env.*.local
+.env.beta
+.env.production
 
 # Editors / IDE
 .vscode/
@@ -24,3 +26,4 @@ Thumbs.db
 
 # aider
 .aider*
+.dev.vars

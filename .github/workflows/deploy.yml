@@ -1,22 +1,20 @@
-name: Deploy to GitHub Pages
+name: Deploy
 
+# Two environments from one repo (PRD-57, DESIGN.md §16f):
+# - push to master  -> beta: Cloudflare Worker (scripts/deploy-beta.sh)
+# - push to release -> production: GitHub Pages at endeary.com
+# PRs run the checks and both builds, no deploy.
 on:
   push:
-    branches: [master]
+    branches: [master, release]
   pull_request:
     branches: [master]
-
-# BASE_PATH matches the GitHub Pages project sub-path. Rename here if the
-# repo is renamed (DESIGN.md §16f). Kept as a workflow env so the build
-# and asset URLs stay consistent.
-env:
-  BASE_PATH: /lp9-beta/
 
 permissions:
   contents: read
 
 concurrency:
-  group: pages-${{ github.ref }}
+  group: deploy-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -32,45 +30,93 @@ jobs:
         env:
           GITLEAKS_CONFIG: .gitleaks.toml
 
-  build:
+  checks:
     runs-on: ubuntu-latest
     needs: gitleaks
     steps:
       - uses: actions/checkout@v4
-
       - uses: pnpm/action-setup@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
-
       - run: pnpm install --frozen-lockfile
-
       - run: pnpm typecheck
-
       - run: pnpm lint
-
       - run: pnpm test
 
-      - run: pnpm build
+  beta:
+    if: github.ref == 'refs/heads/master' || github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    needs: checks
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Build and deploy beta Worker
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
           VITE_VAPID_PUBLIC_KEY: ${{ secrets.VITE_VAPID_PUBLIC_KEY || secrets.VAPID_PUBLIC_KEY }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          PROD_SUPABASE_URL: ${{ secrets.PROD_SUPABASE_URL }}
+          PROD_SUPABASE_KEY: ${{ secrets.PROD_SUPABASE_KEY }}
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ] || [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+            [ -n "$CLOUDFLARE_API_TOKEN" ] || echo "::warning::CLOUDFLARE_API_TOKEN not set; beta build only, no deploy"
+            BASE_PATH=/ VITE_APP_NAME="Endeary beta" pnpm build
+            VITE_APP_NAME="Endeary beta" bash scripts/post-build.sh .output/public
+          else
+            bash scripts/deploy-beta.sh
+          fi
 
-      - name: SPA 404 fallback
+  production-build:
+    if: github.ref == 'refs/heads/release'
+    runs-on: ubuntu-latest
+    needs: checks
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # Prod values use PROD_* names so a missing one can never fall
+      # back to the beta project.
+      - name: Check prod values
+        env:
+          PROD_SUPABASE_URL: ${{ secrets.PROD_SUPABASE_URL }}
+          PROD_SUPABASE_KEY: ${{ secrets.PROD_SUPABASE_KEY }}
+          BETA_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+        run: |
+          [ -n "$PROD_SUPABASE_URL" ] && [ -n "$PROD_SUPABASE_KEY" ] || { echo "::error::PROD_SUPABASE_URL/KEY missing"; exit 1; }
+          [ "$PROD_SUPABASE_URL" != "$BETA_SUPABASE_URL" ] || { echo "::error::prod URL equals beta URL"; exit 1; }
+      - run: pnpm build
+        env:
+          BASE_PATH: /
+          VITE_APP_NAME: Endeary
+          VITE_SUPABASE_URL: ${{ secrets.PROD_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.PROD_SUPABASE_KEY }}
+          VITE_VAPID_PUBLIC_KEY: ${{ secrets.PROD_VAPID_PUBLIC_KEY }}
+      - name: SPA fallback, robots, manifest name
         run: bash scripts/post-build.sh .output/public
-
+        env:
+          VITE_APP_NAME: Endeary
       - uses: actions/upload-pages-artifact@v3
         with:
           path: .output/public
 
-  # Deploy only on push to master, not on PRs.
-  deploy:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+  production-deploy:
+    if: github.ref == 'refs/heads/release' && github.event_name == 'push'
     runs-on: ubuntu-latest
-    needs: build
+    needs: production-build
     permissions:
       pages: write
       id-token: write

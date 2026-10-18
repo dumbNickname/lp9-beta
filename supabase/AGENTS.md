@@ -13,8 +13,9 @@ the branch-driven link between this repo and the Supabase project.
 ## Local Contracts
 
 - Schema changes only as numbered migrations; never click-ops (§16e).
-- The Supabase GitHub integration applies migrations on push to
-  `master` (or to a preview branch on PR). Never `db push`/`link`
+- Two projects, one repo (PRD-57): the beta project's integration
+  applies migrations on push to `master` (previews on PR); the prod
+  project's integration applies them on push to `release`. Never `db push`/`link`
   locally; no PAT or DB password needed.
 - RPCs: security definer with an empty search path, EXECUTE granted to
   `authenticated` only (revoke from public/anon; default privileges no
@@ -23,7 +24,7 @@ the branch-driven link between this repo and the Supabase project.
   UPDATE, column-granted on display name, locale and theme only.
 - Verify live after a migration with a throwaway two-client smoke
   script kept outside the repo.
-- Region is EU Frankfurt; do not move (§12d).
+- Both projects are in EU Frankfurt; do not move (§12d).
 - Config holds no secrets; seed only feeds preview databases.
 - Edge Functions deploy only when declared in config; their secrets
   live in the dashboard. They are excluded from repo typecheck/lint.

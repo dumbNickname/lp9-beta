@@ -8,8 +8,6 @@
 
 - Re-check the dark "ember" palette and the app shell on a phone.
 - Finish push setup (`docs/push-setup.md`).
-- Supabase free tier pauses after about a week idle. Consider a weekly
-  keep-alive ping (GH Actions cron hitting `/auth/v1/health`) during beta.
 - Branch protection on `master` is still unset.
 
 ## Parked: email + account linking

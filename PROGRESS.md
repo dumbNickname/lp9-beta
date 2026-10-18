@@ -16,7 +16,7 @@
     tests pass. Awaiting QA.
   - `qa-done` — QA agent's adversarial tests pass; findings (if any)
     addressed.
-  - `merged` — landed on `master`, deployed to beta.
+  - `merged` — landed on `master`, deployed to beta (production ships via `release`).
 - **PRD** — file path. `—` means the PRD has not been written yet
   (placeholder row for a future phase).
 
@@ -134,7 +134,7 @@ its own end-to-end PRD per `DESIGN.md` §16a.
 
 | #  | Title                                                 | PRD                                            | Status |
 |----|-------------------------------------------------------|------------------------------------------------|--------|
-| 57 | Production at endeary.com + beta on a Worker          | `prds/PRD-57-production-environment.md`        | todo |
+| 57 | Production at endeary.com + beta on a Worker          | `prds/PRD-57-production-environment.md`        | dev-done (owner setup pending: `docs/production-setup.md`) |
 
 ### Phase 5 — Coupon claim/escrow flow
 

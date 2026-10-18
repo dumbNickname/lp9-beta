@@ -15,8 +15,9 @@ secret**
 - `VAPID_PUBLIC_KEY` = the public key (the workflow also accepts the
   name `VITE_VAPID_PUBLIC_KEY`). Must be a **Repository secret**, not a
   Variable or an environment secret.
-Then re-run the latest "Deploy to GitHub Pages" workflow (or push any
-commit).
+Then re-run the latest "Deploy" workflow (or push any commit).
+Production uses its own keys and the environment secret
+`PROD_VAPID_PUBLIC_KEY` (`docs/production-setup.md`, Part E).
 
 ## 2. Supabase — Edge Function secrets
 Dashboard → **Edge Functions → Secrets** (or Project Settings → Edge
@@ -28,8 +29,8 @@ Functions) → add:
 
 ## 3. Supabase — the function itself
 `supabase/functions/notify` is declared in `supabase/config.toml`, so
-the GitHub integration deploys it on merge to `master` **if "Deploy to
-production" is enabled** in Project Settings → Integrations → GitHub.
+the GitHub integration deploys it on merge to `master` (beta) or push
+to `release` (production) **if "Deploy to production" is enabled** in Project Settings → Integrations → GitHub.
 Check Dashboard → Edge Functions: `notify` should be listed. If not,
 deploy once from a machine with the CLI:
 `supabase functions deploy notify --no-verify-jwt --project-ref <ref>`.
@@ -65,7 +66,7 @@ select vault.update_secret(
    Chrome/Edge on iOS 16.4+), open the app from the icon, then turn it
    on there.
 2. Quick check on your own device: open the app with `?debug=true`
-   (e.g. `…/lp9-beta/app?debug=true#settings`) → **Send test** (see
+   (e.g. `…/app/?debug=true#settings` on the beta URL) → **Send test** (see
    "Debug test button" below).
 3. From your partner's device, send a heart. You should get "Someone
    appreciated you" right away, for every heart. Coupon events (claim /

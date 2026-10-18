@@ -7,16 +7,15 @@
 > coupons each partner has approved on the other's wishlist.
 
 **The product is called Endeary** ([`DESIGN.md`](./DESIGN.md) §14).
-This repo is the beta, which shows the working title `lp9` through one
-`APP_NAME` constant so a rename stays cheap.
+Each build sets the shown name ("Endeary", "Endeary beta") through one
+`APP_NAME` constant.
 
 ## Status
 
-**Pre-MVP. Design phase.** No public product exists yet, no
-`package.json`, no Supabase project, no deployed site. The repository
-currently contains design documents, license + trademark notices, the
-phased implementation plan, individual PRDs for the work in flight, and
-the toolchain installer that bootstraps a fresh dev machine.
+**Beta.** The app works end to end for anonymous couples (pairing,
+encrypted notes, hearts, wishes, claims, push). Not launched: privacy
+and legal pages and the homepage are still to come; production at
+`endeary.com` is being set up.
 
 What's being built and where each PRD stands lives in
 [`PROGRESS.md`](./PROGRESS.md).
@@ -49,7 +48,7 @@ in [`DESIGN.md`](./DESIGN.md) §17.
 | File | What it is |
 |------|------------|
 | [`DESIGN.md`](./DESIGN.md) | Every locked-in design decision. Read this first if you want to understand what the product is and why it's shaped the way it is. |
-| [`HANDOFF.md`](./HANDOFF.md) | The phased implementation plan (Phase 0 → Phase 10) and the product principles that must inform every implementation decision. |
+| [`HANDOFF.md`](./HANDOFF.md) | Historical phased plan and product principles; `DESIGN.md` and `PROGRESS.md` win where they differ. |
 | [`PROGRESS.md`](./PROGRESS.md) | Single source of truth for which PRDs exist, which phase they belong to, and what state each one is in (`todo` / `in-progress` / `dev-done` / `qa-done` / `merged`). |
 | [`prds/`](./prds/) | Per-task PRDs. Each PRD is a self-contained slice that a Dev agent can implement end-to-end and a QA agent can verify. |
 | [`LICENSE`](./LICENSE) | AGPL-3.0-or-later. |
@@ -112,11 +111,12 @@ pnpm dev
 ```
 
 Other scripts: `pnpm build` (static site to `.output/public/`),
-`pnpm preview`, `pnpm typecheck`, `pnpm lint`, `pnpm test`.
+`pnpm preview`, `pnpm typecheck`, `pnpm lint`, `pnpm test`,
+`pnpm deploy:beta` (build + deploy the beta Worker; see
+[`docs/production-setup.md`](./docs/production-setup.md)).
 
-`BASE_PATH` (default `/`) prefixes built asset URLs; set it to the
-GitHub Pages sub-path (e.g. `/lp9-beta/`) at build time when deploying
-to a project page.
+`BASE_PATH` (default `/`) prefixes built asset URLs; both environments
+build at `/`. `VITE_APP_NAME` sets the shown name.
 
 For the database workflow (migrations, the branch-driven Supabase
 GitHub integration, and where the project URL / anon key come from),
@@ -124,39 +124,24 @@ see [`supabase/README.md`](./supabase/README.md).
 
 ## Deployment
 
-The GitHub repository
-[`dumbNickname/lp9-beta`](https://github.com/dumbNickname/lp9-beta) is
-the **single source repo** for this project, served via GitHub Pages.
-It is the **beta** environment and keeps the `lp9` working title.
-Production under the name Endeary and its custom domain is set up
-later ([`DESIGN.md`](./DESIGN.md) §16f).
+One repo ([`dumbNickname/lp9-beta`](https://github.com/dumbNickname/lp9-beta)),
+two environments ([`DESIGN.md`](./DESIGN.md) §16e-§16f, PRD-57):
 
-The deploy + branching model is documented in
-[`DESIGN.md`](./DESIGN.md) §16e (Supabase access via GitHub
-integration) and §16f (single-repo, branch-driven environments).
+| | Beta | Production |
+|---|---|---|
+| Branch | `master` | `release` (fast-forward from `master`) |
+| Site | Cloudflare Worker `endeary-beta.<account>.workers.dev` | GitHub Pages, `endeary.com` |
+| Supabase | beta project (previews on PRs) | prod project |
+| Name shown | Endeary beta | Endeary |
 
-### Pipeline
+`.github/workflows/deploy.yml` runs gitleaks, typecheck, lint and tests
+on every push and PR, then deploys beta (push to `master`) or
+production (push to `release`). Both sites are `noindex` until launch.
+The beta Worker also runs a daily keep-alive so neither free Supabase
+project pauses.
 
-`.github/workflows/deploy.yml` runs on every push and PR to `master`:
-
-1. **gitleaks** — CI secret scan (mirrors the PRD-06 pre-commit hook).
-2. **build** — `pnpm install --frozen-lockfile`, `pnpm build` with
-   `BASE_PATH` set (currently `/lp9-beta/`; update this env in the
-   workflow if the repo is renamed), then `scripts/post-build.sh`
-   copies `index.html` → `404.html` so deep-links into `/app/*` land on
-   the SPA shell.
-3. **deploy** — pushes the static `.output/public` tree to GitHub Pages
-   (only on push to `master`, not on PRs).
-
-### One-time owner setup
-
-- **GitHub Pages source:** Settings → Pages → Source: **GitHub
-  Actions**.
-- **Branch protection on `master`** (Settings → Branches → add rule):
-  - Require a pull request before merging (no direct pushes).
-  - Require status checks to pass: the **Supabase Preview** check
-    (§16e.1) and the **gitleaks** check.
-  - Require linear history (squash merges).
+Owner setup (Cloudflare, Supabase, GitHub, OVH DNS):
+[`docs/production-setup.md`](./docs/production-setup.md).
 
 ## Credits
 

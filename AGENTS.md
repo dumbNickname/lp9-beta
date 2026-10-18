@@ -86,8 +86,8 @@ short encrypted note; hearts become a balance spent on mutually-approved
 appreciation; nothing transactional, no scoreboard.
 
 Product name: **Endeary** (`endeary.com`, `endeary.pl`; `DESIGN.md`
-§14). The beta (repo and sub-path `lp9-beta`) shows the working title
-`lp9` via the `APP_NAME` constant.
+§14). Builds set the shown name ("Endeary", "Endeary beta") through the
+`APP_NAME` constant; repo `lp9-beta`.
 
 ## Source-of-truth docs
 
@@ -100,7 +100,7 @@ Product name: **Endeary** (`endeary.com`, `endeary.pl`; `DESIGN.md`
 - `IDEAS.md` — backlog; promote to a PRD before building.
 - `REVIEW.md` — ranked review findings.
 - `HANDOFF.md` — historical roadmap; loses to DESIGN/PROGRESS.
-- `docs/` — owner setup guides. `LICENSE` (AGPL-3.0+), `TRADEMARK.md`.
+- `docs/` — owner setup guides (production + beta, push). `LICENSE` (AGPL-3.0+), `TRADEMARK.md`.
 
 AGENTS.md files hold operating rules; they do not replace `DESIGN.md`.
 Docs describe ideas, contracts and where things live, not code lines.
@@ -108,7 +108,8 @@ Docs describe ideas, contracts and where things live, not code lines.
 ## Tech stack (locked)
 
 - SolidJS + SolidStart (Vinxi), strict TypeScript, pnpm.
-- Static pages + SPA `/app` on GitHub Pages under a sub-path.
+- Static pages + SPA `/app`, built at `/`. Beta: Cloudflare Worker
+  (`master`). Production: GitHub Pages at `endeary.com` (`release`).
 - Supabase (Postgres, anonymous auth, RLS, Edge Functions), EU
   Frankfurt.
 - Vitest + Solid testing library; ESLint flat config.
@@ -184,10 +185,10 @@ Docs describe ideas, contracts and where things live, not code lines.
   outside the render container (query the screen).
 - Solid hydration can leave reactive attributes stale on SSR'd nodes;
   write them in an effect.
-- Static `public/` files land under the sub-path; use relative URLs.
-- Local E2E: don't use the dev server (it reloads mid-run). Build with
-  the sub-path, run the post-build step, serve the output with a simple
-  static server under the sub-path, drive two browser contexts with
+- Static `public/` files: use relative URLs (a base path may return).
+- Local E2E: don't use the dev server (it reloads mid-run). Build, run
+  the post-build step, serve the output with a simple static server (or
+  `wrangler dev` with the beta Worker config), drive two browser contexts with
   playwright-core and the cached Chromium. Helpers live in a temp dir
   and vanish on restart; recreate as needed.
 - Builds can exceed the tool timeout: clear the output dir first (a
@@ -206,6 +207,11 @@ Docs describe ideas, contracts and where things live, not code lines.
 - Full test suite: the dashboard tabs test can time out under load on
   this machine; it passes when run alone.
 - Rewriting pushed history only with owner OK and force-with-lease.
+- Beta deploy by hand: `pnpm deploy:beta` reads exported vars, then
+  `.env.beta`, then `.env` (all gitignored); the agent can run it
+  without seeing values. Never print them.
+- Production ships only by fast-forwarding `release` to `master`, and
+  only when the owner asks.
 
 ## User preferences (durable)
 
@@ -232,5 +238,6 @@ Docs describe ideas, contracts and where things live, not code lines.
 - `scripts/AGENTS.md` — toolchain installers, git hooks, build helpers.
 - `prds/AGENTS.md` — PRD convention and lifecycle.
 - `tests/AGENTS.md` — unit and QA adversarial suites.
-- `.github/AGENTS.md` — CI/CD and Pages deploy.
+- `.github/AGENTS.md` — CI/CD: beta Worker and production Pages deploy.
+- `cloudflare/AGENTS.md` — beta Worker: static host + keep-alive cron.
 - `.opencode/agent/` — Dev/QA subagent role definitions.

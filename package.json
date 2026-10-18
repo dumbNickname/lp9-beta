@@ -9,7 +9,8 @@
     "preview": "vinxi start",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --max-warnings 0",
-    "test": "vitest run"
+    "test": "vitest run",
+    "deploy:beta": "bash scripts/deploy-beta.sh"
   },
   "dependencies": {
     "@solidjs/router": "^0.16.1",
@@ -33,6 +34,7 @@
     "typescript": "~5.7.3",
     "typescript-eslint": "^8.62.0",
     "vite-plugin-solid": "^2.11.12",
-    "vitest": "4.1.9"
+    "vitest": "4.1.9",
+    "wrangler": "4.147.0"
   }
 }

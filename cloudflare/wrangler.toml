@@ -1,0 +1,18 @@
+# Beta host: static build served as Worker assets on workers.dev, plus a
+# daily cron that keeps both Supabase projects from pausing (PRD-57).
+# Deploy: `pnpm deploy:beta` or CI on push to master.
+name = "endeary-beta"
+main = "worker.js"
+compatibility_date = "2026-10-01"
+workers_dev = true
+
+[assets]
+directory = "../.output/public"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+
+[triggers]
+crons = ["17 4 * * *"]
+
+[observability]
+enabled = true

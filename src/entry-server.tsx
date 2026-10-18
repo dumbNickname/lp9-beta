@@ -19,6 +19,8 @@ export default createHandler(() => (
           <meta name="apple-mobile-web-app-capable" content="yes" />
           <meta name="apple-mobile-web-app-status-bar-style" content="default" />
           <meta name="apple-mobile-web-app-title" content={APP_NAME} />
+          {/* Not indexed until launch (PRD-57, D-57.8). */}
+          <meta name="robots" content="noindex, nofollow" />
           {/* No-flash theme init: set data-theme before first paint. */}
           {/* eslint-disable-next-line solid/no-innerhtml */}
           <script innerHTML={THEME_INIT_SCRIPT} />

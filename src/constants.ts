@@ -1,4 +1,4 @@
-// Single source of truth for the product name until branding is locked
-// in (see DESIGN.md §14i). Referenced everywhere the name is displayed
-// so a global rename is a one-line change.
-export const APP_NAME = "lp9";
+// Product name shown in the UI. Builds set VITE_APP_NAME ("Endeary",
+// "Endeary beta"; DESIGN.md §14a, PRD-57); the fallback is the beta's
+// working title.
+export const APP_NAME = (import.meta.env.VITE_APP_NAME as string | undefined) || "lp9";

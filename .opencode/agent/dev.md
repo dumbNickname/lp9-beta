@@ -53,8 +53,8 @@ Skim `HANDOFF.md` only if the PRD references it.
 - Run bash: pnpm scripts, supabase CLI for migration scaffolding +
   local stack (`supabase start` / `supabase migration new`) — NEVER
   against the production Supabase project's DB directly. Schema
-  changes reach prod only via merge to `master`, applied by the
-  Supabase GitHub integration. Git operations except `git push`.
+  changes reach beta via `master` and prod via `release`, applied by
+  the Supabase GitHub integration. Git operations except `git push`.
 - Create unit tests for the feature under `tests/unit/` (or the
   framework's conventional location).
 - Append a `## Dev notes` section to the PRD with: what you did,

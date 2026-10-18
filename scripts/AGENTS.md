@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Toolchain installers, git hooks and build helpers. Bash, user-local
+Toolchain installers, git hooks, build and deploy helpers. Bash, user-local
 (no sudo), Linux x86_64.
 
 ## Ownership
@@ -20,8 +20,12 @@ scripts source.
   (§16h).
 - The pre-commit hook runs gitleaks on staged changes; `--no-verify` is
   the documented escape hatch.
-- The post-build step copies the shell to `404.html` so GitHub Pages
-  deep links into `/app` work (§11b).
+- The post-build step copies the shell to `404.html` so deep links into
+  `/app` work (§11b), writes a disallow-all `robots.txt` (until launch)
+  and sets the manifest name from the build's app name.
+- The beta deploy script builds, deploys the Cloudflare Worker and
+  syncs keep-alive secrets. Values: exported vars, then `.env.beta`,
+  then `.env`; it never prints them (PRD-57).
 - The verify script is read-only.
 
 ## Work Guidance

@@ -31,9 +31,11 @@
 
 ## Start here (in order)
 
-0. **PRD-57 production environment** (decided with owner): beta to a
-   Cloudflare Worker, prod `release` -> `endeary.com` + new Supabase
-   project, keep-alive cron. Owner steps in the PRD.
+0. **PRD-57 production environment** is built (dev-done). Owner works
+   through `docs/production-setup.md` (Cloudflare, Supabase, GitHub,
+   OVH DNS); then the agent pushes `release`, E2E-checks both sites and
+   the keep-alive logs, and marks PRD-57 merged. Next PRD: weekly prod
+   backup (D-57.11) before real users.
 1. **"Us" visuals trial:** owner reviews garland, almanac (season /
    clock / words), milestone ribbon, wish stamps, week warmth on the
    live site and picks which stay (D-UX.7–10). Remove the rest.
@@ -75,9 +77,14 @@
 
 ## Deployment
 
-- Site `https://dumbnickname.github.io/lp9-beta/`, app `…/lp9-beta/app`.
-- Supabase project `mxjhablmyxeyzciyyovx` (eu-central-1). It pauses
-  after about a week idle (see the AGENTS.md gotcha).
+- Beta: Cloudflare Worker `endeary-beta.<account>.workers.dev` from
+  `master` (`pnpm deploy:beta` by hand); until the owner adds the
+  Cloudflare secrets, the old `dumbnickname.github.io/lp9-beta/` keeps
+  its last deploy. Supabase beta project `mxjhablmyxeyzciyyovx`
+  (eu-central-1).
+- Production: `endeary.com` on GitHub Pages from `release`, own Supabase
+  project (not created yet). Steps: `docs/production-setup.md`.
+- Keep-alive: daily cron on the beta Worker pings both projects.
 - Push/VAPID keys: kept by the owner in a private file outside the repo.
 
 ## Owner action items
@@ -86,7 +93,7 @@
 - Branch protection on `master`; sign Supabase DPA before launch; name is
   Endeary, domains `endeary.com` + `endeary.pl` bought at OVH (renew
   yearly; DNS still OVH defaults). OVH done: email confirmed, 2FA, auto-renew,
-  DNSSEC on `.pl`; mailbox later. Production setup: PRD-57 owner steps.
+  DNSSEC on `.pl`; mailbox later. Production setup: `docs/production-setup.md`.
 
 ## Read order on resume
 

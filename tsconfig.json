@@ -1,5 +1,5 @@
 {
-  "exclude": ["node_modules", "supabase/functions", ".output", ".vinxi"],
+  "exclude": ["node_modules", "supabase/functions", "cloudflare", ".output", ".vinxi"],
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",

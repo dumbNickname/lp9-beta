@@ -49,11 +49,12 @@ separate Supabase project. Neither Supabase project pauses.
   runtime-safe points (prerender has no `VITE_*` at module load).
 - Worker `endeary-beta`: serves the build as static assets with the
   existing `404.html` SPA fallback, plus a daily cron (`scheduled`)
-  that reads one row-less query on each project
-  (`/rest/v1/<table>?select=id&limit=1` with the publishable key) and
-  logs the status. Publishable URLs/keys are plain Worker vars, not
-  secrets. Config lives in the repo (folder of Dev's choice, excluded
-  from app typecheck/lint like Edge Functions).
+  that runs one row-limited query on each project with its publishable
+  key and logs the result. URLs/keys are Worker secrets synced by the
+  deploy script. Config in `cloudflare/`, excluded from app
+  typecheck/lint like Edge Functions.
+- On-demand beta deploy script (`pnpm deploy:beta`) reading exported
+  vars, then `.env.beta`, then `.env`; CI uses the same script.
 - Workflow: push to `master` -> checks + beta build + Worker deploy;
   push to `release` -> checks + prod build (environment `production`)
   + GitHub Pages deploy. PRs: checks + both builds, no deploy.
@@ -66,21 +67,10 @@ separate Supabase project. Neither Supabase project pauses.
 - Backups (D-57.11), Pro plan, beta custom domain, repo rename,
   GDPR/legal/homepage (Phases 8-10), OVH mailbox, data migration.
 
-## Owner setup (goes into `docs/production-setup.md`)
+## Owner setup
 
-1. Supabase: new project (Frankfurt), enable anonymous sign-ins, GitHub
-   integration on this repo with production branch `release`.
-2. Prod push: new VAPID pair, Edge Function secrets, Vault
-   `push_webhook_url` / secret, per `docs/push-setup.md`.
-3. GitHub: environment `production` (deployment branch `release` only)
-   with prod Supabase URL, publishable key, VAPID public key; allow
-   `release` on the `github-pages` environment; repo secrets
-   `CLOUDFLARE_API_TOKEN` (Workers edit) and `CLOUDFLARE_ACCOUNT_ID`.
-4. OVH DNS for `endeary.com`: A records 185.199.108-111.153, AAAA
-   2606:50c0:8000-8003::153, `www` CNAME `dumbnickname.github.io`;
-   remove OVH default A/`www` records. GitHub Pages: custom domain
-   `endeary.com`, Enforce HTTPS once the certificate is issued.
-5. First release: create `release` from `master`, push.
+Step by step in `docs/production-setup.md` (Cloudflare, GitHub,
+Supabase, push keys, OVH DNS, first release).
 
 ## Data model impact
 
@@ -112,3 +102,34 @@ env and fall back safely when env is empty (prerender).
 ## Open questions
 
 - None at write time.
+
+---
+
+## Dev notes
+
+- Worker `endeary-beta` in `cloudflare/` (assets with SPA fallback +
+  daily cron at 04:17 UTC). Anon has no table rights, so the ping gets
+  Postgres error 42501 (HTTP 401): that proves the database was hit and
+  is logged as ok. Verified with `wrangler dev --test-scheduled`
+  against the beta project.
+- `scripts/deploy-beta.sh` (`pnpm deploy:beta`): build at `/` with name
+  "Endeary beta", post-build, `wrangler deploy`, `wrangler secret bulk`
+  for keep-alive targets. Wrangler pinned to a 2-week-old release
+  (pnpm minimum release age); `workerd` build script not needed.
+- CI: jobs `checks`, `beta` (master + PR build-only; skips deploy with a
+  warning while the Cloudflare token is missing), `production-build`
+  (environment `production`, `PROD_*` secrets, fails if missing or equal
+  to beta) and `production-deploy` (Pages, `release` only).
+- `APP_NAME` reads `VITE_APP_NAME` (fallback `lp9`); post-build writes
+  the manifest name, `robots.txt` disallow; every page has meta
+  `noindex, nofollow`.
+- Local checks: build with "Endeary beta" -> titles, h1, manifest,
+  robots correct; `wrangler dev` serves `/`, `/app/` (307 from `/app`),
+  deep links and unknown paths reach the shell. Typecheck, lint, 515
+  tests pass.
+- Not verifiable without the owner's accounts: real Worker deploy,
+  prod project, DNS, Pages custom domain (Verification 1-7 live).
+- Risk to watch: the beta project's integration may create a preview
+  branch for `release` if automatic branching is on; and Supabase must
+  accept the same repo on a second project. Setup guide says to report
+  either.

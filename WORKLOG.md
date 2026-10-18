@@ -220,3 +220,21 @@ ours (server and Local test) do not. App not installed.
   "default", or Chrome warning that macOS blocks it); ours is already
   granted, and Turn off/on cannot reset permission, so it never shows.
   Owner chose: one-tap ask on the paired moment (no ask on load).
+
+## Session: production environment built (PRD-57)
+
+**Brief:** build the production plan; on-demand beta deploy script like
+the owner's Cloudflare apps; owner step-by-step guide; review all docs.
+
+- **Done:** beta Worker (`cloudflare/`, static assets + daily keep-alive
+  cron for both projects), `pnpm deploy:beta` (exported vars, then
+  `.env.beta`, then `.env`), CI split (master -> Worker, release ->
+  Pages, `PROD_*` secrets in environment `production`), per-build name,
+  `noindex` + `robots.txt`. Owner guide `docs/production-setup.md`.
+- **Owner answer:** beta deploys both from CI on push and by hand.
+- **Note:** until the Cloudflare secrets exist, pushes to `master` build
+  beta but do not deploy it; the old github.io beta keeps its last
+  deploy.
+- **Docs reviewed:** root/child AGENTS, DESIGN §11b/§14/§16e/§16f/tech
+  stack, README, supabase README, push docs, NEXT_SESSION, PROGRESS.
+- **Owner to do:** `docs/production-setup.md` Parts A-H.
