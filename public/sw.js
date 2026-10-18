@@ -80,8 +80,10 @@ self.addEventListener("push", (event) => {
         body: data.body || "Open the app to see.",
         icon: BASE + "icons/icon-192.png",
         badge: BASE + "icons/icon-192.png",
+        // Same tag replaces an older one still in the tray; renotify makes
+        // the replacement alert again instead of updating silently.
         tag: data.tag || "update",
-        renotify: false,
+        renotify: true,
         data: { url: BASE + (data.path || "app") },
       })
       .then(

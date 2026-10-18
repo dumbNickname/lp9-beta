@@ -193,3 +193,17 @@ buying.
   dropped; beta keeps `lp9`.
 - **Owner to do:** OVH account hygiene (auto-renew, 2FA, mailbox);
   production setup later.
+
+## Session: push still invisible on Chrome/macOS
+
+**Brief:** cleverpush.com test notifications show on the same Chrome;
+ours (server and Local test) do not. App not installed.
+
+- **Suspect:** fixed tags + `renotify: false`. A notification with a
+  reused tag that still sits in the macOS tray is replaced silently,
+  so every later test or push looks like nothing happened.
+- **Done:** service worker sets `renotify: true`; Local test uses a
+  unique tag; debug adds Page test (`new Notification`), Clear held,
+  and Chrome's held count. Regression tests added.
+- **Owner to do:** after deploy, reload with `?debug=true`, Clear
+  held, then Local test / Page test / Send test; report the lines.

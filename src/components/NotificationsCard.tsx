@@ -44,20 +44,53 @@ export default function NotificationsCard() {
       const sub = await reg?.pushManager.getSubscription();
       const sw = reg?.active?.state ?? "none";
       const host = sub ? new URL(sub.endpoint).host : "no subscription";
-      setInfo(`Permission: ${Notification.permission}. Worker: ${sw}. Push service: ${host}.`);
+      const held = (await reg?.getNotifications())?.length ?? 0;
+      setInfo(`Permission: ${Notification.permission}. Worker: ${sw}. Push service: ${host}. Held: ${held}.`);
     } catch (e) {
       setInfo(`Info failed: ${errorMessage(e)}`);
     }
   };
 
+  // Unique tags: a reused tag silently replaces an old notification still
+  // in the OS tray, which looks like "nothing shown".
   const showLocal = async () => {
     try {
       const reg = await navigator.serviceWorker.getRegistration(SW_URL);
       if (!reg) throw new Error("no service worker");
-      await reg.showNotification("Local test", { body: "Shown by this page, no server involved.", tag: "local" });
-      setSwLog("Local notification requested. Not visible = blocked by the OS or browser app settings.");
+      const before = (await reg.getNotifications()).length;
+      await reg.showNotification("Local test", {
+        body: "Shown by the service worker, no server involved.",
+        tag: `local-${Date.now()}`,
+      });
+      const after = (await reg.getNotifications()).length;
+      setSwLog(
+        `Worker notification requested. Chrome holds ${after} (was ${before}). ` +
+          "Held but not visible = macOS hides it (Notifications settings, Focus).",
+      );
     } catch (e) {
-      setSwLog(`Local notification failed: ${errorMessage(e)}`);
+      setSwLog(`Worker notification failed: ${errorMessage(e)}`);
+    }
+  };
+
+  const showPage = () => {
+    try {
+      const n = new Notification("Page test", { body: "Shown by the page itself.", tag: `page-${Date.now()}` });
+      setSwLog("Page notification requested...");
+      n.onshow = () => setSwLog("Page notification: browser says shown. Not visible = macOS hides it.");
+      n.onerror = () => setSwLog("Page notification: browser reported an error showing it.");
+    } catch (e) {
+      setSwLog(`Page notification failed: ${errorMessage(e)}`);
+    }
+  };
+
+  const clearAll = async () => {
+    try {
+      const reg = await navigator.serviceWorker.getRegistration(SW_URL);
+      const list = (await reg?.getNotifications()) ?? [];
+      list.forEach((n) => n.close());
+      setSwLog(`Cleared ${list.length} notification(s) Chrome was holding for this site.`);
+    } catch (e) {
+      setSwLog(`Clear failed: ${errorMessage(e)}`);
     }
   };
 
@@ -188,9 +221,17 @@ export default function NotificationsCard() {
               {swLog() || info() || "No push seen yet."}
             </p>
           </div>
-          <button type="button" class="quiet small" onClick={() => void showLocal()}>
-            Local test
-          </button>
+          <div class="notify-debug-actions">
+            <button type="button" class="quiet small" onClick={() => void showLocal()}>
+              Local test
+            </button>
+            <button type="button" class="quiet small" onClick={showPage}>
+              Page test
+            </button>
+            <button type="button" class="quiet small" onClick={() => void clearAll()}>
+              Clear held
+            </button>
+          </div>
         </div>
       </Show>
     </section>

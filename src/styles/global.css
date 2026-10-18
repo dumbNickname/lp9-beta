@@ -1552,6 +1552,13 @@ button.is-danger {
   font-family: ui-monospace, monospace;
 }
 
+.notify-debug-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
 /* --- New markers (PRD-46) ---------------------------------------------- */
 
 .new-dot {

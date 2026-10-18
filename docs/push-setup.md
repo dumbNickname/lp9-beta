@@ -121,13 +121,23 @@ notification:
 | "show failed: …" | Browser refused to show it; the error text says why |
 | Stays "Waiting for the device..." | Push never reached the device: the browser was killed / in battery saver, or the push service drops it. Keep the app open and retry; on Android check the browser has no battery restriction |
 
-**Local test** shows a notification from the page itself, no server
-involved. Not visible = the device blocks notifications for this
-browser/app (fix in OS settings); visible = the device side works and
-the problem is delivery.
+Device-only buttons (no server involved):
+- **Local test**: notification from the service worker (same path as a
+  real push). Each test uses a fresh tag, so it never silently replaces
+  an older one. The line reports how many notifications Chrome holds
+  for the site.
+- **Page test**: notification from the page itself (`new Notification`).
+  "browser says shown" but not visible = the OS hides it.
+- **Clear held**: closes every notification Chrome holds for the site.
 
-The row also shows permission, service-worker state and which push
-service the subscription uses (e.g. `fcm.googleapis.com`).
+| Result | Meaning |
+|---|---|
+| Held count goes up, nothing on screen | Chrome showed it; macOS hides it: System Settings -> Notifications -> Google Chrome (and "Google Chrome (Alerts)"), Focus off, not screen sharing |
+| Page test shows, Local test does not | Service-worker path; report it |
+| Both show | Device fine; problem is delivery |
+
+The row also shows permission, service-worker state, push service
+(e.g. `fcm.googleapis.com`) and held count.
 
 ## SQL checks (SQL editor)
 - Vault secrets present: see step 4.

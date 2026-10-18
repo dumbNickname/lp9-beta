@@ -37,8 +37,10 @@
 2. **Push: confirm visible on screen.** Whole chain verified on the
    owner's device (Chrome on macOS, FCM): Send test -> `sent:1`, but
    even the Local test (no server) stays invisible, so macOS hides
-   Chrome notifications (System Settings -> Notifications -> Google
-   Chrome, Focus). Hearts now push on every heart (no 20 h cap,
+   Chrome notifications, or a reused tag silently replaced an old
+   one in the tray (now `renotify: true`, unique local tags, Page test
+   + Clear held + held count in debug). cleverpush.com shows on the
+   same Chrome, app not installed. Hearts now push on every heart (no 20 h cap,
    migration 0015). Next: owner fixes macOS settings and re-tests with
    a real heart from the partner; if visible, mark PRD-53 merged. Open
    proposals (not built): `urgency: high` in `notify` for idle Android,
