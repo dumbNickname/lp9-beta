@@ -6,11 +6,9 @@
 > become a spendable balance, and the balance can be redeemed against
 > coupons each partner has approved on the other's wishlist.
 
-**`lp9` is a working title.** A final product name has not been
-chosen yet. See [`DESIGN.md`](./DESIGN.md) §14 for the (deferred)
-naming decision and the verification checklist that gates it. Until a
-name is locked in, code refers to the product through one `APP_NAME`
-constant so a global rename stays cheap.
+**The product is called Endeary** ([`DESIGN.md`](./DESIGN.md) §14).
+This repo is the beta, which shows the working title `lp9` through one
+`APP_NAME` constant so a rename stays cheap.
 
 ## Status
 
@@ -129,12 +127,9 @@ see [`supabase/README.md`](./supabase/README.md).
 The GitHub repository
 [`dumbNickname/lp9-beta`](https://github.com/dumbNickname/lp9-beta) is
 the **single source repo** for this project, served via GitHub Pages.
-The `lp9` in that URL is a deferred-name placeholder — the same kind of
-working title shown in the app — and **is not a final product name**.
-It exists so the repo could be created before the naming question
-is settled (see [`DESIGN.md`](./DESIGN.md) §14i). The repo will be
-renamed in the GitHub dashboard once a real name is locked in; the
-custom domain is wired up in Phase 10 of [`HANDOFF.md`](./HANDOFF.md).
+It is the **beta** environment and keeps the `lp9` working title.
+Production under the name Endeary and its custom domain is set up
+later ([`DESIGN.md`](./DESIGN.md) §16f).
 
 The deploy + branching model is documented in
 [`DESIGN.md`](./DESIGN.md) §16e (Supabase access via GitHub
@@ -166,5 +161,4 @@ integration) and §16f (single-repo, branch-driven environments).
 ## Credits
 
 **TODO** — author / maintainer credits will be added here once the
-project's name and brand are resolved (see
-[`DESIGN.md`](./DESIGN.md) §14).
+brand is resolved (see [`DESIGN.md`](./DESIGN.md) §14).

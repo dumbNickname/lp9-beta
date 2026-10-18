@@ -161,7 +161,7 @@ its own end-to-end PRD per `DESIGN.md` §16a.
 
 ### Phase 9 — Homepage + SEO polish
 
-Blocker: name must be locked in before this phase starts (§14i).
+Name locked: Endeary (`DESIGN.md` §14a).
 
 | #  | Title                                                 | PRD | Status |
 |----|-------------------------------------------------------|-----|--------|

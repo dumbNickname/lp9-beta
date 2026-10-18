@@ -19,7 +19,7 @@ calls for: `/`, `/privacy`, `/terms`, `/app`.
   asset URLs and the HTML shell's `<base href>` carry the sub-path.
 - HTML shell with an empty theme-init slot (filled by PRD-10).
 - Client router enabled for SPA navigation inside `/app` (§11b).
-- `APP_NAME` is a single constant (§14i); every route imports it, no
+- `APP_NAME` is a single constant (§14); every route imports it, no
   duplicated literals.
 - Tooling: Vitest + Solid testing library; ESLint flat config with
   typescript-eslint and the Solid plugin.

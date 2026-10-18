@@ -10,8 +10,7 @@
 This document hands off the design phase to the next session. The next
 session's job is **either**:
 
-1. **Pick up branding / naming** once the owner has chosen a name and
-   verified it per the checklist in `DESIGN.md` §14d, OR
+1. **Pick up branding** (name locked: `DESIGN.md` §14), OR
 2. **Start implementation**, working through the prioritized task list
    below one task at a time.
 
@@ -32,21 +31,16 @@ session's job is **either**:
 
 - All major MVP design decisions are locked in. See `DESIGN.md`
   sections 1–13.
-- Section 14 (branding & app name) is **deferred** with a verification
-  checklist for the owner to use before locking in a name.
 - No code has been written. No `package.json`, no `pnpm install`, no
   Supabase project provisioned. Repo contains only `DESIGN.md` and this
   handoff.
 
 ## What's NOT done / deferred decisions
 
-- **App name** — `DESIGN.md` §14. Still not chosen. Two sessions of
-  exploration captured in §14f–§14i. Owner has a defended candidate
-  ("Long Term Performance" / `lp9`) and an open list of two-word
-  alternatives. Decision deferred; not blocking until Phase 9 (homepage).
-  Until then, code uses an `APP_NAME` constant so rename is trivial.
-- **Mirror motif as visual identity** — locked in (§14f), independent of
-  whichever name wins. Brand mark should explore symmetry / reflection.
+- **App name** — Endeary (`DESIGN.md` §14a). Beta keeps `lp9` via the
+  `APP_NAME` constant.
+- **Mirror motif as visual identity** — locked in (§14c). Brand mark
+  should explore symmetry / reflection.
 - **Branding visuals** (logo, palette, typography) — depends on name.
 - **Offline behavior / optimistic UI** — pin down at implementation time
   when writing the data-access layer (§9c gives the shape).
@@ -371,8 +365,7 @@ sign-up.
 
 - [ ] **9.1** Write homepage copy: hero, "how it works" section,
   honest section about encryption + privacy.
-- [ ] **9.2** Visual design (depends on locked-in name + branding —
-  see §14e).
+- [ ] **9.2** Visual design (depends on branding — see §14c).
 - [ ] **9.3** SEO meta tags (per-page `<title>`, `<meta>`,
   Open Graph) via a reusable head component.
 - [ ] **9.4** Generate `sitemap.xml`, `robots.txt`, `llms.txt`
@@ -387,8 +380,7 @@ sitemap covers all SSG routes.
 
 ### Phase 10 — Pre-launch checklist
 
-- [ ] **10.1** Run owner's name verification checklist (§14d) — domain
-  registered, trademark cleared, social handles secured.
+- [x] **10.1** Name locked, domains `endeary.com` + `endeary.pl` owned.
 - [ ] **10.2** Custom domain pointed at production GH Pages repo with
   HTTPS.
 - [ ] **10.3** Confirm Supabase DPA signed, project in EU region.

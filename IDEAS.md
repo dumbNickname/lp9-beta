@@ -11,7 +11,6 @@
 - Supabase free tier pauses after about a week idle. Consider a weekly
   keep-alive ping (GH Actions cron hitting `/auth/v1/health`) during beta.
 - Branch protection on `master` is still unset.
-- Pick the final app name (blocks Phase 9).
 
 ## Parked: email + account linking
 
@@ -135,7 +134,7 @@ Thinking so far, to pick up when Phase 6 resumes:
 - **Haptics** (`navigator.vibrate(10)`) on heart select, on Android only.
 ## Design
 
-- Real brand face after naming: self-host a variable serif (Newsreader /
+- Real brand face (name: Endeary): self-host a variable serif (Newsreader /
   Fraunces) with `font-display: swap`. Currently system fallbacks
   (Iowan / Palatino / Georgia).
 - Subtle paper grain texture on `--color-bg` (SVG noise, very low

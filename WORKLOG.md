@@ -180,17 +180,16 @@ expert; then drop the 20 h hearts cap.
 - **Proposed, not built:** `urgency: high`, in-flow Turn on card,
   `pushsubscriptionchange` handling + re-save on app start.
 
-## Session: naming via domains
+## Session: name and domains
 
-**Brief:** owner checked domains (started with situationship.pl); asked
-for honest advice, availability checks and how to buy cheaply.
+**Brief:** owner checked domains; asked for honest advice and help
+buying.
 
-- **Done:** registry (RDAP/WHOIS) checks for ~50 names across `.com`,
-  `.app`, `.love`, `.eu`, `.pl`, `.page` and more; OVH PLN prices.
-  Ranking and rejections in `DESIGN.md` §14j; buying guide in
-  `docs/buying-a-domain.md`.
-- **Advice:** Situationship rejected (means non-commitment, dating
-  space). Top pick Endeary (`.com` free). `endearly.com` is a broker
-  listing (Afternic), not a normal buy.
-- **Owner to do:** pick a name, run the §14d trademark/app-store checks,
-  then register.
+- **Done:** availability checks across TLDs; owner picked **Endeary**
+  and bought `endeary.com` + `endeary.pl` at OVH (1 year, free hosting
+  plan with one mailbox, no paid add-ons).
+- **Docs:** naming exploration removed from `DESIGN.md` §14 (name,
+  principle, mirror motif kept); domain and trademark discussion
+  dropped; beta keeps `lp9`.
+- **Owner to do:** OVH account hygiene (auto-renew, 2FA, mailbox);
+  production setup later.

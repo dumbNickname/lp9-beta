@@ -148,8 +148,8 @@ editorial paper + ink.
 - **Decision:** add header navigation links (home / app / privacy /
   terms); convert the archetype and locale pickers to native `<select>`
   dropdowns (current layout breaks on mobile); apply a first-pass visual
-  polish using existing theme tokens (no brand overhaul — name/brand
-  still pending §14i).
+  polish using existing theme tokens (no brand overhaul — brand
+  still pending).
 - **Owner input given:** nav + selectors + light polish now; full
   redesign deferred.
 

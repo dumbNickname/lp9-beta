@@ -23,7 +23,7 @@ of the wrong theme on first paint, built on CSS custom properties on
 - Logical CSS properties only (§12e), RTL-ready.
 - Data: theme lives in `localStorage` only; a per-user
   `user_settings.theme` column is reserved for later sync.
-- Out: final palette/brand (§14e), typography and layout systems.
+- Out: final palette/brand (§14c), typography and layout systems.
 
 ## Decisions
 

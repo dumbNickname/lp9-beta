@@ -85,8 +85,9 @@ short encrypted note; hearts become a balance spent on mutually-approved
 **wishes** (coupons). Principle: train people to notice and say
 appreciation; nothing transactional, no scoreboard.
 
-The product name is not chosen yet (working title `lp9`, shown via the
-`APP_NAME` constant; repo and sub-path `lp9-beta`; `DESIGN.md` §14i).
+Product name: **Endeary** (`endeary.com`, `endeary.pl`; `DESIGN.md`
+§14). The beta (repo and sub-path `lp9-beta`) shows the working title
+`lp9` via the `APP_NAME` constant.
 
 ## Source-of-truth docs
 

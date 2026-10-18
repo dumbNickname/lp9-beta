@@ -13,7 +13,7 @@ page shell where pairs give hearts, wish and claim.
 ## Local Contracts
 
 **Platform**
-- Product name comes from one constant; never hard-code it (§14i).
+- Product name comes from one constant; never hard-code it (§14a).
 - GitHub Pages sub-path: the router must be given the base path, and
   `<base href>` is set, so history URLs must always be absolute
   (path + query + hash). A bare `#x` drops `/app`.

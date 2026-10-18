@@ -74,12 +74,12 @@ None.
   (PRD-06, PRD-08, PRD-09) where the README naturally points the reader
   forward (secret-scanning hook, build entrypoints, deploy workflow).
   All referenced files were verified to exist at the time of writing.
-- Used `APP_NAME` as the placeholder per `DESIGN.md` §14i and
+- Used `APP_NAME` as the placeholder per `DESIGN.md` §14 and
   `TRADEMARK.md`. Did not invent a real product name anywhere.
 - Called out that `https://github.com/dumbNickname/lp9-beta` is the
   **beta deploy target**, and that `lp9` in that URL is a
   deferred-name placeholder, not a final product name — explicitly
-  pointed at `DESIGN.md` §14i for context.
+  pointed at `DESIGN.md` §14 for context.
 - Updated `PROGRESS.md` row for PRD-02: `todo` → `in-progress` →
   `dev-done`.
 
@@ -188,7 +188,7 @@ None.
 
 - **Markdown lint authority** (Dev: "a markdown linter run as part of QA's 'markdown lint clean' check is the authoritative answer"). Addressed. The adversarial script under `tests/qa/PRD-02-readme.sh` is the QA-side authoritative check; it extracts every relative-link target and tests file-existence at the resolved path. All links pass. No external markdown linter was run; the bespoke link-resolution check is more precise for this PRD's actual concern (link rot to repo paths) than a generic linter would be.
 - **`lp9-beta` repo accessibility** (Dev: "I did not fetch it. If the repo doesn't yet exist or is private, QA should flag the README's claim against reality"). **Not attempted.** Verifying `https://github.com/dumbNickname/lp9-beta` is reachable requires `webfetch`, which is `ask` for the QA subagent per `.opencode/agent/qa.md:21`. The orchestrator did not pre-authorize a network fetch in this invocation, so QA did not prompt for one out-of-band. Recommended: orchestrator either confirms the repo's existence directly or amends the README to drop the URL claim until it does exist. The README's statement is plausible (matches DESIGN §16f's two-GitHub-repos pattern and `LICENSE`'s copyright holder `dumbNickname`) but unverified by QA.
-- **Tone of `lp9`-is-placeholder.** QA read: acceptable. README §"Deployment" frames it factually ("a deferred-name placeholder — the same kind of placeholder as `APP_NAME` in code — and **is not a final product name**") and pins the explanation to `DESIGN.md` §14i, which is the canonical decision. It does not read as embarrassed and does not silently endorse `lp9` as a name. Not a defect.
+- **Tone of `lp9`-is-placeholder.** QA read: acceptable. README §"Deployment" frames it factually ("a deferred-name placeholder — the same kind of placeholder as `APP_NAME` in code — and **is not a final product name**") and pins the explanation to `DESIGN.md` §14, which is the canonical decision. It does not read as embarrassed and does not silently endorse `lp9` as a name. Not a defect.
 - **PRD Verification step 5 (fresh-clone)** — **explicitly marked out of scope** for this QA invocation. The PRD's own QA-suite text concedes the step needs a real fresh machine ("run by a human, since this needs a real fresh machine"). QA agent environment has node/pnpm/git/supabase/gitleaks pre-installed and cannot simulate the cold-start path. Not blocking `qa-done`; flagged as a human follow-up for the orchestrator before merge.
 - **Build/run section deferral to PRD-08.** Not a current defect. README is honest about the absence of `package.json` and pins the future content to PRD-08. The orchestrator should flag this section for re-verification when PRD-08 lands.
 

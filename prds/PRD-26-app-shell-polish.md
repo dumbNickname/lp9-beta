@@ -19,7 +19,7 @@ pickers broke layout on mobile.
   `close_friends`; locale: `en` / `pl` / `de`).
 - Light styling pass with existing theme tokens and logical CSS only:
   spacing, readable container, buttons, form fields, focus ring, callouts.
-  No new hues, no brand overhaul (name pending §14i). `APP_NAME` constant
+  No new hues, no brand overhaul (name pending §14). `APP_NAME` constant
   kept; English nav literals (i18n in Phase 7).
 - **Reset account (start fresh):** confirm-guarded action that clears
   device keys (IndexedDB), only the pairing/recovery localStorage markers

@@ -32,4 +32,4 @@ until formal registration once a name is locked in.
 
 ## Open questions
 
-- Product name still unchosen (`DESIGN.md` §14i).
+- Product name since chosen: Endeary (`DESIGN.md` §14).

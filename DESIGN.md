@@ -455,237 +455,24 @@ All non-optional; ship with MVP:
   - `prefers-color-scheme` media query handles "system."
   - Toggle UI in app header / settings.
 
-### 14. Branding & app name — **DEFERRED**
+### 14. Branding & app name
 
-**Status:** name not chosen yet. Top candidate "Kindling" rejected (existing
-dating app — too close in product space). Owner will revisit; branding
-depends on the chosen name. Current domain-led shortlist: §14j.
+#### 14a. Name — locked 2026-10-18 (owner)
+- **Name: Endeary** (coined from "endear"). Domains owned:
+  `endeary.com` and `endeary.pl` (OVH, renew yearly).
+- Beta (`lp9-beta`) keeps the `lp9` working title via `APP_NAME`.
+  Production gets the real name and the custom domain; setup deferred.
 
-#### 14a. Direction chosen
-- **Direction E: metaphorical object / single-noun.** Picked over invented
-  word, compound, foreign, or punny.
-- Product thesis: *gentle appreciation, small tokens of care, warmth between
-  partners.* Avoid gamified-sounding names ("Score", "Quest", "Battle")
-  and avoid cute/cringe names.
+#### 14b. Naming principle (keeps guiding copy and brand)
+A name or slogan must not fight the product: *noticing without
+expecting*, *warmth without measurement*, *reciprocity without
+bookkeeping*. No "performance", "score", "exchange", "karma" framing.
+Avoid dating connotations and cute/cringe tone.
 
-#### 14b. Constraints to honor when picking
-1. Pronounceable in EN / PL / DE; not embarrassing in any of them.
-2. Domain available — `.app` is acceptable; do NOT chase `.com` (single-noun
-   `.com`s are universally taken). `.app` requires HTTPS, signals "app",
-   widely recognized.
-3. No collision with an existing app **in our product space** (couples /
-   relationships / dating). Kindling failed exactly this check.
-4. Short, easy to type, easy to mention out loud.
-5. Not too on-the-nose about gamification / points / coupons (the metaphor
-   should be warmth, care, or small-things-collected — not scoreboards).
-6. Searchable: type the name into Google — does it land on something
-   confusing or embarrassing?
-
-#### 14c. Candidate shortlist (already brainstormed)
-
-Reject any with collisions in couples/dating space. Verify the rest.
-
-| Name | Metaphor | Notable risks |
-|---|---|---|
-| ~~Kindling~~ | small things keep the fire | **Existing dating app — REJECTED** |
-| Hearth | warm center of shared home | Fintech "Hearth" exists (home loans, different category) |
-| Petal | soft small thing; flower of small kindnesses | Common word, many products |
-| Ember | warmth kept alive | Popular JS framework "Ember.js" — collision risk for devs |
-| Lantern | light you give each other | Several apps (VPN, others) |
-| Bouquet | collection of beautiful gifts | Spelling friction for non-French-speakers |
-| Posy | small collected bouquet (old-fashioned) | Obscure word; mispronounceable |
-| Marigold | warm flower; affection in many cultures | Several marketing-platform "Marigold" companies |
-| Pinecone | small thing collected on walks together | "Pinecone" is a vector DB |
-| Acorn | small thing that grows | Acorn UK bank |
-| Clover | small lucky find | Generic; many uses |
-
-Owner can also explore additional directions if E doesn't pan out:
-- **A: invented 2-syllable word** (Notion-style) — most distinctive
-  long-term, hardest to evoke meaning at first
-- **C: foreign-language word** (e.g. PL *Bliskość*, DE *Liebevoll*,
-  Spanish *Cariño*, JP *Kigai*) — emotionally rich but adds friction
-
-#### 14d. How to check availability — full checklist
-
-For each candidate, run all four checks. Don't skip any.
-
-**1. Domain availability**
-- Primary registrar to check: **Porkbun** (`porkbun.com`) or **Namecheap**
-  (`namecheap.com`). Both show available TLDs at a glance.
-- TLDs to check, in priority order:
-  1. `.app` — recommended primary
-  2. `.love` — niche but fits the product
-  3. `.cc` / `.io` — fallbacks
-  4. `get<name>.app`, `<name>hq.app`, `<name>club.app`,
-     `we<name>.app`, `our<name>.app` — compound fallbacks if the bare
-     name is taken
-
-**2. Trademark search (free, official)**
-- **EU (covers PL + DE markets):**
-  [`euipo.europa.eu/eSearch`](https://euipo.europa.eu/eSearch/) — search
-  text mark in classes **9** (software) and **42** (SaaS / hosted
-  software). Look for active registrations, not abandoned ones.
-- **US:** [`tmsearch.uspto.gov`](https://tmsearch.uspto.gov/) — same
-  classes. Use TESS basic word-mark search.
-- **WIPO global brand database** (cross-checks many countries at once):
-  [`branddb.wipo.int`](https://branddb.wipo.int/branddb/en/).
-- **Heuristic:** identical mark in same class = blocker. Similar mark in
-  same class = grey area, consider renaming. Identical mark in unrelated
-  class (e.g. clothing brand) = usually fine.
-
-**3. Existing-app collision check**
-- Google: `"<name> app"`, `"<name>" couples`, `"<name>" relationship`,
-  `"<name>" dating`. Any hit on a couples/dating/wellness app is a
-  blocker (this is what killed Kindling).
-- App stores: search both **Apple App Store** and **Google Play** —
-  even though we're a web app, the same name on a mobile dating app is
-  problematic for SEO and brand confusion.
-- Product Hunt: `producthunt.com/search?q=<name>` — surfaces small new
-  apps trademark searches won't catch.
-
-**4. Linguistic sanity (EN / PL / DE)**
-- Read it out loud in each language. Ask a native PL and DE speaker.
-- Look it up in each language on Wiktionary — sometimes a benign English
-  word is a slur or vulgar in another language (the classic "Mist" =
-  fog/dung problem).
-- Also test: does the name sound similar to any negative word in those
-  languages?
-
-**5. Social handle availability** (nice-to-have, not blocker)
-- Check `twitter.com/<name>`, `instagram.com/<name>`,
-  `github.com/<name>`. Side-project owners can usually live with handle
-  variants like `<name>app` if the bare handle is taken.
-
-#### 14e. Once a name is chosen, return to branding
-The name unlocks: visual identity (logo metaphor flows from a
-single-noun name), color palette, copy voice (warm vs. playful vs.
-serious), domain registration, OAuth client display name, README, social
-copy, etc. **All deferred until name is locked.**
-
-#### 14f. Session 2 — exploration shifted away from single-noun
-
-Owner reported that single-noun (.app) availability and trademark collisions
-in §14c make Direction E impractical in 2026 — most warm single nouns are
-taken in some category that creates SEO or brand risk. Direction E remains
-the **fallback ideal** but is no longer the primary search.
-
-**New directions explored:**
-
-1. **Phrase → acronym pattern** (BMW / IKEA / TED style). Phrase carries
-   meaning, acronym becomes the brand.
-2. **Two-word evocative compound** (Day One / Big Sur / Hello Fresh style).
-   Sidesteps single-noun trademark scarcity without needing explanation.
-
-**Candidates discussed:**
-
-- **"Long Term Performance" → `ltp` / `lp9`** (mirrored-P glyph as logo).
-  - Owner's case for keeping it: "performance" here refers to the
-    *relationship's* performance, not individual benchmarking. Acronym
-    is corporate enough that it stays in corporate heads; the warm
-    brand can reclaim it.
-  - Counter-case (assistant's grilling): conflicts with the product
-    principle that the app is **not** a score/measure/optimize tool
-    (see HANDOFF.md "Don't poison the game", DESIGN §5b hidden lifetime
-    totals). "Performance" reframes the loop as something to optimize.
-    Risk: undermines the warm tone on the homepage. Also: `lp9` mixes
-    letter+digit, which usually reads as cheap/license-plate unless
-    iconic. Also: requires constant explanation ("LP-nine, the 9 is a
-    mirrored P").
-  - **Status:** owner defends, decision deferred. Revisit alongside
-    other candidates with fresh eyes.
-
-- **"What You Give Is What You Get" → WYGIWYG / WIGIWIG.**
-  - Rejected by assistant on three grounds: (1) the phrase *literally*
-    describes karmic transactionalism, contradicting the product's
-    "give because you noticed, not to get back" principle;
-    (2) WYSIWYG collision is unavoidable; (3) acronym is unpronounceable.
-  - **Status:** owner did not push back; consider this direction closed.
-
-**Mirroring as visual identity — KEEP regardless of name.**
-
-The mirror motif (reciprocity, partner reflection, give↔receive symmetry)
-is a strong **brand/visual** idea independent of the name. Logos with
-mirror symmetry work for almost any warm noun or short acronym. Decision:
-once a name is picked, the mark explores a mirrored / symmetric form.
-
-#### 14g. Two-word candidates seeded (not yet evaluated against §14d checklist)
-
-Capturing the brainstorm so it's not lost. None of these are chosen.
-Owner to react / extend / reject in a later session.
-
-| Name | Reading |
-|---|---|
-| Soft Tally | gentle scorekeeping; "tally" already has mirror-mark feel |
-| Two Hearths | two homes, two warmths; mirroring built in |
-| Kind Ledger | honest about the mechanics, "kind" warms it |
-| Daily Bouquet | small things collected each day |
-| Quiet Credit | appreciation as currency, but quiet |
-| Slow Glow | warmth that builds over time |
-
-Acronym-pattern candidates that *might* survive scrutiny (also unverified):
-
-| Phrase | Shortcut | Notes |
-|---|---|---|
-| "Thanks I Never Said" | TINS | reads as "tins" — mirror-friendly? Collision check unverified |
-| "Little Things, Often" | LTO | LTO = "limited time offer" — collision risk |
-| "You and I" | Y&I | natural symmetry; very generic, SEO-hostile |
-
-#### 14h. Working principle going forward
-
-A good name for this product **does not fight the product**. The product
-is about *noticing without expecting*, *warmth without measurement*,
-*reciprocity without bookkeeping*. The name should not introduce
-"performance", "score", "exchange", "tally" (despite the entry above —
-might be too on-the-nose), or "karma" framing even by implication.
-
-Reject any candidate that, read by a fresh user on the homepage, would
-suggest the app is about optimizing, comparing, or earning.
-
-#### 14i. Status & decision
-- **Name: NOT CHOSEN.** Deferred again.
-- **Approach:** move on to technical implementation (Phase 0 of HANDOFF).
-  Names sometimes clarify themselves once the product takes physical
-  shape. Revisit branding when (a) owner has a strong candidate to
-  evaluate, or (b) we approach Phase 9 (homepage) where a name is
-  finally a blocker.
-- **Until a name is chosen:** the repo / project remains generically
-  named ("coupons"); placeholders in code/copy use `APP_NAME` constant
-  so a global rename is trivial later.
-- **Amended 2026-10-04 (owner):** the displayed working title is `lp9`
-  (app header, page titles, home-screen name), because a literal
-  "APP_NAME" looked like a broken template. Still not the final name.
-
-#### 14j. Session 3 — domain-led shortlist (2026-10-18)
-
-Owner started from domains. Registry lookups on 2026-10-18 (snapshot;
-re-check before buying). Prices: OVH PL list, PLN/year, first / renewal.
-Buying how-to: `docs/buying-a-domain.md`.
-
-**Ranking (assistant's advice, owner not decided):**
-
-| # | Name + domains | Why | Risk |
-|---|---|---|---|
-| 1 | **Endeary** — `endeary.com` + `endeary.pl` | Coined from "endear"; every TLD free incl. `.com`; ownable mark | Slightly cute "-y"; not a dictionary word |
-| 2 | **Hearten** — `hearten.love` + `hearten.pl` | Real word, "heart" (our currency) inside; `.love` says couples | `.com/.app` taken; `.love` ~111/123; weak trademark |
-| 3 | **Heartenjar** — `heartenjar.com` | Clear image (jar of hearts), `.com` free | Long |
-| 4 | **Endears** — `endears.app` / `.eu` | Real word, `.app` free | Awkward to say |
-| 5 | **Hearten** — `hearten.page` | Cheap (~48/62) | `.page` reads as site builder |
-| 6 | **Boonjar** / **Boonly** — `.app` / `.eu` / `.pl` | "Boon" = gift freely given, fits wishes | `.com` taken; Boonly is generic "-ly" |
-
-**Rejected:**
-- Situationship (`.pl`): means uncommitted non-relationship; dating
-  connotation; `.com` is a fresh dating-app project. Fights §14h.
-- `endearly.com`: held by a domain broker (Afternic), sold as premium
-  (price on request), not a normal registration. Use `endeary` instead.
-- Smitten, Swoon: pull toward dating. Dotes: misread as "dot-es".
-  Fondlet: reads "fondle". `hearten.cc`: spammy TLD.
-  `heartsfor2` / `boonfor2`: digit looks cheap, spelled two ways.
-- Weak coinages: heartn, heartenly, noticly, hearto, heartee, boonie,
-  boonsy, endeara, endearo, doteful, dotey, kindlet, boonary, endearie.
-
-**Note:** §14b said skip `.com`; a coined name makes `.com` reachable,
-so it is preferred when free. Next gate for the pick: §14d checks
-(trademark EUIPO, app stores, PL/DE sanity).
+#### 14c. Visual identity
+- **Mirror motif** (reciprocity, partner reflection, give and receive
+  symmetry): the mark explores a mirrored / symmetric form.
+- Visual identity, palette, copy voice, OG image: next branding pass.
 
 ### 13. Data model
 
@@ -1097,8 +884,8 @@ agent starts cold from the PRD, not from the implementation choices.
 
 #### 16f. Git hosting — single GitHub repo, branching for environments
 
-- **One GitHub repo** (currently `dumbNickname/lp9-beta`; will be
-  renamed when the final app name is locked per §14i).
+- **One GitHub repo** (currently `dumbNickname/lp9-beta`; production
+  plans per §14a).
   - Public, AGPL-licensed (see §17).
   - **Default `git push` target** = this repo. No other remote in the
     plan (the previously planned separate `prod` repo is dropped per
@@ -1130,11 +917,10 @@ agent starts cold from the PRD, not from the implementation choices.
   default-push-to-beta pattern works fine for static sites with no
   shared backend state, but it's the wrong pattern for a
   Supabase-backed app.
-- **Renaming later:** when the final name is chosen (§14i), the
-  GitHub repo gets renamed via the dashboard. The Supabase GitHub
-  integration follows the rename automatically. No code change
-  required beyond updating `APP_NAME` in `src/constants.ts` and
-  any documentation that refers to the repo by name.
+- **Production (open, 2026-10-18):** `lp9-beta` stays the beta
+  environment under the working title. How production is hosted
+  (repo, Supabase project, custom domain) is not decided yet; the
+  real name only needs `APP_NAME` and docs updated.
 
 #### 16g. Secret hygiene — layered defense
 
@@ -1251,14 +1037,14 @@ restricts use itself.
   by the trademark notice to **rename** before redistributing. The AGPL
   itself does not address trademarks; this file fills that gap.
 - **Registration timing:** actual trademark registration (EUIPO + USPTO,
-  classes 9 + 42 per §14d) happens **after the name is locked in**.
+  classes 9 + 42) happens before the production launch.
   Until then, `TRADEMARK.md` asserts unregistered ("common law")
   rights — weaker than registration but not nothing, and standard
   practice for pre-registration projects.
 - **Scope of the reservation:**
-  - The project name (placeholder `APP_NAME` for now per §14i) and any
+  - The project name (Endeary, §14a) and any
     associated wordmark.
-  - The logo / brand mark (mirror-motif visual identity per §14f),
+  - The logo / brand mark (mirror motif, §14c),
     once designed.
   - The combined name + logo lockup.
 - **Out of scope of `TRADEMARK.md`** (these stay AGPL):

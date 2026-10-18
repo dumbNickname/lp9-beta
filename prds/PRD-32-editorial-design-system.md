@@ -31,7 +31,7 @@ dashboard layout: calm, mobile-first, intimate, not gamified.
 - Anti-patterns: no confetti, streak flames, progress bars, big numbers
   or purple gradients.
 
-Out: logo/brand (name pending §14i), i18n (Phase 7), illustrations.
+Out: logo/brand (name pending §14), i18n (Phase 7), illustrations.
 
 ## Verification
 

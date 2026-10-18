@@ -7,11 +7,11 @@ pending formal registration.
 
 ## What this notice covers
 
-- The project's name (placeholder: `APP_NAME` until a final name is
-  selected per `DESIGN.md` §14).
+- The project's name, **Endeary** (the beta build shows the working
+  title `lp9` via the `APP_NAME` constant).
 - Any wordmark formed from that name.
 - The project's logo and brand mark, including any mirror-symmetric
-  variants per `DESIGN.md` §14f, once such a mark is created.
+  variants per `DESIGN.md` §14c, once such a mark is created.
 - The combined name + logo lockup.
 
 ## What this notice does NOT cover
@@ -32,8 +32,8 @@ If you fork this project — which the AGPL fully permits — you **must
 rename** your fork before redistributing or running it as a
 network-accessible service. Specifically:
 
-- Replace every occurrence of `APP_NAME` (and any later final project
-  name) with a name of your own choosing.
+- Replace every occurrence of `APP_NAME` and the name Endeary with a
+  name of your own choosing.
 - Do not use the project's logo, mirror-symmetric mark, or any
   confusingly similar variant.
 - Do not represent your fork as the original project, its successor,
@@ -59,8 +59,8 @@ ask before publishing.
 ## Registration status
 
 The trademark is currently unregistered. Formal registration with
-EUIPO and USPTO (Nice classes 9 and 42) will follow once the final
-project name is selected. Until then, the protection asserted by this
+EUIPO and USPTO (Nice classes 9 and 42) may follow before the
+production launch. Until then, the protection asserted by this
 notice rests on common-law trademark rights established by use in
 commerce.
 

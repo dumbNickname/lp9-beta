@@ -75,10 +75,10 @@
 ## Owner action items
 
 - Push: none (steps 1–4 done).
-- Branch protection on `master`; sign Supabase DPA before launch; pick
-  the final app name (blocks Phase 9 + brand icon). Shortlist and
-  ranking: `DESIGN.md` §14j (top: Endeary, `.com` free); buying steps:
-  `docs/buying-a-domain.md`.
+- Branch protection on `master`; sign Supabase DPA before launch; name is
+  Endeary, domains `endeary.com` + `endeary.pl` bought at OVH (renew
+  yearly; DNS still OVH defaults). Production setup (repo, Supabase
+  project, custom domain) to plan later; `lp9-beta` stays beta.
 
 ## Read order on resume
 
