@@ -130,6 +130,12 @@ its own end-to-end PRD per `DESIGN.md` §16a.
 | 54 | Lock relationship writes + helper grants (HIGH)       | `prds/PRD-54-lock-relationship-writes.md`      | merged (live-probed) |
 | 55 | Signed-in RPCs, invite/profile/push lockdown          | `prds/PRD-55-security-followups.md`            | dev-done |
 
+### Environments
+
+| #  | Title                                                 | PRD                                            | Status |
+|----|-------------------------------------------------------|------------------------------------------------|--------|
+| 57 | Production at endeary.com + beta on a Worker          | `prds/PRD-57-production-environment.md`        | todo |
+
 ### Phase 5 — Coupon claim/escrow flow
 
 | #  | Title                                                 | PRD | Status |

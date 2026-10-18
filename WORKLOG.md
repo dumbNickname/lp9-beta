@@ -191,8 +191,12 @@ buying.
 - **Docs:** naming exploration removed from `DESIGN.md` §14 (name,
   principle, mirror motif kept); domain and trademark discussion
   dropped; beta keeps `lp9`.
-- **Owner to do:** OVH account hygiene (auto-renew, 2FA, mailbox);
-  production setup later.
+- **Production plan (grilled):** one repo; beta on a Cloudflare Worker
+  (`workers.dev`), prod `release` branch -> GitHub Pages `endeary.com`
+  with DNS at OVH and a second Supabase project; daily keep-alive cron
+  on the Worker instead of Pro; names "Endeary" / "Endeary beta";
+  prod `noindex` until launch; backups a later PRD. PRD-57.
+- **Owner to do:** OVH mailbox later; PRD-57 owner steps.
 
 ## Session: push still invisible on Chrome/macOS
 

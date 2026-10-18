@@ -31,6 +31,9 @@
 
 ## Start here (in order)
 
+0. **PRD-57 production environment** (decided with owner): beta to a
+   Cloudflare Worker, prod `release` -> `endeary.com` + new Supabase
+   project, keep-alive cron. Owner steps in the PRD.
 1. **"Us" visuals trial:** owner reviews garland, almanac (season /
    clock / words), milestone ribbon, wish stamps, week warmth on the
    live site and picks which stay (D-UX.7–10). Remove the rest.
@@ -81,8 +84,8 @@
 - Push: none (steps 1–4 done).
 - Branch protection on `master`; sign Supabase DPA before launch; name is
   Endeary, domains `endeary.com` + `endeary.pl` bought at OVH (renew
-  yearly; DNS still OVH defaults). Production setup (repo, Supabase
-  project, custom domain) to plan later; `lp9-beta` stays beta.
+  yearly; DNS still OVH defaults). OVH done: email confirmed, 2FA, auto-renew,
+  DNSSEC on `.pl`; mailbox later. Production setup: PRD-57 owner steps.
 
 ## Read order on resume
 

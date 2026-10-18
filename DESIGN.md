@@ -460,8 +460,8 @@ All non-optional; ship with MVP:
 #### 14a. Name — locked 2026-10-18 (owner)
 - **Name: Endeary** (coined from "endear"). Domains owned:
   `endeary.com` and `endeary.pl` (OVH, renew yearly).
-- Beta (`lp9-beta`) keeps the `lp9` working title via `APP_NAME`.
-  Production gets the real name and the custom domain; setup deferred.
+- Builds show "Endeary" (prod) and "Endeary beta" (beta) once PRD-57
+  ships; until then the beta shows `lp9`.
 
 #### 14b. Naming principle (keeps guiding copy and brand)
 A name or slogan must not fight the product: *noticing without
@@ -917,10 +917,11 @@ agent starts cold from the PRD, not from the implementation choices.
   default-push-to-beta pattern works fine for static sites with no
   shared backend state, but it's the wrong pattern for a
   Supabase-backed app.
-- **Production (open, 2026-10-18):** `lp9-beta` stays the beta
-  environment under the working title. How production is hosted
-  (repo, Supabase project, custom domain) is not decided yet; the
-  real name only needs `APP_NAME` and docs updated.
+- **Amended 2026-10-18 (owner): two environments, one repo.** Beta =
+  `master` -> Cloudflare Worker (`workers.dev`) + current Supabase
+  project. Prod = `release` -> GitHub Pages at `endeary.com` + a new
+  Supabase project. Supersedes "one Supabase project" in §16e and the
+  "`master` = production" model above once built. Details: PRD-57.
 
 #### 16g. Secret hygiene — layered defense
 
