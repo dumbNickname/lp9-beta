@@ -63,6 +63,7 @@ describe("NotificationsCard", () => {
     expect(screen.getByRole("button", { name: "Local test" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Page test" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Clear held" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Sticky test" })).toBeInTheDocument();
   });
 
   it("?debug=true: Local test uses a fresh tag each time (no silent replace)", async () => {

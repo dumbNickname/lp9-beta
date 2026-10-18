@@ -61,4 +61,4 @@ DESIGN §8 (amended 2026-09-29).
   every heart pushes. `push_state.last_hearts_push_at` is unused.
 - 2026-10-18: pushes re-alert when replacing a same-tag notification
   (`renotify`); debug adds Page test, Clear held, held count; Local
-  test uses unique tags.
+  test uses unique tags; Sticky test.

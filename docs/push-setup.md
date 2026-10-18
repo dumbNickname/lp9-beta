@@ -128,7 +128,14 @@ Device-only buttons (no server involved):
   for the site.
 - **Page test**: notification from the page itself (`new Notification`).
   "browser says shown" but not visible = the OS hides it.
+- **Sticky test**: worker notification that stays until clicked
+  (`requireInteraction`).
 - **Clear held**: closes every notification Chrome holds for the site.
+
+macOS: System Settings -> Notifications lists Google Chrome (often
+twice: Chrome and its helper). **Both** must have Allow notifications
+on; "off" drops every Chrome notification from every site, while the
+debug lines still say "shown". Then quit Chrome (Cmd+Q) and reopen.
 
 | Result | Meaning |
 |---|---|

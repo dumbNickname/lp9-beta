@@ -207,3 +207,7 @@ ours (server and Local test) do not. App not installed.
   and Chrome's held count. Regression tests added.
 - **Owner to do:** after deploy, reload with `?debug=true`, Clear
   held, then Local test / Page test / Send test; report the lines.
+- **Root cause (owner Mac):** both "Google Chrome" entries in macOS
+  Notifications were off; Chrome reports shown, macOS drops them. No
+  app bug. Added debug Sticky test (`requireInteraction`). Pending:
+  owner turns both on, re-tests; then phone.

@@ -83,6 +83,23 @@ export default function NotificationsCard() {
     }
   };
 
+  // Stays on screen until clicked; on macOS it may use a different
+  // Chrome notification entry than normal ones.
+  const showSticky = async () => {
+    try {
+      const reg = await navigator.serviceWorker.getRegistration(SW_URL);
+      if (!reg) throw new Error("no service worker");
+      await reg.showNotification("Sticky test", {
+        body: "Stays until you click it.",
+        tag: `sticky-${Date.now()}`,
+        requireInteraction: true,
+      });
+      setSwLog("Sticky notification requested. Not visible = the OS blocks this browser.");
+    } catch (e) {
+      setSwLog(`Sticky notification failed: ${errorMessage(e)}`);
+    }
+  };
+
   const clearAll = async () => {
     try {
       const reg = await navigator.serviceWorker.getRegistration(SW_URL);
@@ -227,6 +244,9 @@ export default function NotificationsCard() {
             </button>
             <button type="button" class="quiet small" onClick={showPage}>
               Page test
+            </button>
+            <button type="button" class="quiet small" onClick={() => void showSticky()}>
+              Sticky test
             </button>
             <button type="button" class="quiet small" onClick={() => void clearAll()}>
               Clear held

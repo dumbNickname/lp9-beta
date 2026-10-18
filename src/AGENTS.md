@@ -80,7 +80,7 @@ page shell where pairs give hearts, wish and claim.
   never cover controls.
 - Every device-local storage key must also be cleared by Reset account.
 - `?debug=true` reveals owner diagnostics (Settings → Notifications:
-  test push, device report, worker/page test notifications, clear held). Never shown without it.
+  test push, device report, worker/page/sticky test notifications, clear held). Never shown without it.
 
 **Money rules**
 - Balance is computed, never stored, and only your own is shown (§13b).
