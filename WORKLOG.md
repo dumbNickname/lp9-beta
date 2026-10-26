@@ -259,3 +259,7 @@ Align the code.
   table. DESIGN §13c amended; supabase AGENTS/README rule.
 - **Owner to look at:** after deploy, beta app still loads hearts,
   wishes, profile edit, push subscribe; keep-alive still logs ok (42501).
+- **Verified live (beta):** anon 42501 on all tables; two-user API
+  smoke (pair, hearts, wish submit/approve/claim, profile name edit,
+  co-member name) ok; direct table writes and other profile columns
+  denied; `push_state` closed to users.

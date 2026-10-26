@@ -31,9 +31,9 @@
 
 ## Start here (in order)
 
-- **Migration 0016 (explicit table grants)** pushed: verify the live
-  beta with the two-client smoke (hearts, wishes, claims, profile edit,
-  push subscribe) and that `anon` gets 42501 on every table.
+- **Migration 0016 (explicit table grants)** live on beta and
+  smoke-verified via API; owner to click through the app once (incl.
+  push subscribe). Reaches prod with the first `release` push.
 
 0. **PRD-57 production environment** is built (dev-done). Owner works
    through `docs/production-setup.md` (Cloudflare, Supabase, GitHub,
