@@ -153,6 +153,9 @@ Thinking so far, to pick up when Phase 6 resumes:
 (See `REVIEW.md` for the ranked list; items below are not duplicated
 there.)
 
+- Undo after spend: a giver can undo hearts (5-min window) that the
+  receiver already escrowed in a claim, so the balance can go negative.
+  Product call: block undo once spent, or allow and show it.
 - CI: add a Playwright smoke against the built site (no DB) to catch
   blank-page regressions.
 - Edit/undo window expiry isn't live-tested (needs time travel). Add a

@@ -104,6 +104,20 @@ describe("explicit table grants (0016)", () => {
   });
 });
 
+describe("security audit follow-ups (0017)", () => {
+  it("set_recovery_password validates blob, salt, iterations and algo", () => {
+    const at = all.lastIndexOf("create or replace function public.set_recovery_password(");
+    const fn = all.slice(at, all.indexOf("$$;", at));
+    expect(fn).toContain("octet_length(p_wrapped_blob) not between 28 and 256");
+    expect(fn).toContain("octet_length(p_salt) not between 16 and 64");
+    expect(fn).toContain("p_iterations not between 100000 and 5000000");
+    expect(fn).toContain("p_algo is distinct from 'pbkdf2-sha256'");
+  });
+  it("future functions get no PUBLIC execute (global default, not per schema)", () => {
+    expect(all).toContain("alter default privileges for role postgres revoke execute on functions from public;");
+  });
+});
+
 describe("push fixes (0014)", () => {
   const lastDef = (name: string) => {
     const at = all.lastIndexOf(`create or replace function public.${name}(`);

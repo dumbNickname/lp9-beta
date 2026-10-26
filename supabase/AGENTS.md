@@ -18,8 +18,12 @@ the branch-driven link between this repo and the Supabase project.
   project's integration applies them on push to `release`. Never `db push`/`link`
   locally; no PAT or DB password needed.
 - RPCs: security definer with an empty search path, EXECUTE granted to
-  `authenticated` only (revoke from public/anon; default privileges no
-  longer grant PUBLIC). Helpers: revoke from public/anon/authenticated.
+  `authenticated` only: each function gets its own revoke from
+  public/anon plus grant (a static test enforces it). A global default
+  also stops new functions starting open to PUBLIC; per-schema defaults
+  cannot do that. Helpers: revoke from public/anon/authenticated.
+- RPCs validate every client-supplied size and value; definer code
+  bypasses table checks only where the RPC itself skips them.
   No write RLS policies; writes go through RPCs. Exception: `profiles`
   UPDATE, column-granted on display name, locale and theme only.
 - Tables get no implicit Data API grants (Supabase default since

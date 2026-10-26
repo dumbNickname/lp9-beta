@@ -60,8 +60,9 @@
 ## Technical — security review loop (migrations 0011/0012)
 
 - **FIXED — API RPCs callable by `anon`:** every RPC now executes for
-  `authenticated` only (anonymous sign-in users keep access); default
-  privileges no longer grant new functions to PUBLIC/anon.
+  `authenticated` only (anonymous sign-in users keep access). The
+  0011 per-schema default did not stop PUBLIC on new functions; fixed
+  by the global default in 0017.
 - **FIXED — direct invite INSERT policy** let a client pick its own code
   and expiry; dropped (invites only via `create_pair_invite`).
 - **FIXED — profiles writable on any column:** UPDATE limited to
@@ -71,6 +72,22 @@
 - **FIXED — hearts push throttle burned without a send** (no device or
   Vault yet silenced the next 20 h); `notify` swallowed push-service
   errors. Migration 0014; failures now logged and returned.
+
+## Technical — security audit (migrations 0016/0017)
+
+- **FIXED — tables relied on auto-grants; anon held full DML +
+  TRUNCATE:** explicit least-privilege grants (0016).
+- **FIXED — MEDIUM — `set_recovery_password` stored any value** (1 MB
+  blob, iterations -1, 10k-char algo accepted live): a member could
+  break the partner's restore or hang their device. Validated in 0017.
+- **Verified live, no issue:** outsider (third user) cannot read or
+  change another pair's rows via tables or any RPC; anon blocked on
+  all tables and RPCs; internal helpers and trigger functions not
+  callable; GraphQL off; no storage buckets; schema listing needs the
+  secret key; direct table writes denied; `notify` needs the shared
+  secret.
+- **Open, LOW:** undo after spend can make a balance negative
+  (`IDEAS.md`, product call).
 
 ## Technical — correctness / code quality
 

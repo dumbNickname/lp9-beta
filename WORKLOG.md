@@ -263,3 +263,18 @@ Align the code.
   smoke (pair, hearts, wish submit/approve/claim, profile name edit,
   co-member name) ok; direct table writes and other profile columns
   denied; `push_state` closed to users.
+
+## Session: security audit of the database
+
+**Brief:** review the grants change and audit what users can reach.
+
+- **Method:** read every migration and the `notify` function; live
+  probes on beta as anon, as a paired user, and as an outsider (a third
+  user) against every table and RPC; GraphQL, storage, schema listing.
+- **Found:** outsiders and anon blocked everywhere; helpers closed.
+  Two gaps: `set_recovery_password` accepted any value (MEDIUM), and the
+  0011 per-schema function default never removed PUBLIC (reproduced in
+  PGlite; the per-function revokes still covered every function).
+- **Owner answer:** fix both; park "undo after spend" in `IDEAS.md`.
+- **Done:** migration 0017 (recovery parameter checks, global function
+  default), static tests, REVIEW/AGENTS updated.
