@@ -626,6 +626,14 @@ Per-table policies (sketch):
   enforce the time windows.
 - **user_settings:** SELECT/UPDATE own only.
 
+**Amended 2026-10-26 (owner): explicit table grants.** Supabase stops
+auto-granting new `public` tables to the Data API roles (2026-10-30).
+Every table's grants are written in migrations, least privilege:
+`anon` none; `authenticated` SELECT where a select policy exists, plus
+UPDATE on the profile name/locale/theme; `service_role` full DML;
+internal tables (`push_state`) service-role only. Default privileges
+grant nothing on future tables or sequences.
+
 #### 13d. RPCs (Postgres functions, called from client)
 
 Business logic stays server-side; clients call RPCs rather than raw

@@ -22,6 +22,13 @@ the branch-driven link between this repo and the Supabase project.
   longer grant PUBLIC). Helpers: revoke from public/anon/authenticated.
   No write RLS policies; writes go through RPCs. Exception: `profiles`
   UPDATE, column-granted on display name, locale and theme only.
+- Tables get no implicit Data API grants (Supabase default since
+  2026-10-30; our default privileges revoke them too). Every new table
+  writes its grants in the same migration that creates it, least
+  privilege (§13c): `anon` none, `authenticated` SELECT only where a
+  select policy exists, `service_role` select/insert/update/delete.
+  Serial columns also need a sequence grant (prefer identity/uuid).
+  A static migrations test checks every table has them.
 - Verify live after a migration with a throwaway two-client smoke
   script kept outside the repo.
 - Both projects are in EU Frankfurt; do not move (§12d).

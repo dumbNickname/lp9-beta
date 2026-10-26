@@ -238,3 +238,24 @@ the owner's Cloudflare apps; owner step-by-step guide; review all docs.
 - **Docs reviewed:** root/child AGENTS, DESIGN §11b/§14/§16e/§16f/tech
   stack, README, supabase README, push docs, NEXT_SESSION, PROGRESS.
 - **Owner to do:** `docs/production-setup.md` Parts A-H.
+
+## Session: Supabase explicit table grants
+
+**Brief:** Supabase email: from 2026-10-30 new `public` tables get no
+automatic Data API grants (also new projects, previews, `db reset`).
+Align the code.
+
+- **Found:** no migration wrote table grants; every table relied on the
+  old auto-grant. The new prod project (and every preview) would have
+  come up with all tables unreachable: app broken. Live beta probe:
+  `anon` held full grants (incl. TRUNCATE) on every table, RLS the only
+  barrier.
+- **Owner answer:** least privilege, not the email's broad template.
+- **Done:** migration 0016: default privileges revoke all on future
+  tables/sequences; per table revoke all, then `authenticated` SELECT
+  where a select policy exists + profile column UPDATE, `service_role`
+  full DML, `anon` nothing; `push_state` service-role only. Checked in
+  PGlite (exact ACLs, new table gets none). Static test guards every
+  table. DESIGN §13c amended; supabase AGENTS/README rule.
+- **Owner to look at:** after deploy, beta app still loads hearts,
+  wishes, profile edit, push subscribe; keep-alive still logs ok (42501).

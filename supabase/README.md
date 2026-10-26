@@ -26,7 +26,9 @@ the GitHub integration — **not** from your local machine.
 1. Create a feature branch: `git checkout -b feat/PRD-NN-slug`.
 2. Scaffold a migration: `supabase migration new <slug>`. This creates
    `supabase/migrations/<timestamp>_<slug>.sql`.
-3. Edit the SQL, commit, push the branch.
+3. Edit the SQL, commit, push the branch. A new table needs its
+   Data API grants in the same migration (Supabase no longer adds them;
+   see `AGENTS.md`), or the app gets "permission denied".
 4. Open a PR. Within ~2 minutes Supabase auto-creates an **ephemeral
    preview branch** — an isolated environment with its own DB, its own
    migration history, and no production data — and applies the new

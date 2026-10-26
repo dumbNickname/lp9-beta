@@ -31,6 +31,10 @@
 
 ## Start here (in order)
 
+- **Migration 0016 (explicit table grants)** pushed: verify the live
+  beta with the two-client smoke (hearts, wishes, claims, profile edit,
+  push subscribe) and that `anon` gets 42501 on every table.
+
 0. **PRD-57 production environment** is built (dev-done). Owner works
    through `docs/production-setup.md` (Cloudflare, Supabase, GitHub,
    OVH DNS); then the agent pushes `release`, E2E-checks both sites and

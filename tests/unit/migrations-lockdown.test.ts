@@ -77,6 +77,33 @@ describe("security follow-ups (0012)", () => {
   });
 });
 
+// Supabase stops auto-granting new public tables to the Data API roles
+// (2026-10-30): every table needs its grants written in a migration.
+describe("explicit table grants (0016)", () => {
+  const stmts = all.split(";").map((s) => s.trim());
+  const tables = [...all.matchAll(/create table public\.(\w+)/g)].map((m) => m[1] ?? "");
+  const grantsTo = (role: string) =>
+    stmts.filter((s) => s.startsWith("grant ") && / on (table )?public\./.test(s) && s.endsWith(` to ${role}`));
+  const listed = (t: string, ss: string[]) => ss.some((s) => new RegExp(`public\\.${t}\\b`).test(s));
+
+  it("default privileges no longer expose future tables or sequences", () => {
+    expect(all).toContain("alter default privileges for role postgres in schema public revoke all on tables from anon, authenticated, service_role");
+    expect(all).toContain("alter default privileges for role postgres in schema public revoke all on sequences from anon, authenticated, service_role");
+  });
+  it.each(tables)("%s: implicit grants revoked, service_role granted after creation", (t) => {
+    const createdAt = all.indexOf(`create table public.${t} `);
+    const after = all.slice(createdAt).split(";").map((s) => s.trim());
+    expect(after.some((s) => s.startsWith("revoke all on table") && new RegExp(`public\\.${t}\\b`).test(s) && s.endsWith("from anon, authenticated, service_role"))).toBe(true);
+    expect(listed(t, after.filter((s) => s.startsWith("grant ") && s.endsWith(" to service_role")))).toBe(true);
+  });
+  it("anon gets no table grants", () => {
+    expect(grantsTo("anon")).toEqual([]);
+  });
+  it("push_state stays service-role only", () => {
+    expect(listed("push_state", grantsTo("authenticated"))).toBe(false);
+  });
+});
+
 describe("push fixes (0014)", () => {
   const lastDef = (name: string) => {
     const at = all.lastIndexOf(`create or replace function public.${name}(`);
