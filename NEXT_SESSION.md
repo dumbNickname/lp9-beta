@@ -34,6 +34,8 @@
 - **Migration 0016 (explicit table grants)** live on beta and
   smoke-verified via API; owner to click through the app once (incl.
   push subscribe). Reaches prod with the first `release` push.
+  Security audit done (0017 live); findings in `REVIEW.md`. Owner:
+  set a recovery password in the app once to confirm it still saves.
 
 0. **PRD-57 production environment** is built (dev-done). Owner works
    through `docs/production-setup.md` (Cloudflare, Supabase, GitHub,
