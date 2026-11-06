@@ -27,3 +27,4 @@ Thumbs.db
 # aider
 .aider*
 .dev.vars
+.wrangler/

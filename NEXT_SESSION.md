@@ -83,11 +83,11 @@
 
 ## Deployment
 
-- Beta: Cloudflare Worker `endeary-beta.<account>.workers.dev` from
-  `master` (`pnpm deploy:beta` by hand); until the owner adds the
-  Cloudflare secrets, the old `dumbnickname.github.io/lp9-beta/` keeps
-  its last deploy. Supabase beta project `mxjhablmyxeyzciyyovx`
-  (eu-central-1).
+- Beta: Cloudflare Worker `https://endeary-beta.impalatab.workers.dev/`
+  from `master` (CI on push, or `pnpm deploy:beta`); live E2E passed.
+  Old `dumbnickname.github.io/lp9-beta/` keeps its last deploy until the
+  custom domain redirects it. Supabase beta project
+  `mxjhablmyxeyzciyyovx` (eu-central-1).
 - Production: `endeary.com` on GitHub Pages from `release`, own Supabase
   project (not created yet). Steps: `docs/production-setup.md`.
 - Keep-alive: daily cron on the beta Worker pings both projects.

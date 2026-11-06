@@ -278,3 +278,11 @@ Align the code.
 - **Owner answer:** fix both; park "undo after spend" in `IDEAS.md`.
 - **Done:** migration 0017 (recovery parameter checks, global function
   default), static tests, REVIEW/AGENTS updated.
+
+## Session: production setup with owner (PRD-57)
+
+- Owner deployed beta by hand; live at
+  `endeary-beta.impalatab.workers.dev`; two-user E2E (pair, hearts,
+  note read) passed. Cloudflare secrets added to GitHub Actions.
+- Removed accidentally committed `wrangler dev` temp files; `.wrangler/`
+  ignored.
