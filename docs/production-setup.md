@@ -15,8 +15,7 @@ Cloudflare API token, the VAPID private key and the webhook secret.
 
 ## Part A — Cloudflare (beta host)
 
-1. Log in to the Cloudflare dashboard (the account you use for your
-   other Workers).
+1. Log in to the Cloudflare dashboard.
 2. **Account ID:** Workers & Pages → Overview, right column "Account
    ID". Copy it.
 3. **API token:** profile icon → My Profile → API Tokens → Create
@@ -68,7 +67,10 @@ works, and the agent can run it without seeing the values.
    on. Save.
 3. Authentication → URL Configuration → Site URL:
    `https://endeary.com`. Save.
-4. Project Settings → Integrations → **GitHub** → Authorize → repo
+4. The branch `release` must exist on GitHub first, or Supabase reports
+   "Branch not found". Create it once: `git push beta master:release`
+   (this also starts a production build that fails until Part F; harmless).
+   Then Project Settings → Integrations → **GitHub** → Authorize → repo
    `dumbNickname/lp9-beta`, working directory `.`.
    - **Production branch:** `release`.
    - **Deploy to production:** on.
@@ -76,8 +78,9 @@ works, and the agent can run it without seeing the values.
    - Enable integration.
 5. Project Settings → API Keys (or Data API): copy the **Project URL**
    and the **publishable key** (`sb_publishable_...`).
-6. The database is still empty: migrations arrive with the first push
-   to `release` (Part H).
+6. Once connected, the integration applies all migrations and deploys
+   the `notify` function from `release` (check Integrations / Branches
+   for the deployment).
 7. If Supabase refuses to connect the repo to a second project, stop
    and tell the agent. Also check the **beta** project's integration:
    if it starts a preview branch for `release`, turn on "Supabase
@@ -133,8 +136,9 @@ select vault.create_secret('https://<prod-ref>.supabase.co/functions/v1/notify',
 OVH Manager → Web Cloud → Domain names → `endeary.com` → **DNS zone**.
 
 1. Delete the existing **A**, **AAAA** and **CNAME** records for
-   `endeary.com` and `www.endeary.com` (OVH parking defaults). Keep MX,
-   TXT/SPF and NS records.
+   `endeary.com` and `www.endeary.com` (OVH parking defaults, often
+   `213.186.33.x`). Keep MX, TXT/SPF and NS records. If the domain has
+   a **Redirection** entry, delete it too (it is built from A records).
 2. Add four **A** records, subdomain empty, TTL default:
    `185.199.108.153`, `185.199.109.153`, `185.199.110.153`,
    `185.199.111.153`.
@@ -143,11 +147,20 @@ OVH Manager → Web Cloud → Domain names → `endeary.com` → **DNS zone**.
    `2606:50c0:8002::153`, `2606:50c0:8003::153`.
 4. Add one **CNAME** record: subdomain `www`, target
    `dumbnickname.github.io.` (with the trailing dot).
-5. Changes take minutes to a few hours.
+5. Changes take minutes to a few hours. Until the first prod deploy the
+   domain shows a GitHub 404; harmless.
+6. **Verify the domain on GitHub** (stops anyone else claiming it on
+   Pages): your GitHub **profile** settings (not the repo) → Pages →
+   Add a domain → `endeary.com`. Add the shown TXT record
+   (`_github-pages-challenge-<user>`) in OVH, wait, click Verify.
+7. Repo → Settings → **Pages** → Source must be **GitHub Actions**. Do
+   not set the custom domain yet (Part H).
 
 ## Part H — First production release
 
-1. Ask the agent (or run): `git push beta master:release`.
+1. `release` already exists (D4). After Parts E-F, fast-forward it:
+   `git push beta master:release` (or re-run the failed production
+   build if `master` has not moved).
 2. Supabase prod project → Integrations / Branches shows the
    deployment: all migrations applied, `notify` function deployed.
    Then finish Part E3.

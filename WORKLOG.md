@@ -288,3 +288,7 @@ Align the code.
   public-repo rule added to root AGENTS.
 - Removed accidentally committed `wrangler dev` temp files; `.wrangler/`
   ignored.
+- Branch `release` created from `master` (Supabase needs it to exist
+  before connecting). Prod project connected. Setup guide: added that
+  step, OVH redirection cleanup, GitHub domain verification, Pages
+  source check.
