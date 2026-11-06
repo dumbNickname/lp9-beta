@@ -17,7 +17,7 @@ secret**
   Variable or an environment secret.
 Then re-run the latest "Deploy" workflow (or push any commit).
 Production uses its own keys and the environment secret
-`PROD_VAPID_PUBLIC_KEY` (`docs/production-setup.md`, Part E).
+`PROD_VAPID_PUBLIC_KEY` (`docs/production-setup.md`, Part F).
 
 ## 2. Supabase — Edge Function secrets
 Dashboard → **Edge Functions → Secrets** (or Project Settings → Edge

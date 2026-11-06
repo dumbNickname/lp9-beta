@@ -292,3 +292,7 @@ Align the code.
   before connecting). Prod project connected. Setup guide: added that
   step, OVH redirection cleanup, GitHub domain verification, Pages
   source check.
+- Setup guide reworked with what the live run taught: first beta deploy
+  by hand before CI, account id format, Actions secrets vs environment
+  secrets, re-run after changing a secret, why anonymous sign-ins are
+  required, `release` before the Supabase connect, DNS moved earlier.

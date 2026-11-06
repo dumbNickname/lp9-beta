@@ -6,30 +6,69 @@ to copy where. Keep every key in a password manager outside the repo.
 **Result:**
 - **Beta:** `https://endeary-beta.<your-account>.workers.dev`, deployed
   on every push to `master` (or by hand with `pnpm deploy:beta`), using
-  the current Supabase project.
+  the beta Supabase project.
 - **Production:** `https://endeary.com`, deployed on every push to
-  `release`, using a new Supabase project.
+  `release`, using a separate prod Supabase project.
 
 All values below are **public** (they ship in the browser) except the
-Cloudflare API token, the VAPID private key and the webhook secret.
+Cloudflare API token, the VAPID private key, the webhook secret and the
+database password.
+
+**Two kinds of Supabase wiring.** The Supabase GitHub integration
+(set up in the Supabase dashboard) applies migrations and deploys Edge
+Functions; it needs no keys in GitHub. The *web build* separately bakes
+the project URL and publishable key into the site, so those go into
+GitHub secrets.
+
+**GitHub secrets, in general:** repo → Settings → Secrets and variables
+→ **Actions** → tab **Secrets** (not Variables, not Dependabot).
+"Repository secrets" are seen by every job; "Environment secrets" only
+by jobs running in that environment. Changing a secret does not re-run
+anything: open the failed run → **Re-run failed jobs**. Job logs are
+visible only when signed in to GitHub.
 
 ## Part A — Cloudflare (beta host)
 
 1. Log in to the Cloudflare dashboard.
 2. **Account ID:** Workers & Pages → Overview, right column "Account
-   ID". Copy it.
+   ID" (also the part of the dashboard URL after
+   `dash.cloudflare.com/`, or run `pnpm exec wrangler whoami`). It is
+   32 hex characters, not your email and not the workers.dev
+   subdomain. A wrong value makes the CI deploy fail.
 3. **API token:** profile icon → My Profile → API Tokens → Create
    Token → template **Edit Cloudflare Workers** → Account Resources:
    your account; Zone Resources: All zones → Continue → Create. Copy
-   the token (shown once).
+   the token (shown once). A narrower token fails with an
+   authentication error.
 4. **workers.dev subdomain:** Workers & Pages → Overview shows
    `<your-account>.workers.dev`. The beta URL will be
    `https://endeary-beta.<your-account>.workers.dev`.
 
-## Part B — GitHub (beta)
+## Part B — First beta deploy by hand
 
-Repo `dumbNickname/lp9-beta` → Settings → Secrets and variables →
-Actions → **New repository secret**:
+The Worker does not exist until the first deploy. From the repo, in a
+shell with nvm loaded (`source ~/.nvm/nvm.sh`):
+
+1. Create `.env.beta` in the repo root (gitignored), one `NAME=value`
+   per line, then `chmod 600 .env.beta`:
+
+```
+CLOUDFLARE_API_TOKEN=<token from A3>
+CLOUDFLARE_ACCOUNT_ID=<id from A2>
+```
+
+2. Run `pnpm deploy:beta`. It reads exported vars, then `.env.beta`,
+   then `.env` (beta Supabase URL and key are already there), builds
+   with the name "Endeary beta", deploys, and never prints the values.
+   An agent on the same machine can run it without seeing them.
+3. Open the beta URL: title "Endeary beta".
+
+Testers start fresh on the new address: device keys belong to a site
+address, so everyone onboards and pairs again.
+
+## Part C — GitHub (beta deploy on push)
+
+Repository secrets (see "GitHub secrets" above):
 
 | Name | Value |
 |---|---|
@@ -39,99 +78,51 @@ Actions → **New repository secret**:
 The beta Supabase secrets (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`,
 `VAPID_PUBLIC_KEY`) already exist; leave them.
 
-Then push any commit to `master` (or ask the agent) and check Actions →
-Deploy → job **beta** is green. Open the beta URL; the title says
-"Endeary beta".
+Then push any commit to `master` (or re-run the last Deploy run) and
+check Actions → Deploy → job **beta** is green. Without the token the
+job only builds and warns.
 
-## Part C — Deploy beta by hand (optional)
-
-From the repo, in a shell with nvm loaded:
-
-```bash
-export CLOUDFLARE_API_TOKEN=...      # from A3
-export CLOUDFLARE_ACCOUNT_ID=...     # from A2
-pnpm deploy:beta
-```
-
-The Supabase values are read from `.env` (already there). To keep the
-Cloudflare values too, put them in a `.env.beta` file in the repo root
-(gitignored), one `NAME=value` per line; then `pnpm deploy:beta` alone
-works, and the agent can run it without seeing the values.
+**Keep-alive check:** Cloudflare → Workers & Pages → `endeary-beta` →
+Settings → Triggers shows one daily cron. Trigger it once; Logs show
+`keepalive beta: ok` (and `prod: not configured` until Part G3).
 
 ## Part D — Supabase (new production project)
 
 1. Dashboard → **New project**. Organization: same as beta. Name:
    `endeary-prod`. Region: **Central EU (Frankfurt)**. Plan: Free.
    Save the database password in a password manager.
-2. Authentication → Sign In / Providers → **Allow anonymous sign-ins**:
-   on. Save.
+2. Make sure the project picker at the top shows `endeary-prod`, then
+   Authentication → Sign In / Providers → **Allow anonymous sign-ins**:
+   on (keep "Allow new users to sign up" on) → Save. Required: the app
+   signs every user in anonymously; with it off nobody gets past
+   onboarding.
 3. Authentication → URL Configuration → Site URL:
-   `https://endeary.com`. Save.
+   `https://endeary.com` → Save. Redirect URLs stay empty.
 4. The branch `release` must exist on GitHub first, or Supabase reports
    "Branch not found". Create it once: `git push beta master:release`
-   (this also starts a production build that fails until Part F; harmless).
-   Then Project Settings → Integrations → **GitHub** → Authorize → repo
-   `dumbNickname/lp9-beta`, working directory `.`.
-   - **Production branch:** `release`.
-   - **Deploy to production:** on.
-   - **Automatic branching:** off (previews stay on the beta project).
+   (this also starts a production build that fails at "Check prod
+   values" until Part G; harmless, nothing deploys).
+5. Project Settings (gear, bottom of sidebar) → Integrations →
+   **GitHub Integration** → Authorize GitHub → Choose repository
+   `dumbNickname/lp9-beta`:
+   - **Working directory:** `.`
+   - **Production branch:** `release`
+   - **Deploy to production:** on
+   - **Automatic branching:** off (previews stay on the beta project)
    - Enable integration.
-5. Project Settings → API Keys (or Data API): copy the **Project URL**
-   and the **publishable key** (`sb_publishable_...`).
+   The same repo can be connected to both projects.
 6. Once connected, the integration applies all migrations and deploys
-   the `notify` function from `release` (check Integrations / Branches
-   for the deployment).
-7. If Supabase refuses to connect the repo to a second project, stop
-   and tell the agent. Also check the **beta** project's integration:
-   if it starts a preview branch for `release`, turn on "Supabase
-   changes only" there or tell the agent.
+   the `notify` function from `release` (Integrations / Branches shows
+   the deployment).
+7. Check the **beta** project's integration: production branch still
+   `master`, no preview branch for `release`.
+8. Project Settings → API Keys: copy the **Project URL** and the
+   **publishable key** (`sb_publishable_...`) to the password manager.
 
-## Part E — Push keys for production
+## Part E — DNS for endeary.com (OVH)
 
-Production gets its own keys; never reuse the beta ones.
-
-1. On your machine: `npx web-push generate-vapid-keys` (public +
-   private key) and `openssl rand -base64 24` (webhook secret). Save
-   all three in a password manager, labelled "prod".
-2. Prod project → Edge Functions → Secrets, add:
-   - `VAPID_PUBLIC_KEY` = prod public key
-   - `VAPID_PRIVATE_KEY` = prod private key
-   - `VAPID_SUBJECT` = `mailto:<your email>`
-   - `PUSH_WEBHOOK_SECRET` = prod webhook secret
-3. After Part H (function deployed), prod project → SQL Editor, run
-   once with your values:
-
-```sql
-select vault.create_secret('<prod webhook secret>', 'push_webhook_secret');
-select vault.create_secret('https://<prod-ref>.supabase.co/functions/v1/notify', 'push_webhook_url');
-```
-
-`<prod-ref>` is the part of the prod Project URL before `.supabase.co`.
-
-## Part F — GitHub (production)
-
-1. Settings → Environments → **New environment** `production`.
-   - Deployment branches and tags → **Selected branches** → add
-     `release`.
-   - Environment secrets:
-
-| Name | Value |
-|---|---|
-| `PROD_SUPABASE_URL` | prod Project URL (D5) |
-| `PROD_SUPABASE_KEY` | prod publishable key (D5) |
-| `PROD_VAPID_PUBLIC_KEY` | prod VAPID public key (E1) |
-
-2. Settings → Environments → `github-pages` → Deployment branches →
-   add `release` (keep or remove `master`; Pages is prod-only now).
-3. Repository secrets (Actions → New repository secret), for the
-   keep-alive cron on the beta Worker:
-
-| Name | Value |
-|---|---|
-| `PROD_SUPABASE_URL` | same as above |
-| `PROD_SUPABASE_KEY` | same as above |
-
-## Part G — OVH DNS for endeary.com
+Do this early: it takes minutes to hours and can run in parallel with
+F and G.
 
 OVH Manager → Web Cloud → Domain names → `endeary.com` → **DNS zone**.
 
@@ -147,8 +138,8 @@ OVH Manager → Web Cloud → Domain names → `endeary.com` → **DNS zone**.
    `2606:50c0:8002::153`, `2606:50c0:8003::153`.
 4. Add one **CNAME** record: subdomain `www`, target
    `dumbnickname.github.io.` (with the trailing dot).
-5. Changes take minutes to a few hours. Until the first prod deploy the
-   domain shows a GitHub 404; harmless.
+5. Until the first prod deploy the domain shows a GitHub 404; harmless.
+   Ask the agent to check the records once saved.
 6. **Verify the domain on GitHub** (stops anyone else claiming it on
    Pages): your GitHub **profile** settings (not the repo) → Pages →
    Add a domain → `endeary.com`. Add the shown TXT record
@@ -156,23 +147,70 @@ OVH Manager → Web Cloud → Domain names → `endeary.com` → **DNS zone**.
 7. Repo → Settings → **Pages** → Source must be **GitHub Actions**. Do
    not set the custom domain yet (Part H).
 
+## Part F — Push keys for production
+
+Production gets its own keys; never reuse the beta ones.
+
+1. On your machine: `npx web-push generate-vapid-keys` (public +
+   private key) and `openssl rand -base64 24` (webhook secret). Save
+   all three in a password manager, labelled "prod".
+2. Prod project → Edge Functions → Secrets, add:
+   - `VAPID_PUBLIC_KEY` = prod public key
+   - `VAPID_PRIVATE_KEY` = prod private key
+   - `VAPID_SUBJECT` = `mailto:<your email>`
+   - `PUSH_WEBHOOK_SECRET` = prod webhook secret
+3. Once `notify` is deployed (D6), prod project → SQL Editor, run once
+   with your values:
+
+```sql
+select vault.create_secret('<prod webhook secret>', 'push_webhook_secret');
+select vault.create_secret('https://<prod-ref>.supabase.co/functions/v1/notify', 'push_webhook_url');
+```
+
+`<prod-ref>` is the part of the prod Project URL before `.supabase.co`.
+
+## Part G — GitHub (production)
+
+1. Settings → Environments → **New environment** `production`.
+   - Deployment branches and tags → **Selected branches** → add
+     `release`.
+   - Environment secrets (the production build reads only these):
+
+| Name | Value |
+|---|---|
+| `PROD_SUPABASE_URL` | prod Project URL (D8) |
+| `PROD_SUPABASE_KEY` | prod publishable key (D8) |
+| `PROD_VAPID_PUBLIC_KEY` | prod VAPID public key (F1) |
+
+2. Settings → Environments → `github-pages` → Deployment branches →
+   add `release` (`master` can go; Pages is prod-only now).
+3. Repository secrets, again, for the keep-alive cron (the beta job
+   runs outside the `production` environment, so it cannot see the
+   copies above):
+
+| Name | Value |
+|---|---|
+| `PROD_SUPABASE_URL` | same as above |
+| `PROD_SUPABASE_KEY` | same as above |
+
 ## Part H — First production release
 
-1. `release` already exists (D4). After Parts E-F, fast-forward it:
-   `git push beta master:release` (or re-run the failed production
-   build if `master` has not moved).
-2. Supabase prod project → Integrations / Branches shows the
-   deployment: all migrations applied, `notify` function deployed.
-   Then finish Part E3.
-3. GitHub Actions → Deploy → jobs **production-build** and
-   **production-deploy** green.
-4. Repo → Settings → **Pages** → Custom domain: `endeary.com` → Save.
+1. Re-run the failed production build from D4 (or, if `master` has
+   moved, ask the agent to `git push beta master:release`).
+2. GitHub Actions → Deploy → jobs **production-build** and
+   **production-deploy** green. The build fails on purpose if the prod
+   values are missing or equal the beta ones.
+3. Repo → Settings → **Pages** → Custom domain: `endeary.com` → Save.
    Wait for the DNS check to pass, then tick **Enforce HTTPS** (the
-   certificate can take up to an hour).
-5. Open `https://endeary.com`: title "Endeary", app at `/app`.
+   certificate can take up to an hour). From then on the old
+   `dumbnickname.github.io/lp9-beta/` address redirects to production,
+   not to the new beta.
+4. Open `https://endeary.com`: title "Endeary", app at `/app`.
    `https://www.endeary.com` redirects to it.
-6. Push the next beta commit (or `pnpm deploy:beta` with the prod
-   values set) so the keep-alive cron knows the prod project.
+5. Push the next beta commit (or re-run the beta job) so the keep-alive
+   cron learns the prod project; Logs then show `keepalive prod: ok`.
+6. Tell the agent: it runs a two-user check on the live site and marks
+   PRD-57 done.
 
 ## Shipping later
 

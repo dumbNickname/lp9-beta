@@ -98,8 +98,8 @@
 - Push: none (steps 1–4 done).
 - Branch protection on `master`; sign Supabase DPA before launch.
   Production setup: `docs/production-setup.md` (A-D done: beta on CI,
-  prod project connected to `release`; next E push keys, F secrets,
-  G DNS + GitHub domain verification).
+  prod project connected to `release`; next E DNS + GitHub domain
+  verification, F prod push keys, G prod secrets, H first release).
 
 ## Read order on resume
 
