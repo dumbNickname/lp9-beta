@@ -172,8 +172,8 @@ review code (headless browsers cannot test push).
 expert; then drop the 20 h hearts cap.
 
 - **Review:** chain correct live (SW served, VAPID key in bundle,
-  `notify` deployed). Owner on Chrome/macOS: Send test `sent:1`, Local
-  test (no server) also invisible -> macOS notification settings for
+  `notify` deployed). Desktop Chrome: Send test `sent:1`, Local
+  test (no server) also invisible -> OS notification settings for
   Chrome. Permission prompt only appears on Turn on (opt-in by design).
 - **Done:** hearts push on every heart (migration 0015, DESIGN §8a
   amended 2026-10-16), copy and docs updated, test adjusted.
@@ -186,8 +186,7 @@ expert; then drop the 20 h hearts cap.
 buying.
 
 - **Done:** availability checks across TLDs; owner picked **Endeary**
-  and bought `endeary.com` + `endeary.pl` at OVH (1 year, free hosting
-  plan with one mailbox, no paid add-ons).
+  and `endeary.com` + `endeary.pl` were registered.
 - **Docs:** naming exploration removed from `DESIGN.md` §14 (name,
   principle, mirror motif kept); domain and trademark discussion
   dropped; beta keeps `lp9`.
@@ -196,35 +195,35 @@ buying.
   with DNS at OVH and a second Supabase project; daily keep-alive cron
   on the Worker instead of Pro; names "Endeary" / "Endeary beta";
   prod `noindex` until launch; backups a later PRD. PRD-57.
-- **Owner to do:** OVH mailbox later; PRD-57 owner steps.
+- **To do:** PRD-57 setup steps.
 
-## Session: push still invisible on Chrome/macOS
+## Session: push still invisible on desktop Chrome
 
-**Brief:** cleverpush.com test notifications show on the same Chrome;
+**Brief:** a third-party push demo shows on the same Chrome;
 ours (server and Local test) do not. App not installed.
 
 - **Suspect:** fixed tags + `renotify: false`. A notification with a
-  reused tag that still sits in the macOS tray is replaced silently,
+  reused tag that still sits in the OS tray is replaced silently,
   so every later test or push looks like nothing happened.
 - **Done:** service worker sets `renotify: true`; Local test uses a
   unique tag; debug adds Page test (`new Notification`), Clear held,
   and Chrome's held count. Regression tests added.
 - **Owner to do:** after deploy, reload with `?debug=true`, Clear
   held, then Local test / Page test / Send test; report the lines.
-- **Root cause (owner Mac):** both "Google Chrome" entries in macOS
-  Notifications were off; Chrome reports shown, macOS drops them. No
+- **Root cause (test device):** both "Google Chrome" entries in OS
+  Notifications were off; Chrome reports shown, the OS drops them. No
   app bug. Added debug Sticky test (`requireInteraction`). Pending:
   owner turns both on, re-tests; then phone.
-- **Owner ask:** "native integration" like cleverpush's address-bar
+- **Ask:** "native integration" like the demo site's address-bar
   bell. That bell only appears while a site requests permission (state
-  "default", or Chrome warning that macOS blocks it); ours is already
+  "default", or Chrome warning that the OS blocks it); ours is already
   granted, and Turn off/on cannot reset permission, so it never shows.
   Owner chose: one-tap ask on the paired moment (no ask on load).
 
 ## Session: production environment built (PRD-57)
 
 **Brief:** build the production plan; on-demand beta deploy script like
-the owner's Cloudflare apps; owner step-by-step guide; review all docs.
+other Cloudflare Worker apps; step-by-step setup guide; review all docs.
 
 - **Done:** beta Worker (`cloudflare/`, static assets + daily keep-alive
   cron for both projects), `pnpm deploy:beta` (exported vars, then
@@ -237,7 +236,7 @@ the owner's Cloudflare apps; owner step-by-step guide; review all docs.
   deploy.
 - **Docs reviewed:** root/child AGENTS, DESIGN §11b/§14/§16e/§16f/tech
   stack, README, supabase README, push docs, NEXT_SESSION, PROGRESS.
-- **Owner to do:** `docs/production-setup.md` Parts A-H.
+- **To do:** `docs/production-setup.md` Parts A-H.
 
 ## Session: Supabase explicit table grants
 
@@ -281,8 +280,11 @@ Align the code.
 
 ## Session: production setup with owner (PRD-57)
 
-- Owner deployed beta by hand; live at
+- Beta deployed by hand, live at
   `endeary-beta.impalatab.workers.dev`; two-user E2E (pair, hearts,
-  note read) passed. Cloudflare secrets added to GitHub Actions.
+  note read) passed. Cloudflare secrets in GitHub Actions; CI job
+  `beta` now deploys on push (first run failed on a wrong account id).
+- Public-repo pass: personal and account details removed from docs;
+  public-repo rule added to root AGENTS.
 - Removed accidentally committed `wrangler dev` temp files; `.wrangler/`
   ignored.

@@ -140,7 +140,7 @@ production (push to `release`). Both sites are `noindex` until launch.
 The beta Worker also runs a daily keep-alive so neither free Supabase
 project pauses.
 
-Owner setup (Cloudflare, Supabase, GitHub, OVH DNS):
+Setup (Cloudflare, Supabase, GitHub, DNS):
 [`docs/production-setup.md`](./docs/production-setup.md).
 
 ## Credits

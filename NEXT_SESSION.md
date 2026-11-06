@@ -46,16 +46,16 @@
    clock / words), milestone ribbon, wish stamps, week warmth on the
    live site and picks which stay (D-UX.7–10). Remove the rest.
 2. **Push: confirm visible on screen.** Whole chain verified on the
-   owner's device (Chrome on macOS, FCM): Send test -> `sent:1`, but
-   even the Local test (no server) stays invisible, so macOS hides
+   a desktop test device (Chrome, FCM): Send test -> `sent:1`, but
+   even the Local test (no server) stays invisible, so the OS hides
    Chrome notifications, or a reused tag silently replaced an old
    one in the tray (now `renotify: true`, unique local tags, Page test
-   + Clear held + held count in debug). cleverpush.com shows on the
-   same Chrome, app not installed. Root cause found: both macOS
-   "Google Chrome" notification entries were off; owner to enable
+   + Clear held + held count in debug). A third-party push demo shows on the
+   same Chrome, app not installed. Root cause found: the OS had both
+   Chrome notification entries off; enable
    and re-test, then test on the phone. Paired moment now has a
    one-tap notifications ask (owner choice). Hearts now push on every heart (no 20 h cap,
-   migration 0015). Next: owner fixes macOS settings and re-tests with
+   migration 0015). Next: fix OS settings and re-test with
    a real heart from the partner; if visible, mark PRD-53 merged. Open
    proposals (not built): `urgency: high` in `notify` for idle Android,
    in-flow "Turn on" card, `pushsubscriptionchange` + re-save on app
@@ -91,15 +91,14 @@
 - Production: `endeary.com` on GitHub Pages from `release`, own Supabase
   project (not created yet). Steps: `docs/production-setup.md`.
 - Keep-alive: daily cron on the beta Worker pings both projects.
-- Push/VAPID keys: kept by the owner in a private file outside the repo.
+- Push/VAPID keys and other secrets live outside the repo.
 
 ## Owner action items
 
 - Push: none (steps 1–4 done).
-- Branch protection on `master`; sign Supabase DPA before launch; name is
-  Endeary, domains `endeary.com` + `endeary.pl` bought at OVH (renew
-  yearly; DNS still OVH defaults). OVH done: email confirmed, 2FA, auto-renew,
-  DNSSEC on `.pl`; mailbox later. Production setup: `docs/production-setup.md`.
+- Branch protection on `master`; sign Supabase DPA before launch.
+  Production setup: `docs/production-setup.md` (beta parts A-C done,
+  CI deploys beta on push; next Part D).
 
 ## Read order on resume
 

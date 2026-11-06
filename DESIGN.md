@@ -462,7 +462,7 @@ All non-optional; ship with MVP:
 
 #### 14a. Name — locked 2026-10-18 (owner)
 - **Name: Endeary** (coined from "endear"). Domains owned:
-  `endeary.com` and `endeary.pl` (OVH, renew yearly).
+  `endeary.com` and `endeary.pl`.
 - Builds show "Endeary" (prod) and "Endeary beta" (beta) via
   `VITE_APP_NAME`; an unset build falls back to `lp9`.
 
@@ -867,7 +867,7 @@ agent starts cold from the PRD, not from the implementation choices.
   **beta** (production branch `master`, previews on PRs); a new one is
   **production** (production branch `release`, no previews). Data
   isolation between testers and real couples outweighs the duplicated
-  config. Owner steps: `docs/production-setup.md`.
+  config. Setup: `docs/production-setup.md`.
 - **Why one project, not two (original, superseded):** Supabase's branching is the
   isolation mechanism. A second separate Supabase project would
   duplicate config, require its own GitHub integration, and defeat

@@ -95,12 +95,12 @@ Product name: **Endeary** (`endeary.com`, `endeary.pl`; `DESIGN.md`
 - `PROGRESS.md` — PRD status. `prds/` — one small PRD per behaviour.
 - `NEXT_SESSION.md` — where to resume.
 - `WORKLOG.md` — autonomous sessions: brief, findings, decisions, what
-  the owner should look at.
-- `no-human-decisions.md` — agent choices awaiting owner review.
+  needs a manual look.
+- `no-human-decisions.md` — agent choices awaiting review.
 - `IDEAS.md` — backlog; promote to a PRD before building.
 - `REVIEW.md` — ranked review findings.
 - `HANDOFF.md` — historical roadmap; loses to DESIGN/PROGRESS.
-- `docs/` — owner setup guides (production + beta, push). `LICENSE` (AGPL-3.0+), `TRADEMARK.md`.
+- `docs/` — setup guides (production + beta, push). `LICENSE` (AGPL-3.0+), `TRADEMARK.md`.
 
 AGENTS.md files hold operating rules; they do not replace `DESIGN.md`.
 Docs describe ideas, contracts and where things live, not code lines.
@@ -126,6 +126,15 @@ Docs describe ideas, contracts and where things live, not code lines.
 - Secrets never enter the repo; only public `VITE_` values reach the
   browser (§16g). Schema changes only via migrations.
 - No emojis in code/docs (wish templates are product content).
+- **The repo is public.** Every committed file is world-readable,
+  history included. Allowed: public URLs (beta and prod sites,
+  Supabase project URL/ref, publishable keys). Never: secrets, tokens,
+  account IDs, emails, passwords, local paths, personal details (who
+  the maintainer is, their devices, accounts, purchases, account
+  security settings, other projects). Say "maintainer" sparingly and
+  only where the role matters; prefer neutral wording ("needs a manual
+  check on a real device"). Owner-only notes go in a private file
+  outside the repo.
 - Verify on the live site after each deploy with a browser E2E using
   two or three anonymous users; it catches what unit tests miss.
 - The agent cannot view images: assert layout via DOM and computed

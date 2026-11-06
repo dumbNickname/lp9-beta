@@ -1,8 +1,8 @@
-# Push notifications — one-time setup (owner)
+# Push notifications — one-time setup
 
 Everything here is **free**: browser push services (Google FCM, Mozilla,
 Apple) cost nothing, and Supabase free tier includes Edge Functions,
-`pg_net` and Vault. Keep the generated keys in a private file outside
+`pg_net` and Vault. Keep the generated keys in a password manager, outside
 the repo. If you lose them,
 generate new ones: `npx web-push generate-vapid-keys` and a random
 secret (`openssl rand -base64 24`).

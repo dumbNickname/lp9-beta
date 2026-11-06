@@ -19,7 +19,7 @@ separate Supabase project. Neither Supabase project pauses.
   GitHub Pages IPs, `www` CNAME to `dumbnickname.github.io`).
 - D-57.3 Beta moves off GitHub Pages to a Cloudflare Worker with static
   assets on `workers.dev` (`<worker>.<account>.workers.dev`), same
-  pattern as the owner's existing Worker apps. No custom beta domain.
+  common static-Worker pattern. No custom beta domain.
 - D-57.4 Ship to prod = fast-forward `release` to `master`. The prod
   Supabase GitHub integration uses `release` as its production branch,
   so schema and code ship together. No tags, no DB credentials in CI.
@@ -127,7 +127,7 @@ env and fall back safely when env is empty (prerender).
   robots correct; `wrangler dev` serves `/`, `/app/` (307 from `/app`),
   deep links and unknown paths reach the shell. Typecheck, lint, 515
   tests pass.
-- Not verifiable without the owner's accounts: real Worker deploy,
+- Not verifiable without account access: real Worker deploy,
   prod project, DNS, Pages custom domain (Verification 1-7 live).
 - Risk to watch: the beta project's integration may create a preview
   branch for `release` if automatic branching is on; and Supabase must

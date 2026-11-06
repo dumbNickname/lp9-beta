@@ -25,7 +25,7 @@ Owns the GitHub workflows (one deploy workflow).
 ## Work Guidance
 
 - No tokens or private values in workflow files. Public build values
-  come from secrets (§16g). Owner setup: `docs/production-setup.md`.
+  come from secrets (§16g). Setup: `docs/production-setup.md`.
 
 ## Verification
 

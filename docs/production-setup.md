@@ -1,7 +1,7 @@
-# Production + beta setup — owner steps
+# Production + beta setup
 
 One-time manual steps for PRD-57. Do them in order; each part says what
-to copy where. Keep every key in your private file outside the repo.
+to copy where. Keep every key in a password manager outside the repo.
 
 **Result:**
 - **Beta:** `https://endeary-beta.<your-account>.workers.dev`, deployed
@@ -63,7 +63,7 @@ works, and the agent can run it without seeing the values.
 
 1. Dashboard → **New project**. Organization: same as beta. Name:
    `endeary-prod`. Region: **Central EU (Frankfurt)**. Plan: Free.
-   Save the database password in your private file.
+   Save the database password in a password manager.
 2. Authentication → Sign In / Providers → **Allow anonymous sign-ins**:
    on. Save.
 3. Authentication → URL Configuration → Site URL:
@@ -89,7 +89,7 @@ Production gets its own keys; never reuse the beta ones.
 
 1. On your machine: `npx web-push generate-vapid-keys` (public +
    private key) and `openssl rand -base64 24` (webhook secret). Save
-   all three in your private file, labelled "prod".
+   all three in a password manager, labelled "prod".
 2. Prod project → Edge Functions → Secrets, add:
    - `VAPID_PUBLIC_KEY` = prod public key
    - `VAPID_PRIVATE_KEY` = prod private key
