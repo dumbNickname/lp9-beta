@@ -1,5 +1,9 @@
 # Production + beta setup
 
+> **To do after Part H:** shrink this file into a short reference
+> (what lives where: secret names, branches, projects, DNS records;
+> how to ship; how to rotate keys) and drop the click-by-click steps.
+
 One-time manual steps for PRD-57. Do them in order; each part says what
 to copy where. Keep every key in a password manager outside the repo.
 
